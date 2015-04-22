@@ -48,7 +48,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'rest_framework_gis',
 
-    'postcodeinfo'
+    'postcode_api'
 )
 
 MIDDLEWARE_CLASSES = (

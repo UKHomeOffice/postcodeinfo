@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 
-from postcodeinfo.importers.postcode_gss_code_importer import PostcodeGssCodeImporter
+from postcode_api.importers.postcode_gss_code_importer import PostcodeGssCodeImporter
 
 class Command(BaseCommand):
     args = '<csv_file csv_file...>'

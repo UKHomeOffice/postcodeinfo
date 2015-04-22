@@ -10,7 +10,7 @@ from django.contrib.gis.geos import Point
 
 from dateutil.parser import parse as parsedate
 
-from address.importers.local_authorities_importer import LocalAuthoritiesImporter
+from postcode_api.importers.local_authorities_importer import LocalAuthoritiesImporter
 
 
 

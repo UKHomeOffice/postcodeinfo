@@ -5,24 +5,24 @@ from collections import OrderedDict
 from django.contrib.gis.geos import Point
 from dateutil.parser import parse as parsedate
 
-from postcodeinfo.models import Address
+from postcode_api.models import Address
 
 
 class AddressBaseBasicImporter(object):
 
     def __init__(self):
-        self.headers = self.csv_headers()
-        self.indices = self.column_indices()
+        self.headers = self.__csv_headers()
+        self.indices = self.__column_indices()
 
     def import_csv(self, filename):
         with open(filename, 'rb') as csvfile:
             for row in csv.reader(csvfile):
                 print 'Importing UPRN %s' % row[self.indices['uprn']]
-                self.import_row(row)
+                self.__import_row(row)
 
         print "ALL DONE"
 
-    def import_row(self, row):
+    def __import_row(self, row):
         try:
             a = Address.objects.get(uprn=row[self.indices['uprn']])
         except Address.DoesNotExist:
@@ -46,7 +46,7 @@ class AddressBaseBasicImporter(object):
 
         a.save()
 
-    def column_indices(self):
+    def __column_indices(self):
         return {
             'uprn': self.headers.keys().index('uprn'),
             'postcode': self.headers.keys().index('postcode'),
@@ -54,7 +54,7 @@ class AddressBaseBasicImporter(object):
             'y_coord': self.headers.keys().index('y_coordinate')
         }
 
-    def csv_headers(self):
+    def __csv_headers(self):
         return OrderedDict([
             ("uprn", "char"),
             ("os_address_toid", "char"),

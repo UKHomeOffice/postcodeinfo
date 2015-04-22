@@ -6,7 +6,7 @@ import subprocess
 
 from dateutil.parser import parse as parsedate
 
-from postcodeinfo.models import PostcodeGssCode
+from postcode_api.models import PostcodeGssCode
 
 
 class PostcodeGssCodeImporter(object):
@@ -21,19 +21,19 @@ class PostcodeGssCodeImporter(object):
                 print 'importing row ' + str(count) + ' of ' + str(lines - 1)
                 self.import_row(row)
                 count += 1
-                eta_seconds = self.time_remaining(start_time, lines, count)
-                print ' - est time remaining = ' + self.hours_minutes_seconds(eta_seconds)
+                eta_seconds = self.__time_remaining(start_time, lines, count)
+                print ' - est time remaining = ' + self.___hours_minutes_seconds(eta_seconds)
 
             print 'ALL DONE'
 
-    def time_remaining(self, start_time, lines, count):
+    def __time_remaining(self, start_time, lines, count):
         cumulative_time = time.time() - start_time
         time_per_row = cumulative_time / count
         lines_remaining = lines - count
-        print "cumulative_time: %is (%s), processed: %i, remaining: %i, time_per_row: %f " %  (cumulative_time, hours_minutes_seconds(cumulative_time), count, lines_remaining, time_per_row)
+        print "cumulative_time: %is (%s), processed: %i, remaining: %i, time_per_row: %f " %  (cumulative_time, self.___hours_minutes_seconds(cumulative_time), count, lines_remaining, time_per_row)
         return lines_remaining * time_per_row 
 
-    def hours_minutes_seconds(self, seconds):
+    def ___hours_minutes_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         return "%d:%02d:%02d" % (h, m, s)

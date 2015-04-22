@@ -55,6 +55,8 @@ Available from [http://www.ordnancesurvey.co.uk/business-and-government/help-and
 $ ./manage.py import_addressbase_basic <csv_path csv_path...>
 ```
 
+Estimated runtime: ~ 1 minute
+
 ### Import Local Authorities RDF .nt files
 
 Available from The Dept for Communities and Local Government via [http://opendatacommunities.org/data/dev-local-authorities/](opendatacommunities.org), latest data dump: [http://opendatacommunities.org/data/dev-local-authorities/dump]
@@ -63,13 +65,17 @@ Available from The Dept for Communities and Local Government via [http://opendat
 $ ./manage.py import_local_authorities <nt_path nt_path...>
 ```
 
-### Import NSPL Postcode/GSS Code mapping files
+Estimated runtime: ~ 1 minute
+
+### Import NSPL Postcode/Local Authority GSS Code mapping files
 
 Available from the [http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html](Office for National Statistics) at their [https://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page](Geoportal) (search for 'NSPL' to find the latest file)
 
 ```bash
 $ ./manage.py import_postcode_gss_codes <csv_path csv_path...>
 ```
+
+Estimated runtime: ~ 2 hours
 
 ### Start dev server
 
@@ -98,7 +104,7 @@ You can specify which fields you want in the response with the `fields` kwarg:
 http://127.0.0.1:8000/addresses/?postcode=sw1a1aa&fields=formatted_address,point
 ```
 
-View the available fields [here](https://github.com/ministryofjustice/postcodeinfo/blob/develop/postcodeinfo/apps/address/serializers.py#L25)
+View the available fields [here](https://github.com/ministryofjustice/postcodeinfo/blob/develop/postcodeinfo/apps/postcode_api/serializers.py#L25)
 
 Example response:
 
