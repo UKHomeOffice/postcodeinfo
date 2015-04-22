@@ -18,8 +18,8 @@ Setup
 ### Create GIS database
 
 ```bash
-$ createdb addressfinder
-$ psql addressfinder
+$ createdb postcodeinfo
+$ psql postcodeinfo
 ```
 ```SQL
 > CREATE EXTENSION postgis;
@@ -29,8 +29,8 @@ $ psql addressfinder
 
 ```bash
 $ pip install virtualenv
-$ git clone https://github.com/ministryofjustice/addressfinder.git
-$ cd addressfinder
+$ git clone https://github.com/ministryofjustice/postcodeinfo.git
+$ cd postcodeinfo
 $ virtualenv .venv
 $ source .venv/bin/activate
 ```
@@ -80,7 +80,7 @@ You can specify which fields you want in the response with the `fields` kwarg:
 http://127.0.0.1:8000/addresses/?postcode=sw1a1aa&fields=formatted_address,point
 ```
 
-View the available fields [here](https://github.com/ministryofjustice/addressfinder/blob/develop/addressfinder/apps/address/serializers.py#L25)
+View the available fields [here](https://github.com/ministryofjustice/postcodeinfo/blob/develop/postcodeinfo/apps/address/serializers.py#L25)
 
 Example response:
 

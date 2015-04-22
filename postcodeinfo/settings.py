@@ -1,5 +1,5 @@
 """
-Django settings for addressfinder project.
+Django settings for postcodeinfo project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/
@@ -48,7 +48,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'rest_framework_gis',
 
-    'address'
+    'postcodeinfo'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -61,9 +61,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'addressfinder.urls'
+ROOT_URLCONF = 'postcodeinfo.urls'
 
-WSGI_APPLICATION = 'addressfinder.wsgi.application'
+WSGI_APPLICATION = 'postcodeinfo.wsgi.application'
 
 
 # Database
@@ -72,7 +72,7 @@ WSGI_APPLICATION = 'addressfinder.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ.get('DJANGO_DB_NAME', 'addressfinder'),
+        'NAME': os.environ.get('DJANGO_DB_NAME', 'postcodeinfo'),
         'USER': os.environ.get('DJANGO_DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
         'HOST': os.environ.get('DJANGO_DB_HOST', ''),                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.

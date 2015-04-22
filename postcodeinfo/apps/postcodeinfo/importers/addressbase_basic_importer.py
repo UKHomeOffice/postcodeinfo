@@ -5,7 +5,7 @@ from collections import OrderedDict
 from django.contrib.gis.geos import Point
 from dateutil.parser import parse as parsedate
 
-from address.models import Address
+from postcodeinfo.models import Address
 
 
 class AddressBaseBasicImporter(object):

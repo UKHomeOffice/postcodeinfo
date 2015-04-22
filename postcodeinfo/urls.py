@@ -3,7 +3,7 @@ from django.contrib import admin
 
 from rest_framework import routers
 
-from address import views
+from postcodeinfo import views
 
 
 router = routers.DefaultRouter()

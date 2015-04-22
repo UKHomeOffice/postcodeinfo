@@ -6,7 +6,7 @@ import subprocess
 
 from dateutil.parser import parse as parsedate
 
-from address.models import PostcodeGssCode
+from postcodeinfo.models import PostcodeGssCode
 
 
 class PostcodeGssCodeImporter(object):

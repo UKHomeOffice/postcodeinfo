@@ -2,7 +2,7 @@
 from multiprocessing import Pool
 from django.core.management.base import BaseCommand, CommandError
 
-from address.importers.addressbase_basic_importer import AddressBaseBasicImporter
+from postcodeinfo.importers.addressbase_basic_importer import AddressBaseBasicImporter
 
 
 class Command(BaseCommand):

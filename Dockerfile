@@ -30,8 +30,8 @@ RUN rm -f /etc/nginx/sites-enabled/default
 RUN mkdir -p /var/log/wsgi && touch /var/log/wsgi/app.log /var/log/wsgi/debug.log && \
     chown -R www-data:www-data /var/log/wsgi && chmod -R g+s /var/log/wsgi
 
-RUN  mkdir -p /var/log/nginx/addressfinder
-ADD ./docker/addressfinder.ini /etc/wsgi/conf.d/addressfinder.ini
+RUN  mkdir -p /var/log/nginx/postcodeinfo
+ADD ./docker/postcodeinfo.ini /etc/wsgi/conf.d/postcodeinfo.ini
 
 # Define mountable directories.
 VOLUME ["/var/log/nginx", "/var/log/wsgi"]

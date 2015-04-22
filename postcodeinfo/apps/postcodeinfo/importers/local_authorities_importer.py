@@ -3,7 +3,7 @@ import csv
 
 from rdflib import Graph, URIRef
 
-from address.models import LocalAuthority
+from postcodeinfo.models import LocalAuthority
 
 
 class LocalAuthoritiesImporter(object):
