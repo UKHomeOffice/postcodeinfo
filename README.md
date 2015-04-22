@@ -49,8 +49,26 @@ $ ./manage.py syncdb
 
 ### Import OS AddressBase Basic CSV files
 
+Available from [http://www.ordnancesurvey.co.uk/business-and-government/help-and-support/products/how-to-buy.html](Ordnance Survey)
+
 ```bash
 $ ./manage.py import_addressbase_basic <csv_path csv_path...>
+```
+
+### Import Local Authorities RDF .nt files
+
+Available from The Dept for Communities and Local Government via [http://opendatacommunities.org/data/dev-local-authorities/](opendatacommunities.org), latest data dump: [http://opendatacommunities.org/data/dev-local-authorities/dump]
+
+```bash
+$ ./manage.py import_local_authorities <nt_path nt_path...>
+```
+
+### Import NSPL Postcode/GSS Code mapping files
+
+Available from the [http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html](Office for National Statistics) at their [https://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page](Geoportal) (search for 'NSPL' to find the latest file)
+
+```bash
+$ ./manage.py import_postcode_gss_codes <csv_path csv_path...>
 ```
 
 ### Start dev server
@@ -113,7 +131,7 @@ Example response:
 ]
 ```
 
-#### Lat/lon lookup
+#### Postcode info - Lat/lon and Local Authority lookup
 
 ```
 http://127.0.0.1:8000/postcodes/sw1a1aa/
@@ -124,6 +142,10 @@ Example response:
 ```json
 {
   "type": "Point",
+  "local_authority": {
+    "name": "Westminster",
+    "gss_code": "E09000033"
+  }
   "coordinates": [
     -0.141587558526369,
     51.50100893654096

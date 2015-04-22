@@ -3,3 +3,6 @@
 postcodeinfo/local.py
 env
 venv
+.env
+.venv
+
