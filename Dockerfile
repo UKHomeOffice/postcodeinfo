@@ -10,16 +10,15 @@ RUN DEBIAN_FRONTEND='noninteractive' \
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN useradd -m -d /srv/addressfinder addressfinder
+RUN useradd -m -d /srv/postcodeinfo postcodeinfo
 
 ADD ./requirements.txt /
 RUN pip install -r /requirements.txt
 
-ADD . /srv/addressfinder
-RUN rm -rf /srv/tribunals/.git
-RUN chown -R addressfinder: /srv/addressfinder
+ADD . /srv/postcodeinfo
+RUN rm -rf /srv/postcodeinfo/.git
+RUN chown -R postcodeinfo: /srv/postcodeinfo
 
 EXPOSE 8000
-USER addressfinder
-WORKDIR /srv/addressfinder
-
+USER postcodeinfo
+WORKDIR /srv/postcodeinfo
