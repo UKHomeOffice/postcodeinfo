@@ -1,26 +1,30 @@
 import os
 import csv
+import time
 
 from collections import OrderedDict
 from django.contrib.gis.geos import Point
 from dateutil.parser import parse as parsedate
 
 from postcode_api.models import Address
-
+from postcode_api.importers.progress_reporter import ProgressReporter
 
 class AddressBaseBasicImporter(object):
 
     def __init__(self):
         self.headers = self.__csv_headers()
         self.indices = self.__column_indices()
+        self.progress = ProgressReporter()
 
     def import_csv(self, filename):
+        self.progress.start(filename)
+
         with open(filename, 'rb') as csvfile:
             for row in csv.reader(csvfile):
-                print 'Importing UPRN %s' % row[self.indices['uprn']]
                 self.__import_row(row)
+                self.progress.row_processed('UPRN ' + row[self.indices['uprn']])
 
-        print "ALL DONE"
+        self.progress.finish()
 
     def __import_row(self, row):
         try:

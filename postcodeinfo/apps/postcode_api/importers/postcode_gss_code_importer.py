@@ -1,47 +1,29 @@
 import os
 import csv
 import time
-import subprocess
 
 
 from dateutil.parser import parse as parsedate
 
 from postcode_api.models import PostcodeGssCode
+from postcode_api.importers.progress_reporter import ProgressReporter
 
 
 class PostcodeGssCodeImporter(object):
+    def __init__(self):
+        self.progress = ProgressReporter()
+
     def import_postcode_gss_codes(self, filename):
-        lines = self.lines_in_file(filename)
-        start_time = time.time()
-
+        
         with open(filename, "rb") as csvfile:
+            self.progress.start(filename)
             datareader = csv.reader(csvfile)
-            count = 0
             for row in datareader:
-                print 'importing row ' + str(count) + ' of ' + str(lines - 1)
                 self.import_row(row)
-                count += 1
-                eta_seconds = self.__time_remaining(start_time, lines, count)
-                print ' - est time remaining = ' + self.___hours_minutes_seconds(eta_seconds)
-
-            print 'ALL DONE'
-
-    def __time_remaining(self, start_time, lines, count):
-        cumulative_time = time.time() - start_time
-        time_per_row = cumulative_time / count
-        lines_remaining = lines - count
-        print "cumulative_time: %is (%s), processed: %i, remaining: %i, time_per_row: %f " %  (cumulative_time, self.___hours_minutes_seconds(cumulative_time), count, lines_remaining, time_per_row)
-        return lines_remaining * time_per_row 
-
-    def ___hours_minutes_seconds(self, seconds):
-        m, s = divmod(seconds, 60)
-        h, m = divmod(m, 60)
-        return "%d:%02d:%02d" % (h, m, s)
-
-    def lines_in_file(self, filename):
-        output = subprocess.check_output(['wc', '-l', filename], shell=False)
-        lines = int( output.split()[0].strip() )
-        return lines
+                self.progress.row_processed(row[0])
+            
+            self.progress.finish()
+    
 
     def import_row(self, row):
         postcode = row[0]
@@ -55,6 +37,5 @@ class PostcodeGssCodeImporter(object):
         try:
             a = PostcodeGssCode.objects.get(postcode_index=postcode_index)
         except PostcodeGssCode.DoesNotExist:
-            print 'no existing PostcodeGssCode for postcode ' + postcode_index + ' - building...'
             a = PostcodeGssCode(postcode_index=postcode_index)
         return a
