@@ -22,9 +22,11 @@ class AddressViewSet(viewsets.ReadOnlyModelViewSet):
 
 class PostcodeView(generics.RetrieveAPIView):
 
-    @classmethod
+    geom_query = 'postcode_index'
+
+
     def __format_json(cls, geom, local_authority):
-        centre = geom.centroid.geojson
+        centre = geom.centroid.coords
         lat_long = { 'latitude': centre[1], 'longitude': centre[0] }
             
         if local_authority:
@@ -39,21 +41,18 @@ class PostcodeView(generics.RetrieveAPIView):
             }
         return data
 
-    @classmethod
-    def __get_geometry(cls, postcode):
+    def __get_geometry(self, postcode):
         geom = Address.objects.filter(
-            postcode_index=postcode).collect(field_name='point')
+            **{self.geom_query: postcode}).collect(field_name='point')
         return geom
 
-    @classmethod
-    def __get_local_authority(cls, postcode):
-        local_authority = LocalAuthority.for_postcode(postcode)
+    def __get_local_authority(self, postcode):
+        local_authority = LocalAuthority.objects.for_postcode(postcode)
         return local_authority
 
         
     def get(self, request, *args, **kwargs):
         postcode = kwargs.get('postcode', '').replace(' ', '').lower()
-
         geom = self.__get_geometry(postcode)
 
         if geom:
@@ -66,7 +65,5 @@ class PostcodeView(generics.RetrieveAPIView):
 
 class PartialPostcodeView(PostcodeView):
 
-    def __get_geometry(postcode):
-        geom = Address.objects.filter(
-            postcode_area=postcode).collect(field_name='point')
-        return geom
+    geom_query = 'postcode_area'
+

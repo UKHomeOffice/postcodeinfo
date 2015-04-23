@@ -2,7 +2,7 @@ import json
 
 from django.contrib.gis.db import models
 
-
+from django.db.models import Count
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
@@ -59,20 +59,30 @@ class Address(models.Model):
 def address_pre_save(sender, instance, *args, **kwargs):
     instance.postcode_area = instance.postcode.split(' ')[0].lower()
 
-    
+
 
 class PostcodeGssCode(models.Model):
     postcode_index = models.CharField(max_length=7, db_index=True, primary_key=True)
     local_authority_gss_code = models.CharField(max_length=9, db_index=True)
 
+class LocalAuthorityManager(models.Manager):
+    def for_postcode(self, postcode):
+        postcode_to_gss_code_mapping = PostcodeGssCode.objects.filter(postcode_index=postcode).first()
+        if postcode_to_gss_code_mapping:
+            gss_code = postcode_to_gss_code_mapping.local_authority_gss_code
+            return self.filter(gss_code=gss_code).first()
+        else:
+            postcodes = Address.objects.filter(postcode_area=postcode).values_list('postcode_index', flat=True).distinct()
+            gss_codes = PostcodeGssCode.objects.filter(postcode_index__in=postcodes).values('local_authority_gss_code').annotate(count=Count('local_authority_gss_code')).order_by("-count")
+            
+            most_likely_gss_code = gss_codes.first()['local_authority_gss_code']
+            return self.filter(gss_code=most_likely_gss_code).first()
+            
 class LocalAuthority(models.Model):
     gss_code = models.CharField(max_length=9, db_index=True, primary_key=True)
     name = models.CharField(max_length=128,db_index=True)
 
-    @classmethod
-    def for_postcode(cls, postcode):
-        postcode_to_gss_code_mapping = PostcodeGssCode.objects.filter(postcode_index=postcode)[0]
-        if postcode_to_gss_code_mapping:
-            gss_code = postcode_to_gss_code_mapping.local_authority_gss_code
-            return LocalAuthority.objects.filter(gss_code=gss_code)[0]
+    objects = LocalAuthorityManager()
+
+
             
