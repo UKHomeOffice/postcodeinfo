@@ -5,7 +5,7 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 
-from .models import Address
+from .models import Address, LocalAuthority, PostcodeGssCode
 from .serializers import AddressSerializer
 
 
@@ -21,30 +21,52 @@ class AddressViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PostcodeView(generics.RetrieveAPIView):
+
+    @classmethod
+    def __format_json(cls, geom, local_authority):
+        centre = geom.centroid.geojson
+        lat_long = { 'latitude': centre[1], 'longitude': centre[0] }
+            
+        if local_authority:
+                local_authority = {
+                    'name': local_authority.name,
+                    'gss_code': local_authority.gss_code
+                }
+
+        data = {
+                'centre': lat_long,
+                'local_authority': local_authority
+            }
+        return data
+
+    @classmethod
+    def __get_geometry(cls, postcode):
+        geom = Address.objects.filter(
+            postcode_index=postcode).collect(field_name='point')
+        return geom
+
+    @classmethod
+    def __get_local_authority(cls, postcode):
+        local_authority = LocalAuthority.for_postcode(postcode)
+        return local_authority
+
+        
     def get(self, request, *args, **kwargs):
         postcode = kwargs.get('postcode', '').replace(' ', '').lower()
 
-        geom = Address.objects.filter(
-            postcode_index=postcode).collect(field_name='point')
+        geom = self.__get_geometry(postcode)
 
         if geom:
-            return Response(json.loads(geom.centroid.geojson),
-                            status=status.HTTP_200_OK)
+            local_authority = self.__get_local_authority(postcode)
+            data = self.__format_json(geom, local_authority)
+
+            return Response(data, status=status.HTTP_200_OK)
 
         return Response(None, status=status.HTTP_404_NOT_FOUND)
 
-class PartialPostcodeView(generics.RetrieveAPIView):
-    def get(self, request, *args, **kwargs):
-        # NOTE: we add on a space and lookup the value in the formatted postcode field,
-        #       NOT the postcode_index, to allow us to differentiate, say, 
-        #       N1 from N11, N12, etc
-        postcode = kwargs.get('postcode', '').replace(' ', '').upper()
+class PartialPostcodeView(PostcodeView):
 
+    def __get_geometry(postcode):
         geom = Address.objects.filter(
-            postcode__startswith=postcode + ' ').collect(field_name='point')
-
-        if geom:
-            return Response(json.loads(geom.centroid.geojson),
-                            status=status.HTTP_200_OK)
-
-        return Response(None, status=status.HTTP_404_NOT_FOUND)
+            postcode_area=postcode).collect(field_name='point')
+        return geom
