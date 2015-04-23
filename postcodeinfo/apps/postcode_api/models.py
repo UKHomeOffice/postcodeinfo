@@ -2,6 +2,11 @@ import json
 
 from django.contrib.gis.db import models
 
+
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.template.defaultfilters import slugify
+
 from .utils import AddressFormatter
 
 
@@ -49,6 +54,13 @@ class Address(models.Model):
     def formatted_address(self):
         return AddressFormatter.format(self)
 
+
+@receiver(pre_save, sender=Address)
+def address_pre_save(sender, instance, *args, **kwargs):
+    instance.postcode_area = instance.postcode.split(' ')[0].lower()
+
+    
+
 class PostcodeGssCode(models.Model):
     postcode_index = models.CharField(max_length=7, db_index=True, primary_key=True)
     local_authority_gss_code = models.CharField(max_length=9, db_index=True)
@@ -56,3 +68,11 @@ class PostcodeGssCode(models.Model):
 class LocalAuthority(models.Model):
     gss_code = models.CharField(max_length=9, db_index=True, primary_key=True)
     name = models.CharField(max_length=128,db_index=True)
+
+    @classmethod
+    def for_postcode(cls, postcode):
+        postcode_to_gss_code_mapping = PostcodeGssCode.objects.filter(postcode_index=postcode)[0]
+        if postcode_to_gss_code_mapping:
+            gss_code = postcode_to_gss_code_mapping.local_authority_gss_code
+            return LocalAuthority.objects.filter(gss_code=gss_code)[0]
+            
