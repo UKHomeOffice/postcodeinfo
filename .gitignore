@@ -1,0 +1,8 @@
+*.pyc
+.DS_Store
+postcodeinfo/local.py
+env
+venv
+.env
+.venv
+
