@@ -72,8 +72,13 @@ class LocalAuthorityManager(models.Manager):
             gss_code = postcode_to_gss_code_mapping.local_authority_gss_code
             return self.filter(gss_code=gss_code).first()
         else:
-            postcodes = Address.objects.filter(postcode_area=postcode).values_list('postcode_index', flat=True).distinct()
-            gss_codes = PostcodeGssCode.objects.filter(postcode_index__in=postcodes).values('local_authority_gss_code').annotate(count=Count('local_authority_gss_code')).order_by("-count")
+            postcodes = Address.objects.filter(postcode_area=postcode)\
+                            .values_list('postcode_index', flat=True)\
+                            .distinct()
+            gss_codes = PostcodeGssCode.objects.filter(postcode_index__in=postcodes).\
+                            values('local_authority_gss_code').\
+                            annotate(count=Count('local_authority_gss_code')).\
+                            order_by("-count")
             
             most_likely_gss_code = gss_codes.first()['local_authority_gss_code']
             return self.filter(gss_code=most_likely_gss_code).first()
