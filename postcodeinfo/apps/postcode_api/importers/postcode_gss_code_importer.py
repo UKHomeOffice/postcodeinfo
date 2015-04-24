@@ -18,6 +18,8 @@ class PostcodeGssCodeImporter(object):
         with open(filename, "rb") as csvfile:
             self.progress.start(filename)
             datareader = csv.reader(csvfile)
+            # skip the header row!
+            datareader.next()
             for row in datareader:
                 self.import_row(row)
                 self.progress.row_processed(row[0])
