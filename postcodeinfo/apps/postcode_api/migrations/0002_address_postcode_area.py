@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('address', '0001_initial'),
+        ('postcode_api', '0001_initial'),
     ]
 
     operations = [

@@ -1,5 +1,8 @@
 *.pyc
 .DS_Store
-addressfinder/local.py
+postcodeinfo/local.py
 env
 venv
+.env
+.venv
+

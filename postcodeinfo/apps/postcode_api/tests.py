@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from address.models import Address
-from address.utils import AddressFormatter
+from postcode_api.models import Address
+from postcode_api.utils import AddressFormatter
 
 
 class AddressFormatterTestCase(TestCase):

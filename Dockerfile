@@ -7,19 +7,25 @@ RUN DEBIAN_FRONTEND='noninteractive' \
     software-properties-common python-software-properties libpq-dev \
     binutils libproj-dev gdal-bin
 
-# Clean up APT when done.
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Install Nginx.
+RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && apt-get update
+RUN DEBIAN_FRONTEND='noninteractive' apt-get -y --force-yes install nginx-full && \
+    chown -R www-data:www-data /var/lib/nginx
 
-RUN useradd -m -d /srv/addressfinder addressfinder
+ADD ./docker/nginx.conf /etc/nginx/nginx.conf
+RUN rm -f /etc/nginx/sites-enabled/default
 
-ADD ./requirements.txt /
-RUN pip install -r /requirements.txt
+RUN mkdir -p /var/log/wsgi && touch /var/log/wsgi/app.log /var/log/wsgi/debug.log && \
+    chown -R www-data:www-data /var/log/wsgi && chmod -R g+s /var/log/wsgi
 
-ADD . /srv/addressfinder
-RUN rm -rf /srv/tribunals/.git
-RUN chown -R addressfinder: /srv/addressfinder
+RUN  mkdir -p /var/log/nginx/postcodeinfo
+ADD ./docker/postcodeinfo.ini /etc/wsgi/conf.d/postcodeinfo.ini
 
-EXPOSE 8000
-USER addressfinder
-WORKDIR /srv/addressfinder
+# Define mountable directories.
+VOLUME ["/var/log/nginx", "/var/log/wsgi"]
 
+# APP_HOME
+ENV APP_HOME /home/app/django
+
+# Add project directory to docker
+ADD . /home/app/django

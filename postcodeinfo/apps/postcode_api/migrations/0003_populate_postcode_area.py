@@ -7,9 +7,9 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('address', '0002_address_postcode_area'),
+        ('postcode_api', '0002_address_postcode_area'),
     ]
 
     operations = [
-      migrations.RunSQL("UPDATE address_address SET postcode_area = split_part(postcode, ' ', 1);")
+      migrations.RunSQL("UPDATE postcode_api_address SET postcode_area = lower(split_part(postcode, ' ', 1));")
     ]

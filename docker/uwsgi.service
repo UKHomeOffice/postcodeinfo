@@ -4,4 +4,4 @@ cd /home/app/django
 python manage.py syncdb --noinput >> /var/log/wsgi/db_scripts.log 2>&1
 python manage.py collectstatic --noinput >> /var/log/wsgi/db_scripts.log 2>&1
 
-exec /usr/local/bin/uwsgi --ini /etc/wsgi/conf.d/addressfinder.ini
+exec /usr/local/bin/uwsgi --ini /etc/wsgi/conf.d/postcodeinfo.ini
