@@ -15,6 +15,9 @@ RUN DEBIAN_FRONTEND='noninteractive' apt-get -y --force-yes install nginx-full &
 ADD ./docker/nginx.conf /etc/nginx/nginx.conf
 RUN rm -f /etc/nginx/sites-enabled/default
 
+RUN useradd -m -d /srv/postcodeinfo postcodeinfo
+
+
 RUN mkdir -p /var/log/wsgi && touch /var/log/wsgi/app.log /var/log/wsgi/debug.log && \
     chown -R www-data:www-data /var/log/wsgi && chmod -R g+s /var/log/wsgi
 
@@ -29,3 +32,11 @@ ENV APP_HOME /home/app/django
 
 # Add project directory to docker
 ADD . /home/app/django
+
+ADD . /srv/postcodeinfo
+RUN rm -rf /srv/postcodeinfo/.git
+RUN chown -R postcodeinfo: /srv/postcodeinfo
+
+EXPOSE 8000
+USER postcodeinfo
+WORKDIR /srv/postcodeinfo
