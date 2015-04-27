@@ -21,8 +21,13 @@ class AddressBaseBasicImporter(object):
 
         with open(filename, 'rb') as csvfile:
             for row in csv.reader(csvfile):
-                self.__import_row(row)
-                self.progress.row_processed('UPRN ' + row[self.indices['uprn']])
+                if row:
+                    self.__import_row(row)
+                    identifier = 'UPRN ' + row[self.indices['uprn']]
+                else:
+                    identifier = '(empty row)'
+
+                self.progress.row_processed(identifier)
 
         self.progress.finish()
 
