@@ -59,7 +59,7 @@ Estimated runtime: ~ 1 minute
 
 ### Import Local Authorities RDF .nt files
 
-Available from The Dept for Communities and Local Government via [http://opendatacommunities.org/data/dev-local-authorities/](opendatacommunities.org), latest data dump: [http://opendatacommunities.org/data/dev-local-authorities/dump]
+Available from The Dept for Communities and Local Government via [opendatacommunities.org](http://opendatacommunities.org/data/dev-local-authorities/), latest data dump: [http://opendatacommunities.org/data/dev-local-authorities/dump]
 
 ```bash
 $ ./manage.py import_local_authorities <nt_path nt_path...>
@@ -69,7 +69,7 @@ Estimated runtime: ~ 1 minute
 
 ### Import NSPL Postcode/Local Authority GSS Code mapping files
 
-Available from the [http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html](Office for National Statistics) at their [https://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page](Geoportal) (search for 'NSPL' to find the latest file)
+Available from the [Office for National Statistics](http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html) at their [Geoportal](https://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page) (search for 'NSPL' to find the latest file)
 
 ```bash
 $ ./manage.py import_postcode_gss_codes <csv_path csv_path...>
@@ -151,7 +151,7 @@ Example response:
   "local_authority": {
     "name": "Westminster",
     "gss_code": "E09000033"
-  }
+  },
   "coordinates": [
     -0.141587558526369,
     51.50100893654096
