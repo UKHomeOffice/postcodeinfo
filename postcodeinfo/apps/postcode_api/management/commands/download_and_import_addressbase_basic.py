@@ -7,8 +7,8 @@ from StringIO import StringIO
 import zipfile
 from zipfile import ZipFile
 
-from postcode_api.downloaders.postcode_gss_code_downloader import PostcodeGssCodeDownloader
-from postcode_api.importers.postcode_gss_code_importer import PostcodeGssCodeImporter
+from postcode_api.downloaders.addressbase_basic_downloader import AddressBaseBasicDownloader
+from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicImporter
 
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument('--destination_dir', 
                 action='store_true', 
                 dest='destination_dir',
-                default='/tmp/postcode_gss_codes/')
+                default='/tmp/addressbase_basic/')
 
         # Named (optional) arguments
         parser.add_argument('--force',
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     def __download(self, destination_dir, force=False):
         print 'downloading'
-        downloader = PostcodeGssCodeDownloader()
+        downloader = AddressBaseBasicDownloader()
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
@@ -71,7 +71,7 @@ class Command(BaseCommand):
         thezip = ZipFile(zipfile_path, 'r')
         
         for info in thezip.infolist():
-            if re.match( '.*NSPL.*\.csv', info.filename ):
+            if re.match( '.*AddressBase_.*\.csv', info.filename ):
                 extracted_path = thezip.extract(info, dirname)
                 extracted_files.append( extracted_path )
                 print 'extracted ' + extracted_path
@@ -81,8 +81,8 @@ class Command(BaseCommand):
         return extracted_files
 
     def __import(self, downloaded_file):
-        importer = PostcodeGssCodeImporter()
-        importer.import_postcode_gss_codes(downloaded_file)
+        importer = AddressBaseBasicImporter()
+        importer.import_addressbase_basic(downloaded_file)
 
     def __cleanup(self, downloaded_file):
         print 'removing local file ' + downloaded_file

@@ -24,12 +24,12 @@ class FTPDownloadManager(DownloadManager):
     headers = self.get_headers(pattern)
     return map( lambda f: f['url'], headers )
 
-  def download_all_if_needed(self, pattern, dirpath):
+  def download_all_if_needed(self, pattern, dirpath, force=False):
     files = self.list_files(pattern)
     downloads = []
     print '%i files matching %s' % (len(files), pattern)
     for file in files:
-      dl = self.download_if_needed(file, dirpath)
+      dl = self.download_if_needed(file, dirpath, force)
       if dl:
         downloads.append(dl)
 
