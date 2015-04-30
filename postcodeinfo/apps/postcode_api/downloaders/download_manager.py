@@ -9,19 +9,22 @@ from postcode_api.models import Download
 
 class DownloadManager(object):
 
-  def download_if_needed(self, url, dirpath):
-    headers = get_headers(url)
+  def download_if_needed(self, url, dirpath, force=False):
+    headers = self.get_headers(url)
+    if isinstance(headers, list):
+      headers = headers[0]
     print 'headers = '
     print headers
 
     download_record = self.existing_download_record(url, headers)
-    if self.download_is_needed(download_record):
+    if self.download_is_needed(download_record) or force:
       local_path = self.download_to_dir(url, dirpath, headers)
       download_record = self.record_download(url, dirpath, headers)
-      return download_record
+      print "returning " + download_record.local_filepath
+      return download_record.local_filepath
     else:
       print 'no download needed'
-      return download_record
+      return None
 
   def download_to_dir(self, url, dirpath, headers):
     filepath = self.filename(dirpath, url)
@@ -41,8 +44,8 @@ class DownloadManager(object):
     print "downloaded to " + filepath
     return filepath
 
-  def __get_headers(self, url):
-    requests.head(url, allow_redirects=True).headers
+  def get_headers(self, url):
+    return requests.head(url, allow_redirects=True).headers
 
   def __format_time_for_orm(self, given_time):
     # is it a string?

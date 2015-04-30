@@ -19,6 +19,21 @@ class FTPDownloadManager(DownloadManager):
     self.ftp_client.login(username, password)
     return self.ftp_client
 
+  def list_files(self, pattern):
+    """ pattern to match against files (e.g. subdir/*.csv) or '.' """
+    headers = self.get_headers(pattern)
+    return map( lambda f: f['url'], headers )
+
+  def download_all_if_needed(self, pattern, dirpath):
+    files = self.list_files(pattern)
+    downloads = []
+    print '%i files matching %s' % (len(files), pattern)
+    for file in files:
+      dl = self.download_if_needed(file, dirpath)
+      if dl:
+        downloads.append(dl)
+
+    return "\n".join( map( lambda dl: dl.local_filepath, downloads ) )
 
   def get_headers(self, pattern=None):
     files_in_dir = []
@@ -40,7 +55,8 @@ class FTPDownloadManager(DownloadManager):
       'permissions': cols[0],
       'content-length': int(cols[4]),
       'last-modified': ' '.join(cols[5:8]),
-      'url': cols[-1]
+      'url': cols[-1],
+      'etag': None
     }
     return dic
 
@@ -49,7 +65,7 @@ class FTPDownloadManager(DownloadManager):
     print 'downloading file from ' + url + ' to ' + filepath
 
     file = open(filepath, 'wb')
-    counts = { 'size': 0 }
+    counts = { 'size': 0, 'chunks': 0 }
 
     # defined as a local closure so that it can access the variables in local scope
     # We have to do it this way because:
@@ -58,8 +74,10 @@ class FTPDownloadManager(DownloadManager):
     #    mutate a key in a dict. This is .... not pleasant, but it works.
     def handle_chunk_callback(data):
       counts['size'] += len(data)
+      counts['chunks'] += 1
       file.write(data)
-      print '%i/%i bytes' % (counts['size'], headers['content-length'])
+      if counts['chunks'] % 100 == 0:
+        print '%i/%i bytes' % (counts['size'], headers['content-length'])
     
     self.ftp_client.retrbinary( 'RETR %s' % url, handle_chunk_callback )
 
