@@ -90,4 +90,10 @@ class LocalAuthority(models.Model):
     objects = LocalAuthorityManager()
 
 
-            
+class Download(models.Model):
+    url = models.CharField(max_length=2048, db_index=True)
+    last_modified = models.DateTimeField(auto_now=False, db_index=True)
+    etag = models.CharField(max_length=2048, db_index=True, null=True)
+    local_filepath = models.CharField(max_length=2048, db_index=True)
+    state = models.CharField(max_length=16, db_index=True)
+    last_state_change = models.DateTimeField(auto_now=False)
