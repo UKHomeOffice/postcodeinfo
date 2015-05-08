@@ -1,5 +1,8 @@
 import re
 
+import zipfile
+from zipfile import ZipFile
+
 from titlecase import titlecase
 
 
@@ -65,3 +68,31 @@ class AddressFormatter(object):
             building_str += u"%d " % number
 
         return building_str.lstrip()
+
+
+class ZipExtractor(object):
+    def __init__(self, filepath):
+        self.filepath = filepath
+
+    def __unzip_if_needed(self, pattern):
+        if zipfile.is_zipfile(self.filepath):
+            print 'unzipping'
+            return self.__unzip(pattern)
+        else:
+            return [filepath]
+
+
+    def __unzip(self, pattern):
+        extracted_files = []
+        dirname = os.path.dirname(self.filepath)
+        thezip = ZipFile(self.filepath, 'r')
+        
+        for info in thezip.infolist():
+            if re.match( pattern, info.filename ):
+                extracted_path = thezip.extract(info, dirname)
+                extracted_files.append( extracted_path )
+                print 'extracted ' + extracted_path
+            else:
+                print 'ignored ' + info.filename
+
+        return extracted_files

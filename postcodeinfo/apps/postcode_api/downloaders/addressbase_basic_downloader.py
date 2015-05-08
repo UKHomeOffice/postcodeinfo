@@ -1,18 +1,19 @@
 import os
 
-from .download_manager import DownloadManager
-from .ftp_download_manager import FTPDownloadManager
+from postcode_api.downloaders.download_manager import DownloadManager
+from postcode_api.downloaders.ftp_download_manager import FTPDownloadManager
 
 class AddressBaseBasicDownloader(object):
 
+  def __init__(self, dl_mgr=FTPDownloadManager()):
+    self.download_manager = dl_mgr
+
   def download(self, local_dir='/tmp/', force=False):
 
-    dl_mgr = FTPDownloadManager()
-    dl_mgr.open('osmmftp.os.uk', self.__username(), self.__password())
-    dl_mgr.ftp_client.cwd(self.__target_dir())
+    self.download_manager.open('osmmftp.os.uk', self.__username(), self.__password())
+    self.download_manager.ftp_client.cwd(self.__source_dir())
 
-    return dl_mgr.download_all_if_needed('./*_csv.zip', local_dir, force)
-
+    return self.download_manager.download_all_if_needed('./*_csv.zip', local_dir, force)
 
   def __username(self):
     username = os.environ.get('OS_FTP_USERNAME')
@@ -28,7 +29,7 @@ class AddressBaseBasicDownloader(object):
 
     return pwd
     
-  def __target_dir(self):
+  def __source_dir(self):
     # TODO - this is currently just the order number.
     # Make this dynamic based on the most recent directory?
     return os.environ.get('OS_FTP_ORDER_DIR', '../from-os/DCS0001654526/')
