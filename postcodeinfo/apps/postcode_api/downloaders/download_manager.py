@@ -13,14 +13,11 @@ class DownloadManager(object):
     headers = self.get_headers(url)
     if isinstance(headers, list):
       headers = headers[0]
-    print 'headers = '
-    print headers
 
     download_record = self.existing_download_record(url, headers)
     if self.download_is_needed(download_record) or force:
       local_path = self.download_to_dir(url, dirpath, headers)
       download_record = self.record_download(url, dirpath, headers)
-      print "returning " + download_record.local_filepath
       return download_record.local_filepath
     else:
       print 'no download needed'
@@ -96,4 +93,4 @@ class DownloadManager(object):
 
   def chunk_size(self):
     """Tune this as needed"""
-    return os.environ.get('DOWNLOAD_CHUNK_SIZE', 4192)
+    return int(os.environ.get('DOWNLOAD_CHUNK_SIZE') or 4192)
