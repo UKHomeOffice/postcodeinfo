@@ -74,11 +74,6 @@ class DownloadManager(object):
         complex as needed. """
 
     if download_record:
-      print 'existing download record found: '
-      print '  state: %s since %s' % ( download_record.state,  download_record.last_state_change) 
-      print '  last_modified: %s' % download_record.last_modified
-      print '  etag: %s' % download_record.etag
-      print '  local_filepath: %s' % download_record.local_filepath
       return False
     else:
       # no existing record => download is needed
@@ -86,6 +81,12 @@ class DownloadManager(object):
 
   def existing_download_record(self, url, headers):
     dl = Download.objects.filter(url=url, etag=headers['etag'], last_modified=parser.parse(headers['last-modified'])).first()
+    if dl:
+      print 'existing download record found: '
+      print '  state: %s since %s' % ( dl.state,  dl.last_state_change) 
+      print '  last_modified: %s' % dl.last_modified
+      print '  etag: %s' % dl.etag
+      print '  local_filepath: %s' % dl.local_filepath
     return dl
 
   def filename(self, dirname, url):

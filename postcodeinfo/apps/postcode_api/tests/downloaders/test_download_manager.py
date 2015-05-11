@@ -38,3 +38,33 @@ class DownloadManagerTestCase(TestCase):
     headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
     self.assertEqual( self.__existing_record(headers), subject().existing_download_record('http://my/url.html', headers) )
 
+  def test_that_a_record_that_matches_url_etag_but_not_last_modified_is_not_returned(self):
+    headers_existing = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
+    headers_looked_for = {'etag': headers_existing['etag'], 'last-modified': '2015-01-01 23:23:23'}
+    existing_record = self.__existing_record(headers_existing)
+    self.assertEqual( None, subject().existing_download_record('http://my/url.html', headers_looked_for) )
+
+  def test_that_a_record_that_matches_url_and_last_modified_but_not_etag_is_not_returned(self):
+    headers_existing = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
+    headers_looked_for = {'etag': 'foobar', 'last-modified': headers_existing['last-modified']}
+    existing_record = self.__existing_record(headers_existing)
+    self.assertEqual( None, subject().existing_download_record('http://my/url.html', headers_looked_for) )
+
+  # describe: download_is_needed
+  def test_that_when_given_a_thing_it_returns_false(self):
+    self.assertEqual( False, subject().download_is_needed('something') )
+
+  def test_that_when_given_nothing_it_returns_true(self):
+    self.assertEqual( True, subject().download_is_needed(None) )
+
+  # describe: record_download
+  def test_that_it_creates_a_download_record_with_the_right_attributes(self):
+    headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
+    dl = subject().record_download('http://my/url.html', '/my/dir/path/', headers)
+    self.assertEqual( 'http://my/url.html', dl.url )
+    self.assertEqual( '12345', dl.etag )
+    self.assertEqual( '/my/dir/path/url.html', dl.local_filepath )
+    self.assertEqual( 'downloaded', dl.state )
+    self.assertEqual( 'http://my/url.html', dl.url )
+
+
