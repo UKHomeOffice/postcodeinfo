@@ -10,7 +10,14 @@ def subject():
   return DownloadManager()
 
 class DownloadManagerTestCase(TestCase):
-
+  def __existing_record(self, headers):
+    existing_record = Download(url='http://my/url.html', 
+          etag=headers['etag'], 
+          last_modified=headers['last-modified'],
+          state='downloaded',
+          last_state_change='2015-04-03 02:01:00')
+    existing_record.save()
+    return existing_record
 
   # describe: chunk_size
   def test_that_it_takes_the_chunk_size_from_an_environment_variable_if_set(self):
@@ -29,10 +36,5 @@ class DownloadManagerTestCase(TestCase):
   # describe: existing_download_record
   def test_that_a_record_that_matches_url_etag_and_last_modified_is_returned(self):
     headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-    existing_record = Download(url='http://my/url.html', 
-          etag=headers['etag'], 
-          last_modified=headers['last-modified'],
-          state='downloaded',
-          last_state_change='2015-04-03 02:01:00')
-    existing_record.save()
-    self.assertEqual( subject().existing_download_record('http://my/url.html', headers), existing_record )
+    self.assertEqual( self.__existing_record(headers), subject().existing_download_record('http://my/url.html', headers) )
+
