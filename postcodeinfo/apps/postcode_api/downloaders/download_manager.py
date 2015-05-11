@@ -26,23 +26,28 @@ class DownloadManager(object):
   def download_to_dir(self, url, dirpath, headers):
     filepath = self.filename(dirpath, url)
     print 'downloading file from ' + url + ' to ' + filepath
-    r = requests.get(url, stream=True)
     chunk_size = self.chunk_size()
     content_length = headers['content-length']
+    return self.download_to_file(url, filepath, chunk_size, content_length)
+
+  def download_to_file(self, url, filepath, chunk_size=4192, content_length=None):
+    r = requests.get(url, stream=True)
 
     with open(filepath, 'wb') as fd:
       count = 0
       for chunk in r.iter_content(chunk_size):
-          count = count + 1
-          if count % 100 == 0 :
+          if content_length and count % 100 == 0 :
+            count = count + 1
             print '{0} bytes of {1}'.format(count*chunk_size, content_length)
+  
           fd.write(chunk)
 
     print "downloaded to " + filepath
     return filepath
 
   def get_headers(self, url):
-    return requests.head(url, allow_redirects=True).headers
+    r = requests.head(url, allow_redirects=True)
+    return r.headers
 
   def __format_time_for_orm(self, given_time):
     # is it a string?

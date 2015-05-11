@@ -1,4 +1,4 @@
-import os
+import os, requests, responses, tempfile
 
 from django.test import TestCase
 from mock import patch, MagicMock
@@ -67,4 +67,37 @@ class DownloadManagerTestCase(TestCase):
     self.assertEqual( 'downloaded', dl.state )
     self.assertEqual( 'http://my/url.html', dl.url )
 
+  # describe: get_headers
+  @patch('requests.head')
+  def test_that_it_makes_a_head_request_to_the_given_url_and_follows_redirects(self, mock):
+    returned = subject().get_headers('http://some.url/')
+    mock.assertCalledWith('http://some.url/', allow_redirects=True)
 
+  @responses.activate
+  def test_that_it_returns_the_headers(self):
+    headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
+    responses.add(responses.HEAD, 'http://some.url/', body=None,
+      status=200, adding_headers=headers)
+    returned_headers = subject().get_headers('http://some.url/')
+    self.assertEqual( headers['etag'], returned_headers['etag'] )
+    self.assertEqual( headers['last-modified'], returned_headers['last-modified'] )
+
+  # describe: download_to_file
+  @responses.activate
+  def test_that_it_downloads_the_give_url_to_the_given_file_path(self):
+    responses.add(responses.GET, 'http://some.url/test.file', body='file contents',
+      status=200)
+    temp_dir = tempfile.gettempdir()
+    temp_file_path = os.path.join( temp_dir, 'test123.txt' )
+    subject().download_to_file( 'http://some.url/test.file', temp_file_path )
+    temp_file = open(temp_file_path)
+    contents = temp_file.read()
+    self.assertEqual( 'file contents', contents )
+    os.remove(temp_file_path)
+
+  # describe: download_to_dir
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.download_to_file')
+  def test_that_it_calls_download_to_file_with_the_right_arguments(self, mock):
+    dl_mgr = subject()
+    dl_mgr.download_to_dir('http://some.url/test.file', '/my/dir/path/', {'content-length': '1234'})
+    mock.assertCalledWith('http://some.url/test.file', '/my/dir/path/test.file', 4192, 1234)
