@@ -6,7 +6,7 @@ import time
 from dateutil.parser import parse as parsedate
 from time import time, gmtime
 
-from postcode_api.models import PostcodeGssCode
+from postcode_api.models import PostcodeGssCode, Download
 from postcode_api.importers.progress_reporter import ProgressReporter
 
 
@@ -45,7 +45,7 @@ class PostcodeGssCodeImporter(object):
         return a
 
     def update_download(self, filename):
-        dl = Download.objects.filter(local_filename=filename, state='downloaded').first()
+        dl = Download.objects.filter(local_filepath=filename, state='downloaded').first()
         if dl:
             dl.state='imported'
             dl.last_state_change = gmtime()
