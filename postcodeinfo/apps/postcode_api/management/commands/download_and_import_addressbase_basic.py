@@ -4,11 +4,9 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from StringIO import StringIO
 
-import zipfile
-from zipfile import ZipFile
-
 from postcode_api.downloaders.addressbase_basic_downloader import AddressBaseBasicDownloader
 from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicImporter
+from postcode_api.utils import ZipExtractor
 
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
@@ -45,7 +43,7 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
-        files = self.__unzip_if_needed(filepath)
+        files = ZipExtractor(filepath).__unzip_if_needed('.*AddressBase_.*\.csv')
 
         for path in files:
             print 'importing ' + path
@@ -57,28 +55,7 @@ class Command(BaseCommand):
 
         return True
 
-    def __unzip_if_needed(self, filepath):
-        if zipfile.is_zipfile(filepath):
-            print 'unzipping'
-            return self.__unzip(filepath)
-        else:
-            return [filepath]
-
-
-    def __unzip(self, zipfile_path):
-        extracted_files = []
-        dirname = os.path.dirname(zipfile_path)
-        thezip = ZipFile(zipfile_path, 'r')
-        
-        for info in thezip.infolist():
-            if re.match( '.*AddressBase_.*\.csv', info.filename ):
-                extracted_path = thezip.extract(info, dirname)
-                extracted_files.append( extracted_path )
-                print 'extracted ' + extracted_path
-            else:
-                print 'ignored ' + info.filename
-
-        return extracted_files
+    
 
     def __import(self, downloaded_file):
         importer = AddressBaseBasicImporter()
