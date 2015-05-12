@@ -98,6 +98,34 @@ class DownloadManagerTestCase(TestCase):
   # describe: download_to_dir
   @patch('postcode_api.downloaders.download_manager.DownloadManager.download_to_file')
   def test_that_it_calls_download_to_file_with_the_right_arguments(self, mock):
-    dl_mgr = subject()
-    dl_mgr.download_to_dir('http://some.url/test.file', '/my/dir/path/', {'content-length': '1234'})
+    subject().download_to_dir('http://some.url/test.file', '/my/dir/path/', {'content-length': '1234'})
     mock.assertCalledWith('http://some.url/test.file', '/my/dir/path/test.file', 4192, 1234)
+
+  # describe: download_if_needed
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.download_is_needed')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.do_download')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.existing_download_record')
+  def test_that_when_download_is_needed_then_it_downloads_the_given_url_to_the_given_dir(self, mock_hdrs, mock_dl_needed, mock_do_download, mock_existing_download_record):
+    mock_dl_needed.return_value = True
+    rtn_val = subject().download_if_needed('http://some.url/test.file', '/my/dir/path/')
+    mock_do_download.assertCalledWith('http://some.url/test.file', '/my/dir/path/')
+    
+
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.download_is_needed')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.do_download')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.existing_download_record')
+  def test_that_when_download_is_not_needed_then_it_does_not_download(self, mock_hdrs, mock_dl_needed, mock_do_download, mock_existing_download_record):
+    mock_dl_needed.return_value = False
+    rtn_val = subject().download_if_needed('http://some.url/test.file', '/my/dir/path/')
+    self.assertEqual( rtn_val, None )
+
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.download_is_needed')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.do_download')
+  @patch('postcode_api.downloaders.download_manager.DownloadManager.existing_download_record')
+  def test_that_when_download_is_not_needed_but_force_is_passed_then_it_does_download(self, mock_hdrs, mock_dl_needed, mock_do_download, mock_existing_download_record):
+    mock_dl_needed.return_value = False
+    rtn_val = subject().download_if_needed('http://some.url/test.file', '/my/dir/path/', True)
+    mock_do_download.assertCalledWith('http://some.url/test.file', '/my/dir/path/')

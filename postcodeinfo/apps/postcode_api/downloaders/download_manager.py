@@ -11,17 +11,18 @@ class DownloadManager(object):
 
   def download_if_needed(self, url, dirpath, force=False):
     headers = self.get_headers(url)
-    if isinstance(headers, list):
-      headers = headers[0]
-
+    
     download_record = self.existing_download_record(url, headers)
-    if self.download_is_needed(download_record) or force:
-      local_path = self.download_to_dir(url, dirpath, headers)
-      download_record = self.record_download(url, dirpath, headers)
-      return download_record.local_filepath
+    if self.download_is_needed(download_record) == True or force:
+      return self.do_download(url, dirpath, headers)
     else:
       print 'no download needed'
       return None
+
+  def do_download(self, url, dirpath, headers):
+    local_path = self.download_to_dir(url, dirpath, headers)
+    download_record = self.record_download(url, dirpath, headers)
+    return download_record.local_filepath
 
   def download_to_dir(self, url, dirpath, headers):
     filepath = self.filename(dirpath, url)
@@ -47,7 +48,10 @@ class DownloadManager(object):
 
   def get_headers(self, url):
     r = requests.head(url, allow_redirects=True)
-    return r.headers
+    if isinstance(r.headers, list):
+      return r.headers[0]
+    else:
+      return r.headers
 
   def __format_time_for_orm(self, given_time):
     # is it a string?
