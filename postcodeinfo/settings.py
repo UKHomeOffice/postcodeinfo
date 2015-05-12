@@ -115,6 +115,21 @@ REST_FRAMEWORK = {
     )
 }
 
+#################################################################################
+# fix for 'relation "auth_user" does not exist' when running tests on Django 1.8
+# see https://github.com/evonove/django-oauth-toolkit/issues/204
+
+# makemigrations requires this for some reason or it errors
+# Just set to the default value
+# OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+# # tell django where to put the oauth2 migrations
+# MIGRATION_MODULES = {
+#    # key: app name, value: a fully qualified package name, not the usual `app_label.something_else`
+#   'oauth2_provider': 'postcode_api.migrations.oauth2_provider',
+# }
+
+
 # .local.py overrides all the common settings.
 try:
     from .local import *

@@ -45,8 +45,7 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
-        files = self.__unzip_if_needed(filepath)
-
+        files = ZipExtractor(filepath).__unzip_if_needed('.*NSPL.*\.csv')
         for path in files:
             print 'importing ' + path
             self.__import(path)
@@ -56,29 +55,6 @@ class Command(BaseCommand):
             self.__cleanup(filepath)
 
         return True
-
-    def __unzip_if_needed(self, filepath):
-        if zipfile.is_zipfile(filepath):
-            print 'unzipping'
-            return self.__unzip(filepath)
-        else:
-            return [filepath]
-
-
-    def __unzip(self, zipfile_path):
-        extracted_files = []
-        dirname = os.path.dirname(zipfile_path)
-        thezip = ZipFile(zipfile_path, 'r')
-        
-        for info in thezip.infolist():
-            if re.match( '.*NSPL.*\.csv', info.filename ):
-                extracted_path = thezip.extract(info, dirname)
-                extracted_files.append( extracted_path )
-                print 'extracted ' + extracted_path
-            else:
-                print 'ignored ' + info.filename
-
-        return extracted_files
 
     def __import(self, downloaded_file):
         importer = PostcodeGssCodeImporter()

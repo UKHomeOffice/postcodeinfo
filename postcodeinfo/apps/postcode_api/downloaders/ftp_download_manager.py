@@ -15,9 +15,13 @@ class FTPDownloadManager(DownloadManager):
     if self.ftp_client:
       self.ftp_client.close()
     
-    self.ftp_client = FTP(host)
-    self.ftp_client.login(username, password)
+    self.ftp_client = self.ftp_login(host,username,password)
     return self.ftp_client
+
+  def ftp_login(self, host, username, password):
+    ftp = ftplib.FTP(host)
+    ftp.login(username, password)
+    return ftp
 
   def list_files(self, pattern):
     """ pattern to match against files (e.g. subdir/*.csv) or '.' """
@@ -36,11 +40,14 @@ class FTPDownloadManager(DownloadManager):
     return "\n".join( map( lambda dl: dl.local_filepath, downloads ) )
 
   def get_headers(self, pattern=None):
-    files_in_dir = []
-    self.ftp_client.dir(pattern, lambda f: files_in_dir.append(f))
-
-    headers = map(lambda f: self.interpret_ls_line(f), files_in_dir)
+    file_list = self.files_in_dir(pattern)
+    headers = map(lambda f: self.interpret_ls_line(f), file_list)
     return headers
+
+  def files_in_dir(pattern=None):
+    files = []
+    self.ftp_client.dir(pattern, lambda f: files.append(f))
+    return files
 
   def interpret_ls_line(self, line):
     """ NOTE: this is VERY brittle, but the OS FTP server doesn't

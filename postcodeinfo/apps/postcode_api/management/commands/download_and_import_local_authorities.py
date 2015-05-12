@@ -3,11 +3,9 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from StringIO import StringIO
 
-import zipfile
-from zipfile import ZipFile
-
 from postcode_api.downloaders.local_authorities_downloader import LocalAuthoritiesDownloader
 from postcode_api.importers.local_authorities_importer import LocalAuthoritiesImporter
+from postcode_api.utils import ZipExtractor
 
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
@@ -44,30 +42,14 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
-        if zipfile.is_zipfile(filepath):
-            print 'unzipping'
-            files = self.__unzip(filepath)
-        else:
-            files = [filepath]
+        files = ZipExtractor(filepath).__unzip_if_needed('*.nt')
 
-        for filepath in files:
-            print 'importing ' + filepath
-            result = self.__import(filepath)
-            self.__cleanup(filepath)
+        for path in files:
+            print 'importing ' + path
+            result = self.__import(path)
+            self.__cleanup(path)
 
         self.__cleanup(filepath)
-
-    def __unzip(self, zipfile_path):
-        extracted_files = []
-        dirname = os.path.dirname(zipfile_path)
-        thezip = ZipFile(zipfile_path, 'r')
-        
-        for info in thezip.infolist():
-            extracted_path = thezip.extract(info, dirname)
-            extracted_files.append( extracted_path )
-            print 'extracted ' + extracted_path
-
-        return extracted_files
 
     def __import(self, downloaded_file):
         importer = LocalAuthoritiesImporter()

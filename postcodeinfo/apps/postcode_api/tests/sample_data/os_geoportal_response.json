@@ -1,0 +1,304 @@
+{
+  "title" : "Geoportal GeoRSS.",
+  "description" : "Most recently updated metadata documents.",
+  "copyright" : "",
+  "provider" : "https:\/\/geoportal.statistics.gov.uk\/geoportal",
+  "updated" : "2015-04-05T16:14:56Z",
+  "source" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/find\/document?searchText=NSPL&f=pjson",
+  "more" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/find\/document?searchText=NSPL&f=pjson&start=11",
+  "totalResults" : 12,
+  "startIndex" : 1,
+  "itemsPerPage" : 10,
+  "records" : [
+    {
+      "title" : "Explanation of the differences between the NSPL and the ONSPD v2.2",
+      "id" : "{6A226E9B-2773-44F4-A5F8-D8AB0E231B00}",
+      "updated" : "2014-09-24T14:03:45Z",
+      "summary" : "This file contains the following pdf document titled 'Explanation of the differences between the NSPL and the ONSPD v2.2'.\nThe document explains the differences between the National Statistics Postcode Lookup (NSPL) and the ONS Postcode Directory (ONSPD) ...",
+      "bbox" : [-9.1023, 48.6818, 3.5795, 63.2045],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-9.1023,48.6818], [-9.1023,63.2045], [3.5795,63.2045], [3.5795,48.6818], [-9.1023,48.6818]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/Explanation_of_the_differences_between_the_NSPL_and_the_ONSPD_v2.2.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B6A226E9B-2773-44F4-A5F8-D8AB0E231B00%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B6A226E9B-2773-44F4-A5F8-D8AB0E231B00%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Aug 2014",
+      "id" : "{9992801C-8454-4A7A-A84F-6DD25D622E0B}",
+      "updated" : "2014-09-24T14:15:46Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at August 2014. There are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 Census data (N...",
+      "bbox" : [-10.6364, 49.5511, 2.0455, 62.9489],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-10.6364,49.5511], [-10.6364,62.9489], [2.0455,62.9489], [2.0455,49.5511], [-10.6364,49.5511]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_AUG_2014_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B9992801C-8454-4A7A-A84F-6DD25D622E0B%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B9992801C-8454-4A7A-A84F-6DD25D622E0B%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) May 2014",
+      "id" : "{AFA00CD3-5F55-4980-8EC5-D94C68CED977}",
+      "updated" : "2014-09-24T14:15:53Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at May 2014. There are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 Census data (NSPL...",
+      "bbox" : [-9.9205, 48.4773, 3.4773, 64.2273],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-9.9205,48.4773], [-9.9205,64.2273], [3.4773,64.2273], [3.4773,48.4773], [-9.9205,48.4773]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_MAY_2014_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BAFA00CD3-5F55-4980-8EC5-D94C68CED977%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BAFA00CD3-5F55-4980-8EC5-D94C68CED977%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Nov 2014",
+      "id" : "{21B8B70A-3F1B-400D-99A6-9F7094A78A85}",
+      "updated" : "2014-10-21T11:56:02Z",
+      "summary" : "This file contains the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at November 2014. There are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 C...",
+      "bbox" : [-12.8751, 48.8345, 3.7749, 62.9533],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-12.8751,48.8345], [-12.8751,62.9533], [3.7749,62.9533], [3.7749,48.8345], [-12.8751,48.8345]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2014_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B21B8B70A-3F1B-400D-99A6-9F7094A78A85%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B21B8B70A-3F1B-400D-99A6-9F7094A78A85%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Nov 2013",
+      "id" : "{EBB87DB2-D25E-4A2A-98B4-FBE330E72E6B}",
+      "updated" : "2014-00-06T14:40:32Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at November 2013.\t\nThere are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 Census data...",
+      "bbox" : [-8.821, 49.3771, 3.2445, 63.2675],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-8.821,49.3771], [-8.821,63.2675], [3.2445,63.2675], [3.2445,49.3771], [-8.821,49.3771]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2013_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BEBB87DB2-D25E-4A2A-98B4-FBE330E72E6B%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BEBB87DB2-D25E-4A2A-98B4-FBE330E72E6B%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Nov 2012",
+      "id" : "{1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3}",
+      "updated" : "2014-00-06T14:43:16Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at November 2012. \nThere are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 Census data...",
+      "bbox" : [-9.3814, 49.4914, 3.159, 61.6968],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-9.3814,49.4914], [-9.3814,61.6968], [3.159,61.6968], [3.159,49.4914], [-9.3814,49.4914]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2012_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Aug 2013",
+      "id" : "{F48EC07C-B57F-4D03-82FC-B135F8E9502A}",
+      "updated" : "2014-00-06T14:44:57Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at August 2013. There are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 Census data (N...",
+      "bbox" : [-10.6093, 49.1885, 3.8579, 62.9806],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-10.6093,49.1885], [-10.6093,62.9806], [3.8579,62.9806], [3.8579,49.1885], [-10.6093,49.1885]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_AUG_2013_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BF48EC07C-B57F-4D03-82FC-B135F8E9502A%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BF48EC07C-B57F-4D03-82FC-B135F8E9502A%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Feb 2014",
+      "id" : "{364512BE-4509-4D65-9799-85AFB69B94D3}",
+      "updated" : "2014-01-25T12:11:58Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at February 2014.\nThere are two versions of the NSPL provided as part of the product. They are an NSPL based on 2011 Census data (NSPL) and an NSPL based on 2001 Census data ...",
+      "bbox" : [-9.9342, 48.0794, 5.4011, 63.2217],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-9.9342,48.0794], [-9.9342,63.2217], [5.4011,63.2217], [5.4011,48.0794], [-9.9342,48.0794]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_FEB_2014_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B364512BE-4509-4D65-9799-85AFB69B94D3%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B364512BE-4509-4D65-9799-85AFB69B94D3%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) Feb 2015",
+      "id" : "{85944A27-DBF2-43CE-B543-0341537EEFE2}",
+      "updated" : "2015-01-23T09:33:22Z",
+      "summary" : "This file contains the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at February 2015. Please note that from February 2015, there will only be one version of the NSPL provided and this will based on the 2011 Census data.  The NSPL r...",
+      "bbox" : [-9.9364, 48.8017, 4.0749, 63.6312],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-9.9364,48.8017], [-9.9364,63.6312], [4.0749,63.6312], [4.0749,48.8017], [-9.9364,48.8017]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_FEB_2015_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B85944A27-DBF2-43CE-B543-0341537EEFE2%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B85944A27-DBF2-43CE-B543-0341537EEFE2%7D",
+          "type" : "metadata"
+        }
+      ]
+    },
+    {
+      "title" : "National Statistics Postcode Lookup (UK) May 2013 V2",
+      "id" : "{D14C75CE-95C6-4E9F-8753-ECDD88BC2B7D}",
+      "updated" : "2014-00-06T14:36:55Z",
+      "summary" : "This is the National Statistics Postcode Lookup (NSPL) for the United Kingdom as at May 2013.\nPlease note that this is V2 of the NSPL, see Version Notes and User Guide for further details.\nThere are two versions of the NSPL provided as part of the product...",
+      "bbox" : [-10.6093, 49.285, 3.0863, 62.8842],
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [-10.6093,49.285], [-10.6093,62.8842], [3.0863,62.8842], [3.0863,49.285], [-10.6093,49.285]
+          ]
+        ]
+      },
+      "links" : [
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_MAY_2013_V2_csv.zip",
+          "type" : "open"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BD14C75CE-95C6-4E9F-8753-ECDD88BC2B7D%7D",
+          "type" : "details"
+        },
+        {
+          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BD14C75CE-95C6-4E9F-8753-ECDD88BC2B7D%7D",
+          "type" : "metadata"
+        }
+      ]
+    }
+  ]
+}
