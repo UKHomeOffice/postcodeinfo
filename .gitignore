@@ -5,4 +5,5 @@ env
 venv
 .env
 .venv
+.coverage
 
