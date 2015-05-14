@@ -54,7 +54,7 @@ class Command(BaseCommand):
             self.__import(path)
             self.__cleanup(path)
 
-        if file.exists(filepath):
+        if os.path.exists(filepath):
             self.__cleanup(filepath)
 
         return True
