@@ -30,7 +30,7 @@ class LocalAuthoritiesImporter(object):
         self.progress.finish()
         new_count = LocalAuthority.objects.count()
         print str(new_count - la_count) + ' local authorities added'
-        print 'New LocalAuthority count = ' + str(new_count)
+        print 'There are now ' + str(new_count) + ' local authorities'
 
 
     def __import_gss_code(self, code_tuple):

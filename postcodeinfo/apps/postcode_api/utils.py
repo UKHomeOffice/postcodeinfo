@@ -1,4 +1,4 @@
-import re
+import os, re
 
 import zipfile
 from zipfile import ZipFile
@@ -74,15 +74,15 @@ class ZipExtractor(object):
     def __init__(self, filepath):
         self.filepath = filepath
 
-    def __unzip_if_needed(self, pattern):
+    def unzip_if_needed(self, pattern):
         if zipfile.is_zipfile(self.filepath):
             print 'unzipping'
-            return self.__unzip(pattern)
+            return self.unzip(pattern)
         else:
             return [filepath]
 
 
-    def __unzip(self, pattern):
+    def unzip(self, pattern):
         extracted_files = []
         dirname = os.path.dirname(self.filepath)
         thezip = ZipFile(self.filepath, 'r')

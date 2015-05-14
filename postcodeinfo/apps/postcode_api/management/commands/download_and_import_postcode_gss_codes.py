@@ -4,11 +4,13 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from StringIO import StringIO
 
-import zipfile
-from zipfile import ZipFile
 
+from postcode_api.utils import ZipExtractor
 from postcode_api.downloaders.postcode_gss_code_downloader import PostcodeGssCodeDownloader
 from postcode_api.importers.postcode_gss_code_importer import PostcodeGssCodeImporter
+
+def exit_code(key):
+    return {'OK': 0, 'GENERIC_ERROR': 1}[key]
 
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
@@ -34,10 +36,11 @@ class Command(BaseCommand):
 
         downloaded_file = self.__download(options['destination_dir'], options.get('force', False) )
         if downloaded_file:
-            return self.__process(downloaded_file)
+            self.__process(downloaded_file)
+            return exit_code('OK')
         else:
             print 'nothing downloaded - nothing to import'
-            return None
+            return exit_code('OK')
 
     def __download(self, destination_dir, force=False):
         print 'downloading'
@@ -45,7 +48,7 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
-        files = ZipExtractor(filepath).__unzip_if_needed('.*NSPL.*\.csv')
+        files = ZipExtractor(filepath).unzip_if_needed('.*NSPL.*\.csv')
         for path in files:
             print 'importing ' + path
             self.__import(path)

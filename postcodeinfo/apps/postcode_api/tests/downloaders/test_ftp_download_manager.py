@@ -41,7 +41,7 @@ class FTPDownloadManagerTestCase(TestCase):
   @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.list_files')
   def test_that_it_calls_download_if_needed_for_each_listed_file(self, mock_list_files, mock_dl_if_needed):
     mock_list_files.return_value = ['file/1', 'file/2']
-    mock_dl_if_needed.side_effect = [MagicMock(local_filepath='/local/file/1'), MagicMock(local_filepath='/local/file/2')]
+    mock_dl_if_needed.side_effect = ['/local/file/1', '/local/file/2']
     calls = [call('file/1', '/dir/path', False), call('file/2', '/dir/path', False)]
     subject().download_all_if_needed('my pattern', '/dir/path')
     mock_dl_if_needed.assert_has_calls(calls)
@@ -50,7 +50,7 @@ class FTPDownloadManagerTestCase(TestCase):
   @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.list_files')
   def test_that_it_returns_the_local_filepath_of_all_downloads_performed(self, mock_list_files, mock_dl_if_needed):
     mock_list_files.return_value = ['file/1', 'file/2']
-    mock_dl_if_needed.side_effect = [MagicMock(local_filepath='/local/file/1'), MagicMock(local_filepath='/local/file/2')]
+    mock_dl_if_needed.side_effect = ['/local/file/1', '/local/file/2']
     self.assertEqual("/local/file/1\n/local/file/2", subject().download_all_if_needed('my pattern', '/dir/path') )
 
   # describe get_headers
