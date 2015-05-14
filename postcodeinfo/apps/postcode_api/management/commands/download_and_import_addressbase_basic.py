@@ -8,6 +8,9 @@ from postcode_api.downloaders.addressbase_basic_downloader import AddressBaseBas
 from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicImporter
 from postcode_api.utils import ZipExtractor
 
+def exit_code(key):
+    return {'OK': 0, 'GENERIC_ERROR': 1}[key]
+
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
 
@@ -32,10 +35,11 @@ class Command(BaseCommand):
 
         downloaded_file = self.__download(options['destination_dir'], options.get('force', False) )
         if downloaded_file:
-            return self.__process(downloaded_file)
+            self.__process(downloaded_file)
+            return exit_code('OK')
         else:
             print 'nothing downloaded - nothing to import'
-            return None
+            return exit_code('OK')
 
     def __download(self, destination_dir, force=False):
         print 'downloading'
@@ -43,23 +47,22 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
-        files = ZipExtractor(filepath).__unzip_if_needed('.*AddressBase_.*\.csv')
+        files = ZipExtractor(filepath).unzip_if_needed('.*AddressBase_.*\.csv')
 
         for path in files:
             print 'importing ' + path
             self.__import(path)
             self.__cleanup(path)
 
-        if file.exists(filepath):
+        if os.path.exists(filepath):
             self.__cleanup(filepath)
 
         return True
-
     
 
     def __import(self, downloaded_file):
         importer = AddressBaseBasicImporter()
-        importer.import_addressbase_basic(downloaded_file)
+        importer.import_csv(downloaded_file)
 
     def __cleanup(self, downloaded_file):
         print 'removing local file ' + downloaded_file

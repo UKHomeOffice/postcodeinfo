@@ -7,6 +7,9 @@ from postcode_api.downloaders.local_authorities_downloader import LocalAuthoriti
 from postcode_api.importers.local_authorities_importer import LocalAuthoritiesImporter
 from postcode_api.utils import ZipExtractor
 
+def exit_code(key):
+    return {'OK': 0, 'GENERIC_ERROR': 1}[key]
+
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
 
@@ -31,10 +34,11 @@ class Command(BaseCommand):
 
         downloaded_file = self.__download(options['destination_dir'], options.get('force', False) )
         if downloaded_file:
-            return self.__process(downloaded_file)
+            self.__process(downloaded_file)
+            return exit_code('OK')
         else:
             print 'nothing downloaded - nothing to import'
-            return None
+            return exit_code('OK')
 
     def __download(self, destination_dir, force=False):
         print 'downloading'
@@ -42,7 +46,7 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def __process(self, filepath):
-        files = ZipExtractor(filepath).__unzip_if_needed('*.nt')
+        files = ZipExtractor(filepath).unzip_if_needed('.*\.nt')
 
         for path in files:
             print 'importing ' + path

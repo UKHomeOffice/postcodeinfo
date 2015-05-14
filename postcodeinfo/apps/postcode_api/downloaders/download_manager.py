@@ -11,7 +11,9 @@ class DownloadManager(object):
 
   def download_if_needed(self, url, dirpath, force=False):
     headers = self.get_headers(url)
-    
+    if isinstance(headers, list):
+      headers = headers[0]
+
     download_record = self.existing_download_record(url, headers)
     if self.download_is_needed(download_record) == True or force:
       return self.do_download(url, dirpath, headers)
@@ -38,9 +40,8 @@ class DownloadManager(object):
       count = 0
       for chunk in r.iter_content(chunk_size):
           if content_length and count % 100 == 0 :
-            count = count + 1
             print '{0} bytes of {1}'.format(count*chunk_size, content_length)
-  
+          count = count + 1
           fd.write(chunk)
 
     print "downloaded to " + filepath
@@ -69,7 +70,6 @@ class DownloadManager(object):
     dl.local_filepath = self.filename( dirpath, url )
     dl.state = 'downloaded'
     dl.last_state_change = self.__format_time_for_orm( localtime() )
-    #import pdb; pdb.set_trace()
     dl.save()
 
     return dl

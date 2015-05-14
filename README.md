@@ -50,30 +50,68 @@ $ pip install -r requirements.txt
 $ ./manage.py syncdb
 ```
 
-### Import OS AddressBase Basic CSV files
+### Download and Import Data
+
+```bash
+$ ./manage.py download_and_import_all
+```
+_This will take a long time to run - usually around 5hrs_
+
+Note that it will keep a record of downloaded and imported files, comparing etag/last-modified timestamps and filenames to avoid re-downloading files it has already retrieved. This means that if your connection drops, you can restart, and existing files will be skipped.
+
+Passing --force will force it to (re-)download everything, regardless of previous downloads.
+
+Alternatively, you can download and/or import the three required datasets individually, trimming the amount of data in the import files as appropriate.
+
+### Download / Import OS AddressBase Basic CSV files
 
 Available from [http://www.ordnancesurvey.co.uk/business-and-government/help-and-support/products/how-to-buy.html](Ordnance Survey)
 
+OR 
+
+Automatically download the latest version with:
+```bash
+$ ./manage.py download_addressbase_basic <destination_path>
+```
+You will need a valid FTP username and password from Ordnance Survey, and to set these values in OS_FTP_USERNAME and OS_FTP_PASSWORD environment variables. At the time of writing, the latest dataset consists of 29 x ~50MB files, so runtime will be heavily dependent on your bandwidth. However, if you just want to get something up and running and don't really need completeness, then just one datafile will be enough to get started - you don't necessarily _need_ them all.
+
+Import AddressBase Basic files:
 ```bash
 $ ./manage.py import_addressbase_basic <csv_path csv_path...>
 ```
 
-Estimated runtime: ~ 1 minute
+Estimated runtime: ~ 1 minute per megabyte of downloaded data (zipped) - i.e. roughly 2.5 - 3 hrs for the full dataset
 
-### Import Local Authorities RDF .nt files
+### Download / Import Local Authorities RDF .nt files
 
 Available from The Dept for Communities and Local Government via [opendatacommunities.org](http://opendatacommunities.org/data/dev-local-authorities/), latest data dump: [http://opendatacommunities.org/data/dev-local-authorities/dump]
 
+OR 
+
+Automatically download the latest version with:
+```bash
+$ ./manage.py download_local_authorities <destination_path>
+```
+
+Import Local Authorities files:
 ```bash
 $ ./manage.py import_local_authorities <nt_path nt_path...>
 ```
 
-Estimated runtime: ~ 1 minute
+Estimated runtime: < 1 minute
 
-### Import NSPL Postcode/Local Authority GSS Code mapping files
+### Download / Import NSPL Postcode/Local Authority GSS Code mapping files
 
 Available from the [Office for National Statistics](http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html) at their [Geoportal](https://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page) (search for 'NSPL' to find the latest file)
 
+OR 
+
+Automatically download the latest version with:
+```bash
+$ ./manage.py download_postcode_gss_codes <destination_path>
+```
+
+Import Postcode / GSS Code files:
 ```bash
 $ ./manage.py import_postcode_gss_codes <csv_path csv_path...>
 ```
