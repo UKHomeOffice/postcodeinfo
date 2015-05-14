@@ -37,14 +37,14 @@ class FTPDownloadManager(DownloadManager):
       if dl:
         downloads.append(dl)
 
-    return "\n".join( map( lambda dl: dl.local_filepath, downloads ) )
+    return "\n".join( downloads )
 
   def get_headers(self, pattern=None):
     file_list = self.files_in_dir(pattern)
     headers = map(lambda f: self.interpret_ls_line(f), file_list)
     return headers
 
-  def files_in_dir(pattern=None):
+  def files_in_dir(self, pattern=None):
     files = []
     self.ftp_client.dir(pattern, lambda f: files.append(f))
     return files
