@@ -35,6 +35,16 @@ RUN rm -rf /srv/postcodeinfo/.git
 RUN chown -R postcodeinfo: /srv/postcodeinfo
 RUN cd /srv/postcodeinfo && pip install -r requirements.txt
 
+#ENV DJANGO_DEBUG true
+#ENV DJANGO_ALLOWED_HOSTS 127.0.0.1
+#ENV SECRET_KEY lkasjdklajskldaksljdklajskldjiu213oi
+ENV DJANGO_DB_NAME postcodeinfo
+ENV DJANGO_DB_USER postcodeinfo
+ENV DJANGO_DB_PASSWORD postcodeinfo
+ENV DJANGO_DB_HOST 172.42.1.0
+#ENV DJANGO_DB_PORT
+
+
 EXPOSE 8000
 #USER postcodeinfo
 WORKDIR /srv/postcodeinfo
