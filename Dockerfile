@@ -5,7 +5,7 @@ RUN DEBIAN_FRONTEND='noninteractive' \
   apt-get update && \
   apt-get -y --force-yes install python-pip python-dev build-essential \
     software-properties-common python-software-properties libpq-dev \
-    binutils libproj-dev gdal-bin
+    binutils libproj-dev gdal-bin libgdal-dev python-gdal ncurses-dev
 
 # Install Nginx.
 RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && apt-get update
@@ -38,5 +38,5 @@ RUN rm -rf /srv/postcodeinfo/.git
 RUN chown -R postcodeinfo: /srv/postcodeinfo
 
 EXPOSE 8000
-USER postcodeinfo
+#USER postcodeinfo
 WORKDIR /srv/postcodeinfo
