@@ -18,6 +18,7 @@ root = lambda *x: os.path.join(PROJECT_ROOT, *x)
 sys.path.insert(0, root('apps'))
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
@@ -129,6 +130,20 @@ REST_FRAMEWORK = {
 #   'oauth2_provider': 'postcode_api.migrations.oauth2_provider',
 # }
 
+
+################################################################################
+# Sentry integration for error notifications
+# from https://sentry.service.dsd.io/docs/platforms/django/
+
+RAVEN_CONFIG = {
+    'dsn': os.environ.get('SENTRY_DSN', '')
+}
+
+# Add raven to the list of installed apps
+INSTALLED_APPS = INSTALLED_APPS + (
+    # ...
+    'raven.contrib.django.raven_compat',
+)
 
 # .local.py overrides all the common settings.
 try:
