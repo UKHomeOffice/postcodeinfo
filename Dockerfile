@@ -1,11 +1,12 @@
-FROM phusion/baseimage:0.9.11
+FROM phusion/baseimage:0.9.16
 
 # Dependencies
 RUN DEBIAN_FRONTEND='noninteractive' \
   apt-get update && \
   apt-get -y --force-yes install python-pip python-dev build-essential \
     software-properties-common python-software-properties libpq-dev \
-    binutils libproj-dev gdal-bin libgdal-dev python-gdal ncurses-dev
+    binutils libproj-dev gdal-bin libgdal-dev python-gdal ncurses-dev \
+    postgresql-9.3-postgis-scripts
 
 # Install Nginx.
 RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && apt-get update
@@ -41,7 +42,7 @@ RUN cd /srv/postcodeinfo && pip install -r requirements.txt
 ENV DJANGO_DB_NAME postcodeinfo
 ENV DJANGO_DB_USER postcodeinfo
 ENV DJANGO_DB_PASSWORD postcodeinfo
-ENV DJANGO_DB_HOST 172.42.1.0
+ENV DJANGO_DB_HOST postgres
 #ENV DJANGO_DB_PORT
 
 
