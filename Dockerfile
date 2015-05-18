@@ -10,8 +10,6 @@ RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && apt-
 # the recommended way: http://pip.readthedocs.org/en/latest/installing.html#install-pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python2.7
 
-#chown -R www-data:www-data /var/lib/nginx
-
 # APP_HOME, if you change this variable make sure you update the files in docker/ too
 ENV APP_HOME /srv/postcodeinfo
 
