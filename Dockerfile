@@ -42,7 +42,7 @@ RUN cd ${APP_HOME} && pip install -r requirements.txt
 # to whatever is in the settings.py
 #ENV DJANGO_DEBUG true
 #ENV DJANGO_ALLOWED_HOSTS 127.0.0.1
-#ENV SECRET_KEY lkasjdklajskldaksljdklajskldjiu213oi
+#ENV SECRET_KEY tfZmYFM7KWWbSujx2F4WZyYAIcUrQRZp
 ENV DJANGO_DB_NAME postcodeinfo
 ENV DJANGO_DB_USER postcodeinfo
 ENV DJANGO_DB_PASSWORD postcodeinfo
