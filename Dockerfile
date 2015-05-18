@@ -17,7 +17,6 @@ RUN rm -f /etc/nginx/sites-enabled/default
 
 RUN useradd -m -d /srv/postcodeinfo postcodeinfo
 
-
 RUN mkdir -p /var/log/wsgi && touch /var/log/wsgi/app.log /var/log/wsgi/debug.log && \
     chown -R www-data:www-data /var/log/wsgi && chmod -R g+s /var/log/wsgi
 
@@ -28,14 +27,13 @@ ADD ./docker/postcodeinfo.ini /etc/wsgi/conf.d/postcodeinfo.ini
 VOLUME ["/var/log/nginx", "/var/log/wsgi"]
 
 # APP_HOME
-ENV APP_HOME /home/app/django
+ENV APP_HOME /srv/postcodeinfo
 
 # Add project directory to docker
-ADD . /home/app/django
-
 ADD . /srv/postcodeinfo
 RUN rm -rf /srv/postcodeinfo/.git
 RUN chown -R postcodeinfo: /srv/postcodeinfo
+RUN cd /srv/postcodeinfo && pip install -r requirements.txt
 
 EXPOSE 8000
 #USER postcodeinfo
