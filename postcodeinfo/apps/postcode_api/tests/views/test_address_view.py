@@ -13,13 +13,13 @@ class AddressViewTestCase(TestCase):
     token = Token.objects.create(user=self.user)
     token.save()
     self.valid_token = 'Token ' + str(self.user.auth_token)
-    self.__import_data_from('addressbase_basic_sample.csv')
+    self._import_data_from('addressbase_basic_sample.csv')
     
-  def __sample_data_file(self, filename):
+  def _sample_data_file(self, filename):
     return os.path.join(os.path.dirname(__file__), '../', 'sample_data/', filename)
 
-  def __import_data_from(self, file):
-    return AddressBaseBasicImporter().import_csv(self.__sample_data_file(file))
+  def _import_data_from(self, file):
+    return AddressBaseBasicImporter().import_csv(self._sample_data_file(file))
 
   def test_that_getting_addresses_with_a_valid_postcode_and_token_produces_parseable_json(self):
     response = self.client.get('/addresses/', {'postcode': 'EX68BP'}, True, False, HTTP_AUTHORIZATION=self.valid_token )
