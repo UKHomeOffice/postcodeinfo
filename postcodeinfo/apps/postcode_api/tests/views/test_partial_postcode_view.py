@@ -17,11 +17,11 @@ class PartialPostcodeViewTestCase(TestCase):
     token.save()
     self.valid_token = 'Token ' + str(self.user.auth_token)
 
-    AddressBaseBasicImporter().import_csv(self.__sample_data_file('addressbase_basic_barnet_sample.csv'))
-    PostcodeGssCodeImporter().import_postcode_gss_codes(self.__sample_data_file('NSPL_barnet_sample.csv'))
-    LocalAuthoritiesImporter().import_local_authorities(self.__sample_data_file('local_authorities_sample.nt'))
+    AddressBaseBasicImporter().import_csv(self._sample_data_file('addressbase_basic_barnet_sample.csv'))
+    PostcodeGssCodeImporter().import_postcode_gss_codes(self._sample_data_file('NSPL_barnet_sample.csv'))
+    LocalAuthoritiesImporter().import_local_authorities(self._sample_data_file('local_authorities_sample.nt'))
     
-  def __sample_data_file(self, filename):
+  def _sample_data_file(self, filename):
     return os.path.join(os.path.dirname(__file__), '../', 'sample_data/', filename)
 
 
