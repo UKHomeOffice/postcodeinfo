@@ -73,11 +73,11 @@ WSGI_APPLICATION = 'postcodeinfo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ.get('DJANGO_DB_NAME', 'postcodeinfo'),
-        'USER': os.environ.get('DJANGO_DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
-        'HOST': os.environ.get('DJANGO_DB_HOST', ''),                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': os.environ.get('DJANGO_DB_PORT', ''),                      # Set to empty string for default.
+        'NAME': os.environ.get('DB_NAME', 'postcodeinfo'),
+        'USER': os.environ.get('DB_USERNAME', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': os.environ.get('DB_PORT', ''),                      # Set to empty string for default.
     }
 }
 
