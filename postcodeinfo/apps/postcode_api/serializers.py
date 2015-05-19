@@ -5,7 +5,7 @@ from rest_framework_gis.serializers import GeoModelSerializer
 
 
 class AddressSerializer(GeoModelSerializer):
-    formatted_address = serializers.Field(source='formatted_address')
+    formatted_address = serializers.ReadOnlyField()
 
     def __init__(self, *args, **kwargs):
         super(AddressSerializer, self).__init__(*args, **kwargs)

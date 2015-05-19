@@ -66,7 +66,7 @@ class PostcodeGssCode(models.Model):
     local_authority_gss_code = models.CharField(max_length=9, db_index=True)
 
 class LocalAuthorityManager(models.Manager):
-    def for_postcode(self, postcode):
+    def for_postcode(self, postcode):        
         postcode_to_gss_code_mapping = PostcodeGssCode.objects.filter(postcode_index=postcode).first()
         if postcode_to_gss_code_mapping:
             gss_code = postcode_to_gss_code_mapping.local_authority_gss_code
