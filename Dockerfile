@@ -41,13 +41,13 @@ RUN cd ${APP_HOME} && pip install -r requirements.txt
 #ENV DJANGO_DEBUG true
 #ENV DJANGO_ALLOWED_HOSTS 127.0.0.1
 #ENV SECRET_KEY tfZmYFM7KWWbSujx2F4WZyYAIcUrQRZp
-ENV DJANGO_DB_NAME postcodeinfo
-ENV DJANGO_DB_USER postcodeinfo
-ENV DJANGO_DB_PASSWORD postcodeinfo
-ENV DJANGO_DB_HOST postgres
-#ENV DJANGO_DB_PORT
+ENV DB_NAME postcodeinfo
+ENV DB_USERNAME postcodeinfo
+ENV DB_PASSWORD postcodeinfo
+ENV DB_HOST postgres
+ENV DB_PORT 5432
 
-EXPOSE 8000
+EXPOSE 80
 #USER postcodeinfo
 WORKDIR /srv/postcodeinfo
 
