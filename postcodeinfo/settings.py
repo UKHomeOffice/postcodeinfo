@@ -17,7 +17,7 @@ root = lambda *x: os.path.join(PROJECT_ROOT, *x)
 
 sys.path.insert(0, root('apps'))
 
-
+TESTING = 'test' in sys.argv
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/

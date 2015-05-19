@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db import models, migrations
 import django.contrib.gis.db.models.fields
 
@@ -37,7 +38,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        LoadExtension('postgis'),
         migrations.CreateModel(
             name='Address',
             fields=[
@@ -74,3 +74,6 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
     ]
+
+    if not getattr(settings, 'TESTING', False):
+        operations[:0] = [LoadExtension('postgis')]
