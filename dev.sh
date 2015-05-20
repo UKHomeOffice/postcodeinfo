@@ -40,5 +40,5 @@ sleep 5
 build_django_app_container || printf $RED "Failed to build container"
 
 django_manage "migrate" || printf $RED "Failed to execute django migration"
-django_manage "collectstatic" || printf $RED "Failed to execute django collectstatic"
+django_manage "collectstatic --noinput" || printf $RED "Failed to execute django collectstatic"
 django_manage "runserver 0.0.0.0:8000"
