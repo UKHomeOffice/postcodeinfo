@@ -15,20 +15,19 @@ ENV APP_HOME /srv/postcodeinfo
 
 RUN useradd -m -d ${APP_HOME} postcodeinfo
 
-RUN mkdir -p /var/log/wsgi /var/log/nginx/postcodeinfo
-RUN touch /var/log/wsgi/app.log /var/log/wsgi/debug.log
-RUN chown -R www-data:www-data /var/log/wsgi && chmod -R g+s /var/log/wsgi
+RUN mkdir -p /var/log/gunicorn /var/log/nginx/postcodeinfo
+RUN touch /var/log/gunicorn/access.log /var/log/gunicorn/error.log
+RUN chown -R www-data:www-data /var/log/gunicorn && chmod -R g+s /var/log/gunicorn
 
-# copy the wsgi and nginx config
+# copy the nginx config
 ADD ./docker/nginx.conf /etc/nginx/nginx.conf
-ADD ./docker/postcodeinfo.ini /etc/wsgi/conf.d/postcodeinfo.ini
 
 # install service files for runit
 ADD ./docker/nginx.service /etc/service/nginx/run
-ADD ./docker/uwsgi.service /etc/service/uwsgi/run
+ADD ./docker/gunicorn.service /etc/service/gunicorn/run
 
 # Define mountable directories.
-VOLUME ["/var/log/nginx", "/var/log/wsgi"]
+VOLUME ["/var/log/nginx", "/var/log/gunicorn"]
 
 # Add project directory to docker
 ADD . ${APP_HOME}
