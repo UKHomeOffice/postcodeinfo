@@ -6,55 +6,66 @@ Address Finder
 
 Postcode lookup HTTP/REST service using [Ordnance Survey AddressBase Basic](http://www.ordnancesurvey.co.uk/business-and-government/products/addressbase.html) data. No data is included in this project due to copyright/licensing.
 
-Dependencies
+
+Requirements
 ------------
+#### Developing/Contributing
+ * [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+ * [boot2docker](http://boot2docker.io/) (for Mac OS X/Windows, on linux you can install docker using your favourite package manager)
+ * git (`brew install git`)
 
-On MacOS:
+#### Production
+ * docker
+ * [Postgresql 9.3+](http://www.postgresql.org/) with the [postgis](http://postgis.net/) plugin
 
-`$ brew install python postgresql geos proj gdal postgis`
-
-Stick the kettle on, it'll be a while.
 
 Setup
 -----
-
-### Create GIS database
-
-```bash
-$ createdb postcodeinfo
-$ psql postcodeinfo
-```
-```SQL
-> CREATE EXTENSION postgis;
-```
-
-### Create virtualenv
+### Pull down the repository
 
 ```bash
-$ pip install virtualenv
 $ git clone https://github.com/ministryofjustice/postcodeinfo.git
 $ cd postcodeinfo
-$ virtualenv .venv
-$ source .venv/bin/activate
 ```
 
-### Install requirements
+### Make sure you've forwarded the correct ports (only for boot2docker)
+
+boot2docker works by starting a virtualbox VM and running docker inside it. When we forward ports using the -p or -P flag in docker, we need to do an extra step to make sure those are visible to the outside.
 
 ```bash
-$ pip install -r requirements.txt
+$ boot2docker poweroff
+$ VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port8000,tcp,,8000,,8000";
+$ VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port5432,tcp,,5432,,5432";
+$ boot2docker up
 ```
+Note: this only needs running once
 
-### Create database schema and superuser
+### Bring up the development environment
+The commands below will create two docker instances, one for keeping the database (postgresql + postgis) and the other for running the django code by issuing `./manage.py runserver`
+Once they're both up you can edit the code in the repository and you should be able to see your changes immediately on `http://localhost:8000`
 
 ```bash
-$ ./manage.py syncdb
+$ $(boot2docker shellinit)
+$ ./dev.sh
+```
+Note: If you want to execute custom commands inside the docker container you can easily do so by opening up a new shell and running the commands in the container. There's an example on how to do so in the next section (Creating a superuser)
+
+### Create a superuser (optional)
+If you need to use the django built-in admin interface you would need to create an user. We can do so by executing the createsuperuser command in the running container:
+
+```bash
+$ docker exec -ti  --rm postcode-web ./manage.py createsuperuser
 ```
 
 ### Download and Import Data
+In order to download and import the data we must execute the `download_and_import_all` command. We can either do that as in the "Create a superuser" section, or get a shell inside the container like so:
 
 ```bash
+$ docker exec -ti --rm postcode-web /bin/bash
 $ ./manage.py download_and_import_all
+$ exit
 ```
+
 _This will take a long time to run - usually around 5hrs_
 
 Note that it will keep a record of downloaded and imported files, comparing etag/last-modified timestamps and filenames to avoid re-downloading files it has already retrieved. This means that if your connection drops, you can restart, and existing files will be skipped.
