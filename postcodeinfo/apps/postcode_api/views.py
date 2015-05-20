@@ -24,21 +24,20 @@ class PostcodeView(generics.RetrieveAPIView):
 
     geom_query = 'postcode_index'
 
-
     def __format_json(cls, geom, local_authority):
         centre = geom.centroid.coords
-        lat_long = { 'latitude': centre[1], 'longitude': centre[0] }
-            
+        lat_long = {'latitude': centre[1], 'longitude': centre[0]}
+
         if local_authority:
-                local_authority = {
-                    'name': local_authority.name,
-                    'gss_code': local_authority.gss_code
-                }
+            local_authority = {
+                'name': local_authority.name,
+                'gss_code': local_authority.gss_code
+            }
 
         data = {
-                'centre': lat_long,
-                'local_authority': local_authority
-            }
+            'centre': lat_long,
+            'local_authority': local_authority
+        }
         return data
 
     def __get_geometry(self, postcode):
@@ -50,7 +49,6 @@ class PostcodeView(generics.RetrieveAPIView):
         local_authority = LocalAuthority.objects.for_postcode(postcode)
         return local_authority
 
-        
     def get(self, request, *args, **kwargs):
         postcode = kwargs.get('postcode', '').replace(' ', '').lower()
         geom = self.__get_geometry(postcode)
@@ -63,7 +61,7 @@ class PostcodeView(generics.RetrieveAPIView):
 
         return Response(None, status=status.HTTP_404_NOT_FOUND)
 
+
 class PartialPostcodeView(PostcodeView):
 
     geom_query = 'postcode_area'
-

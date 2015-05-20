@@ -1,4 +1,5 @@
-import os, re
+import os
+import re
 
 import zipfile
 from zipfile import ZipFile
@@ -7,6 +8,7 @@ from titlecase import titlecase
 
 
 class AddressFormatter(object):
+
     """
     Heavily inspired by https://github.com/DanMeakin/getputpostcode
     """
@@ -57,9 +59,9 @@ class AddressFormatter(object):
                 final = parts.pop()
 
                 if (exception.match(component)
-                            and not number
-                            and not re.match(r'/^\d*$/', final)
-                        ):
+                        and not number
+                        and not re.match(r'/^\d*$/', final)
+                    ):
                     building_str += u"%s\n%s " % (' '.join(parts), final)
                 else:
                     building_str += u"%s\n" % titlecase(component)
@@ -71,6 +73,7 @@ class AddressFormatter(object):
 
 
 class ZipExtractor(object):
+
     def __init__(self, filepath):
         self.filepath = filepath
 
@@ -81,16 +84,15 @@ class ZipExtractor(object):
         else:
             return [filepath]
 
-
     def unzip(self, pattern):
         extracted_files = []
         dirname = os.path.dirname(self.filepath)
         thezip = ZipFile(self.filepath, 'r')
-        
+
         for info in thezip.infolist():
-            if re.match( pattern, info.filename ):
+            if re.match(pattern, info.filename):
                 extracted_path = thezip.extract(info, dirname)
-                extracted_files.append( extracted_path )
+                extracted_files.append(extracted_path)
                 print 'extracted ' + extracted_path
             else:
                 print 'ignored ' + info.filename
