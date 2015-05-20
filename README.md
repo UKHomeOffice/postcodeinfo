@@ -33,7 +33,7 @@ $ cd postcodeinfo
 boot2docker works by starting a virtualbox VM and running docker inside it. When we forward ports using the -p or -P flag in docker, we need to do an extra step to make sure those are visible to the outside.
 
 ```bash
-$ boot2docker poweroff
+$ boot2docker init
 $ VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port8000,tcp,,8000,,8000";
 $ VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port5432,tcp,,5432,,5432";
 $ boot2docker up
