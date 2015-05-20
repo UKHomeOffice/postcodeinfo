@@ -2,11 +2,11 @@ responses==0.3.0
 mock==1.0.1
 coverage==3.7.1
 
-uwsgi==2.0.10
 ## The following requirements were added by pip freeze:
 Django==1.8.1
 djangorestframework==3.1.2
 djangorestframework-gis==0.8.2
+gunicorn==19.3.0
 html5lib==0.99999
 isodate==0.5.1
 psycopg2==2.6
