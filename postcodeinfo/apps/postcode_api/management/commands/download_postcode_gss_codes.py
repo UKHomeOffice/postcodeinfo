@@ -1,7 +1,9 @@
 import os
 from django.core.management.base import BaseCommand, CommandError
 
-from postcode_api.downloaders.postcode_gss_code_downloader import PostcodeGssCodeDownloader
+from postcode_api.downloaders.postcode_gss_code_downloader \
+  import PostcodeGssCodeDownloader
+
 
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'

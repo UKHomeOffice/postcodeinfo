@@ -9,6 +9,7 @@ from dateutil.parser import parse as parsedate
 from postcode_api.models import Address
 from postcode_api.importers.progress_reporter import ProgressReporter
 
+
 class AddressBaseBasicImporter(object):
 
     def __init__(self):
@@ -45,7 +46,8 @@ class AddressBaseBasicImporter(object):
             if v == 'date' and row[i] != '':
                 setattr(a, k, parsedate(row[i]))
 
-        a.postcode_index = row[self.indices['postcode']].replace(' ', '').lower()
+        given_postcode = row[self.indices['postcode']]
+        a.postcode_index = given_postcode.replace(' ', '').lower()
 
         a.point = Point(
             float(row[self.indices['x_coord']]),

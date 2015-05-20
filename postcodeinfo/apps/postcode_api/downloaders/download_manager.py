@@ -34,14 +34,18 @@ class DownloadManager(object):
         content_length = headers['content-length']
         return self.download_to_file(url, filepath, chunk_size, content_length)
 
-    def download_to_file(self, url, filepath, chunk_size=4192, content_length=None):
+    def download_to_file(self,
+                         url, filepath,
+                         chunk_size=4192,
+                         content_length=None):
         r = requests.get(url, stream=True)
 
         with open(filepath, 'wb') as fd:
             count = 0
             for chunk in r.iter_content(chunk_size):
                 if content_length and count % 100 == 0:
-                    print '{0} bytes of {1}'.format(count*chunk_size, content_length)
+                    print '{0} bytes of {1}'.format(count*chunk_size
+                                                    content_length)
                 count = count + 1
                 fd.write(chunk)
 
@@ -67,20 +71,23 @@ class DownloadManager(object):
     def record_download(self, url, dirpath, headers={}):
         # create Download record storing the url, local path, last modified
         # date, and etag
-        dl = Download(url=url, etag=headers['etag'],
-                      last_modified=self.__format_time_for_orm(headers['last-modified']))
+        formatted_time = self.__format_time_for_orm(headers['last-modified'])
+        dl = Download(url=url,
+                      etag=headers['etag'],
+                      last_modified=formatted_time)
         dl.local_filepath = self.filename(dirpath, url)
         dl.state = 'downloaded'
-        dl.last_state_change = self.__format_time_for_orm(localtime())
+        now = self.__format_time_for_orm(localtime())
+        dl.last_state_change = now
         dl.save()
 
         return dl
 
     def download_is_needed(self, download_record):
         """ Basic naive strategy - if there's an existing record, we don't
-            need to re-download. (The existing record is found by the combination
-            of url, etag and last_modified, so if and only if those three match,
-            then we don't need to download).
+            need to re-download. (The existing record is found by the
+            combination of url, etag and last_modified, so if and only if
+            those three match, then we don't need to download).
             This is sufficient for MVP 1 - future implementations can be as
             complex as needed. """
 
@@ -91,8 +98,10 @@ class DownloadManager(object):
             return True
 
     def existing_download_record(self, url, headers):
-        dl = Download.objects.filter(url=url, etag=headers[
-                                     'etag'], last_modified=parser.parse(headers['last-modified'])).first()
+        last_modified = parser.parse(headers['last-modified'])
+        dl = Download.objects.filter(url=url,
+                                     etag=headers['etag'],
+                                     last_modified=last_modified).first()
         if dl:
             print 'existing download record found: '
             print '  state: %s since %s' % (dl.state,  dl.last_state_change)

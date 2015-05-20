@@ -14,8 +14,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='LocalAuthority',
             fields=[
-                ('gss_code', models.CharField(max_length=9, serialize=False, primary_key=True, db_index=True)),
-                ('name', models.CharField(max_length=128, db_index=True)),
+                ('gss_code', models.CharField(
+                    max_length=9, serialize=False,
+                    primary_key=True, db_index=True)),
+                ('name', models.CharField(max_length=128,
+                                          db_index=True)),
             ],
             options={
             },
@@ -24,8 +27,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PostcodeGssCode',
             fields=[
-                ('postcode_index', models.CharField(max_length=7, db_index=True)),
-                ('local_authority_gss_code', models.CharField(max_length=9, serialize=False, primary_key=True, db_index=True)),
+                ('postcode_index', models.CharField(
+                    max_length=7, db_index=True)),
+                ('local_authority_gss_code', models.CharField(
+                    max_length=9, serialize=False,
+                    primary_key=True, db_index=True)),
             ],
             options={
             },
@@ -34,7 +40,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='address',
             name='postcode_area',
-            field=models.CharField(default=b'', max_length=4, db_index=True, blank=True),
+            field=models.CharField(
+                default=b'', max_length=4, db_index=True, blank=True),
             preserve_default=True,
         ),
     ]

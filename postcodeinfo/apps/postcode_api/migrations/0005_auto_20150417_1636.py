@@ -20,7 +20,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='postcodegsscode',
             name='postcode_index',
-            field=models.CharField(max_length=7, serialize=False, primary_key=True, db_index=True),
+            field=models.CharField(
+                max_length=7, serialize=False,
+                primary_key=True, db_index=True),
             preserve_default=True,
         ),
     ]

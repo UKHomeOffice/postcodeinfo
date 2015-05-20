@@ -75,17 +75,21 @@ class FTPDownloadManager(DownloadManager):
         file = open(filepath, 'wb')
         counts = {'size': 0, 'chunks': 0}
 
-        # defined as a local closure so that it can access the variables in local scope
+        # defined as a local closure so that it can access the
+        # variables in local scope
         # We have to do it this way because:
-        # a) the ftplib interface only supports one argument to the named callback
-        # b) you can't reassign a primitive inside a closure, but you *can*
-        #    mutate a key in a dict. This is .... not pleasant, but it works.
+        # a) the ftplib interface only supports one argument
+        #    to the named callback
+        # b) you can't reassign a primitive inside a closure,
+        #    but you *can* mutate a key in a dict. This is ....
+        #    not pleasant, but it works.
         def handle_chunk_callback(data):
             counts['size'] += len(data)
             counts['chunks'] += 1
             file.write(data)
             if counts['chunks'] % 100 == 0:
-                print '%i/%i bytes' % (counts['size'], headers['content-length'])
+                print '%i/%i bytes' % \
+                    (counts['size'], headers['content-length'])
 
         self.ftp_client.retrbinary('RETR %s' % url, handle_chunk_callback)
 

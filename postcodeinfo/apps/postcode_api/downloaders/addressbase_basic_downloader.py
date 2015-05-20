@@ -15,7 +15,9 @@ class AddressBaseBasicDownloader(object):
             'osmmftp.os.uk', self.__username(), self.__password())
         self.download_manager.ftp_client.cwd(self.__source_dir())
 
-        return self.download_manager.download_all_if_needed('./*_csv.zip', local_dir, force)
+        return self.download_manager.download_all_if_needed('./*_csv.zip',
+                                                            local_dir,
+                                                            force)
 
     def __username(self):
         username = os.environ.get('OS_FTP_USERNAME')

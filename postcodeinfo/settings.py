@@ -13,7 +13,10 @@ import os
 import sys
 PROJECT_ROOT = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(PROJECT_ROOT)
-root = lambda *x: os.path.join(PROJECT_ROOT, *x)
+
+
+def root(*x):
+    os.path.join(PROJECT_ROOT, *x)
 
 sys.path.insert(0, root('apps'))
 
@@ -24,7 +27,8 @@ TESTING = 'test' in sys.argv
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
-    'kitqw3pp!@k&6$a(r4o_m6deowtaeu35n4a%(k=ri0$*0vifbm')
+                            'kitqw3pp!@k&6$a(r4o_'
+                            'm6deowtaeu35n4a%(k=ri0$*0vifbm')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
@@ -76,8 +80,11 @@ DATABASES = {
         'NAME': os.environ.get('DB_NAME', 'postcodeinfo'),
         'USER': os.environ.get('DB_USERNAME', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', ''),                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': os.environ.get('DB_PORT', ''),                      # Set to empty string for default.
+        # Empty for localhost through domain sockets
+        # or '127.0.0.1' for localhost through TCP.
+        'HOST': os.environ.get('DB_HOST', ''),
+        # Set to empty string for default.
+        'PORT': os.environ.get('DB_PORT', ''),
     }
 }
 
@@ -116,22 +123,8 @@ REST_FRAMEWORK = {
     )
 }
 
-#################################################################################
-# fix for 'relation "auth_user" does not exist' when running tests on Django 1.8
-# see https://github.com/evonove/django-oauth-toolkit/issues/204
 
-# makemigrations requires this for some reason or it errors
-# Just set to the default value
-# OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
-
-# # tell django where to put the oauth2 migrations
-# MIGRATION_MODULES = {
-#    # key: app name, value: a fully qualified package name, not the usual `app_label.something_else`
-#   'oauth2_provider': 'postcode_api.migrations.oauth2_provider',
-# }
-
-
-################################################################################
+##########################################################################
 # Sentry integration for error notifications
 # from https://sentry.service.dsd.io/docs/platforms/django/
 
