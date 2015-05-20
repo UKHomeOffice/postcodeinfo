@@ -99,21 +99,6 @@ class AddressFormatterTestCase(TestCase):
             u'The Manor\nUpper Hill\nHorley\nRH6 0HP'
         )
 
-    # PAF docs table 26c
-    # def test_building_name_only_ends_with_number_range(self):
-    #     a = Address(
-    #         organisation_name='S D ALCOTT FLORISTS',
-    #         building_name='FLOWER HOUSE 189A',
-    #         thoroughfare_name='PYE GREEN ROAD',
-    #         post_town='CANNOCK',
-    #         postcode='WS11 5SB'
-    #     )
-
-    #     self.assertEqual(
-    #         AddressFormatter.format(a),
-    #         u'S D Alcott Florists\nFlower House\n189A Pye Green Road\nCannock\nWS11 5SB'
-    #     )
-
     def test_building_name_only_ends_with_simple_number(self):
         a = Address(
             organisation_name='JAMES VILLA HOLIDAYS',
@@ -125,7 +110,8 @@ class AddressFormatterTestCase(TestCase):
 
         self.assertEqual(
             AddressFormatter.format(a),
-            u'James Villa Holidays\nCentre 30\nSt. Laurence Avenue\nGrafton\nME16 0LP'
+            u'James Villa Holidays\nCentre 30\n'
+            'St. Laurence Avenue\nGrafton\nME16 0LP'
         )
 
     def test_building_name_and_building_number(self):
