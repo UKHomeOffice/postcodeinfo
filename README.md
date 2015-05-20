@@ -54,14 +54,16 @@ Note: If you want to execute custom commands inside the docker container you can
 If you need to use the django built-in admin interface you would need to create an user. We can do so by executing the createsuperuser command in the running container:
 
 ```bash
-$ docker exec -ti  --rm postcode-web ./manage.py createsuperuser
+$ $(boot2docker shellinit)
+$ docker exec -ti postcode-web ./manage.py createsuperuser
 ```
 
 ### Download and Import Data
 In order to download and import the data we must execute the `download_and_import_all` command. We can either do that as in the "Create a superuser" section, or get a shell inside the container like so:
 
 ```bash
-$ docker exec -ti --rm postcode-web /bin/bash
+$ $(boot2docker shellinit)
+$ docker exec -ti postcode-web /bin/bash
 $ ./manage.py download_and_import_all
 $ exit
 ```
