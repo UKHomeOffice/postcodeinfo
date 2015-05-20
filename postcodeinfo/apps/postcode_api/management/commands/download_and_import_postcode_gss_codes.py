@@ -6,35 +6,41 @@ from StringIO import StringIO
 
 
 from postcode_api.utils import ZipExtractor
-from postcode_api.downloaders.postcode_gss_code_downloader import PostcodeGssCodeDownloader
-from postcode_api.importers.postcode_gss_code_importer import PostcodeGssCodeImporter
+from postcode_api.downloaders.postcode_gss_code_downloader \
+    import PostcodeGssCodeDownloader
+from postcode_api.importers.postcode_gss_code_importer \
+    import PostcodeGssCodeImporter
+
 
 def exit_code(key):
     return {'OK': 0, 'GENERIC_ERROR': 1}[key]
+
 
 class Command(BaseCommand):
     args = '<destination_dir (default /tmp/)>'
 
     def add_arguments(self, parser):
         # Positional arguments
-        parser.add_argument('--destination_dir', 
-                action='store_true', 
-                dest='destination_dir',
-                default='/tmp/postcode_gss_codes/')
+        parser.add_argument('--destination_dir',
+                            action='store_true',
+                            dest='destination_dir',
+                            default='/tmp/postcode_gss_codes/')
 
         # Named (optional) arguments
         parser.add_argument('--force',
-            action='store_true',
-            dest='force',
-            default=False,
-            help='Force download even if previous download exists')
+                            action='store_true',
+                            dest='force',
+                            default=False,
+                            help='Force download '
+                                 'even if previous download exists')
 
     def handle(self, *args, **options):
 
         if not os.path.exists(options['destination_dir']):
-          os.makedirs(options['destination_dir'])
+            os.makedirs(options['destination_dir'])
 
-        downloaded_file = self.__download(options['destination_dir'], options.get('force', False) )
+        downloaded_file = self.__download(
+            options['destination_dir'], options.get('force', False))
         if downloaded_file:
             self.__process(downloaded_file)
             return exit_code('OK')

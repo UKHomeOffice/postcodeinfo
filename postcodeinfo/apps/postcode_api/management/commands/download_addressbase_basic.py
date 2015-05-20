@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from postcode_api.downloaders.addressbase_basic_downloader import AddressBaseBasicDownloader
+from postcode_api.downloaders.addressbase_basic_downloader \
+    import AddressBaseBasicDownloader
+
 
 class Command(BaseCommand):
     args = '<destination_dir>'
