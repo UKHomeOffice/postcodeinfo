@@ -1,4 +1,15 @@
 #!/bin/bash
+#
+#The script will:
+#  pull down a postgresql + postgis container and run it
+#  build a container for the django code, based on the Dockerfile in the repo (so it resembles prod)
+#  link the containers
+#  runs a django migrate
+#  mount the work dir inside the container so one can use his favourite IDE to change code that's running inside the container
+#
+#Note: django will pick up on the code changes and restart itself automatically
+
+
 set -eu
 GREEN='\n\e[1;32m%-6s\e[m\n'
 RED='\n\e[1;31m%-6s\e[m\n'
@@ -14,16 +25,10 @@ build_django_app_container() {
   docker build -t postcodeinfo-dev .
 }
 
-django_migrate() {
-  printf $GREEN "Running the django migration script"
+django_manage() {
+  printf $GREEN "Running ./manage.py $1"
   docker rm postcode-web 2>/dev/null || :
-  docker run --rm -ti -p 8000:8000 -v $(pwd):/srv/postcodeinfo --name postcode-web --link postcode-db:postgres -e DB_PASSWORD=postcodeinfo -e DB_USER=postcodeinfo postcodeinfo-dev ./manage.py migrate
-}
-
-django_runserver() {
-  printf $GREEN "Running the django container and linking it with the database"
-  docker rm postcode-web 2>/dev/null || :
-  docker run --rm -ti -p 8000:8000 -v $(pwd):/srv/postcodeinfo --name postcode-web --link postcode-db:postgres -e DB_PASSWORD=postcodeinfo -e DB_USER=postcodeinfo postcodeinfo-dev ./manage.py runserver 0.0.0.0:8000
+  docker run --rm -ti -p 8000:8000 -v $(pwd):/srv/postcodeinfo --name postcode-web --link postcode-db:postgres -e DB_PASSWORD=postcodeinfo -e DB_USER=postcodeinfo postcodeinfo-dev ./manage.py $1
 }
 
 printf $GREEN "Looking for an existing postgis container..."
@@ -33,6 +38,6 @@ docker inspect postcode-db|grep '"Running": true' 2>&1>/dev/null || run_postgis_
 sleep 5
 
 build_django_app_container || printf $RED "Failed to build container"
-django_migrate || printf $RED "Failed to execute django migration"
-django_runserver
 
+django_manage "migrate" || printf $RED "Failed to execute django migration"
+django_manage "runserver 0.0.0.0:8000"
