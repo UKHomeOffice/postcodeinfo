@@ -58,10 +58,9 @@ class AddressFormatter(object):
                 parts = titlecase(component).split(' ')
                 final = parts.pop()
 
-                if (exception.match(component)
-                        and not number
-                        and not re.match(r'/^\d*$/', final)
-                    ):
+                if (exception.match(component) and
+                        not number and
+                        not re.match(r'/^\d*$/', final)):
                     building_str += u"%s\n%s " % (' '.join(parts), final)
                 else:
                     building_str += u"%s\n" % titlecase(component)
