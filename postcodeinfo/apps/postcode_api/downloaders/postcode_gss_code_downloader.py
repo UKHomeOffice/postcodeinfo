@@ -11,8 +11,9 @@ class PostcodeGssCodeDownloader(object):
         most_recent_file_url = self.__target_href()
 
         dl_mgr = DownloadManager()
-
-        return dl_mgr.download_if_needed(most_recent_file_url, target_dir, force)
+        return dl_mgr.download_if_needed(most_recent_file_url,
+                                         target_dir,
+                                         force)
 
     def __target_href(self):
         index_json = requests.get(self.__index_json_url()).text
@@ -28,10 +29,12 @@ class PostcodeGssCodeDownloader(object):
         return self.__file_url(most_recent['links'])
 
     def __index_json_url(self):
-        return 'https://geoportal.statistics.gov.uk/geoportal/rest/find/document?searchText=NSPL&f=pjson'
+        return 'https://geoportal.statistics.gov.uk/geoportal'\
+            '/rest/find/document?searchText=NSPL&f=pjson'
 
     def __is_nspl_csv_link(self, element):
-        return element['title'].startswith('National Statistics Postcode Lookup (UK)')
+        return element['title'].startswith(
+            'National Statistics Postcode Lookup (UK)')
 
     def __file_url(self, links):
         link = filter(self.__is_file_link, links)[0]
