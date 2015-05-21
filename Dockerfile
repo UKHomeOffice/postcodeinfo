@@ -30,6 +30,7 @@ ADD ./docker/gunicorn.service /etc/service/gunicorn/run
 VOLUME ["/var/log/nginx", "/var/log/gunicorn"]
 
 # Add project directory to docker
+WORKDIR ${APP_HOME}
 ADD . ${APP_HOME}
 RUN rm -rf ${APP_HOME}/.git
 RUN chown -R postcodeinfo: ${APP_HOME}
@@ -48,7 +49,6 @@ ENV DB_PORT 5432
 
 EXPOSE 80
 #USER postcodeinfo
-WORKDIR /srv/postcodeinfo
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
