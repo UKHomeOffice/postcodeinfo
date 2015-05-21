@@ -64,7 +64,7 @@ In order to download and import the data we must execute the `download_and_impor
 ```bash
 $ $(boot2docker shellinit)
 $ docker exec -ti postcode-web /bin/bash
-$ ./manage.py download_and_import_all
+$ ./scripts/download_and_import_all.sh
 $ exit
 ```
 
