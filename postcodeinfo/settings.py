@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(PROJECT_ROOT)
 
 
 def root(*x):
-    os.path.join(PROJECT_ROOT, *x)
+    return os.path.join(PROJECT_ROOT, *x)
 
 sys.path.insert(0, root('apps'))
 

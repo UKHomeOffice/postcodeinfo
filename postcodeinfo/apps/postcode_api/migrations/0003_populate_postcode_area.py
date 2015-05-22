@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            "UPDATE postcode_api_address"
+            "UPDATE postcode_api_address "
             "SET postcode_area = "
             "lower(split_part(postcode, ' ', 1));")
     ]
