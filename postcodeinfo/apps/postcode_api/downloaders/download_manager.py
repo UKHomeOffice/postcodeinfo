@@ -44,7 +44,7 @@ class DownloadManager(object):
             count = 0
             for chunk in r.iter_content(chunk_size):
                 if content_length and count % 100 == 0:
-                    print '{0} bytes of {1}'.format(count*chunk_size
+                    print '{0} bytes of {1}'.format(count*chunk_size,
                                                     content_length)
                 count = count + 1
                 fd.write(chunk)
