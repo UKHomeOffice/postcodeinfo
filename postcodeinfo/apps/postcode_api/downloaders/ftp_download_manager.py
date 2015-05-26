@@ -38,7 +38,7 @@ class FTPDownloadManager(DownloadManager):
             if dl:
                 downloads.append(dl)
 
-        return "\n".join(downloads)
+        return downloads
 
     def get_headers(self, pattern=None):
         file_list = self.files_in_dir(pattern)

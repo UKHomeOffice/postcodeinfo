@@ -59,7 +59,7 @@ class FTPDownloadManagerTestCase(TestCase):
     def test_that_it_returns_the_local_filepath_of_all_downloads_performed(self, mock_list_files, mock_dl_if_needed):
         mock_list_files.return_value = ['file/1', 'file/2']
         mock_dl_if_needed.side_effect = ['/local/file/1', '/local/file/2']
-        self.assertEqual("/local/file/1\n/local/file/2",
+        self.assertEqual(["/local/file/1","/local/file/2"],
                          subject().download_all_if_needed('my pattern', '/dir/path'))
 
     # describe get_headers

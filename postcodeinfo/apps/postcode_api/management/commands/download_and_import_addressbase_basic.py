@@ -41,7 +41,7 @@ class Command(BaseCommand):
         downloaded_file = self.__download(
             options['destination_dir'], options.get('force', False))
         if downloaded_file:
-            self.__process(downloaded_file)
+            self.__process_all(downloaded_file)
             return exit_code('OK')
         else:
             print 'nothing downloaded - nothing to import'
@@ -51,6 +51,13 @@ class Command(BaseCommand):
         print 'downloading'
         downloader = AddressBaseBasicDownloader()
         return downloader.download(destination_dir, force)
+
+    def __process_all(self, files):
+        if isinstance(files, list):
+            for filepath in files:
+                self.__process(filepath)
+        else:
+            self.__process(files)
 
     def __process(self, filepath):
         files = ZipExtractor(filepath).unzip_if_needed(
