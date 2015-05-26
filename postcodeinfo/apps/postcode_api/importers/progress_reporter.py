@@ -20,10 +20,10 @@ class ProgressReporter(object):
     def row_processed(self, row_identifier=''):
         self.lines_processed += 1
         cumulative_time = self.time_taken()
-        print "%s (%s taken), processed: %i, '\
-                'remaining: %i, '\
-                'time_per_row: %f, '\
-                'est. time remaining %s, %s" %  \
+        print "%s (%s taken), processed: %i, "\
+                "remaining: %i, "\
+                "time_per_row: %f, "\
+                "est. time remaining %s, %s" %  \
             (self.human_time(),
              self.hours_minutes_seconds(cumulative_time),
              self.lines_processed, self.lines_remaining(),
