@@ -28,7 +28,19 @@ build_django_app_container() {
 django_manage() {
   printf $GREEN "Running ./manage.py $1"
   docker rm postcode-web 2>/dev/null || :
-  docker run --rm -ti -p 8000:8000 -v $(pwd):/srv/postcodeinfo --name postcode-web --link postcode-db:postgres -e DB_PASSWORD=postcodeinfo -e DB_USER=postcodeinfo postcodeinfo-dev ./manage.py $1
+  docker run --rm -ti -p 8000:8000 -v $(pwd):/srv/postcodeinfo \
+      --name postcode-web \
+      --link postcode-db:postgres \
+      -e "DB_PASSWORD=postcodeinfo" \
+      -e "DB_USER=postcodeinfo" \
+      -e "OS_FTP_USERNAME=${OS_FTP_USERNAME:-anonymous}" \
+      -e "OS_FTP_PASSWORD=${OS_FTP_PASSWORD:-anonymous@}" \
+      -e "DB_NAME=postcodeinfo" \
+      -e "DB_USERNAME=postcodeinfo" \
+      -e "DB_PASSWORD=postcodeinfo" \
+      -e "DB_HOST=postgres" \
+      -e "DB_PORT=5432" \
+      postcodeinfo-dev ./manage.py $1
 }
 
 printf $GREEN "Looking for an existing postgis container..."
