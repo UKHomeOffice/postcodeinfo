@@ -77,11 +77,12 @@ class ZipExtractor(object):
         self.filepath = filepath
 
     def unzip_if_needed(self, pattern):
-        if zipfile.is_zipfile(self.filepath):
+        if zipfile.is_zipfile(self.filepath) == True:
             print 'unzipping'
             return self.unzip(pattern)
         else:
-            return [filepath]
+            print 'not unzipping'
+            return [self.filepath]
 
     def unzip(self, pattern):
         extracted_files = []
