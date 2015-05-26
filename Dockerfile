@@ -35,6 +35,7 @@ ADD . ${APP_HOME}
 RUN rm -rf ${APP_HOME}/.git
 RUN chown -R postcodeinfo: ${APP_HOME}
 RUN cd ${APP_HOME} && pip install -r requirements.txt
+RUN ./manage.py collectstatic --noinput
 
 # Configuration for the app. Variables that are commented out will be defaulted
 # to whatever is in the settings.py
