@@ -58,6 +58,18 @@ $ $(boot2docker shellinit)
 $ docker exec -ti postcode-web ./manage.py createsuperuser
 ```
 
+### Setting variables used inside the container
+In the `Dockerfile` you will find the complete list of variables that are used by apps running inside the container.
+Most defaults will make a dev environment ready to be used, the only exceptions being the FTP credentials.
+You can easily change the value of any of the variables by prefixing the `./dev.sh` command with the var assignment. Ex:
+
+```bash
+$ OS_FTP_USERNAME="myuser" OS_FTP_PASSWORD="mypass" ./dev.sh
+```
+
+That will define the `OS_FTP_USERNAME` and `OS_FTP_PASSWORD` variables inside the dev environment as long as the container is running.
+Any subsequent `docker exec` command will have those variables defined.
+
 ### Download and Import Data
 In order to download and import the data we must execute the `download_and_import_all` command. We can either do that as in the "Create a superuser" section, or get a shell inside the container like so:
 
@@ -69,6 +81,8 @@ $ exit
 ```
 
 _This will take a long time to run - usually around 5hrs_
+
+Keep in mind that for the download and import script to work, the correct ftp credentials need to be defined when setting the dev environment. See the `Setting variables used inside the container` section.
 
 Note that it will keep a record of downloaded and imported files, comparing etag/last-modified timestamps and filenames to avoid re-downloading files it has already retrieved. This means that if your connection drops, you can restart, and existing files will be skipped.
 

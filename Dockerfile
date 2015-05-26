@@ -37,19 +37,20 @@ RUN chown -R postcodeinfo: ${APP_HOME}
 RUN cd ${APP_HOME} && pip install -r requirements.txt
 RUN ./manage.py collectstatic --noinput
 
-# Configuration for the app. Variables that are commented out will be defaulted
-# to whatever is in the settings.py
+# List of tunables (env vars) used by apps inside the container.
 #ENV DJANGO_DEBUG true
 #ENV DJANGO_ALLOWED_HOSTS 127.0.0.1
 #ENV SECRET_KEY tfZmYFM7KWWbSujx2F4WZyYAIcUrQRZp
-ENV DB_NAME postcodeinfo
-ENV DB_USERNAME postcodeinfo
-ENV DB_PASSWORD postcodeinfo
-ENV DB_HOST postgres
-ENV DB_PORT 5432
+#ENV OS_FTP_USERNAME anonymous
+#ENV OS_FTP_PASSWORD anonymous@
+#ENV DB_NAME postcodeinfo
+#ENV DB_USERNAME postcodeinfo
+#ENV DB_PASSWORD postcodeinfo
+#ENV DB_HOST postgres
+#ENV DB_PORT 5432
 
 EXPOSE 80
-#USER postcodeinfo
+USER postcodeinfo
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
