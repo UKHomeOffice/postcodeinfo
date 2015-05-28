@@ -13,8 +13,8 @@ from postcode_api.importers.progress_reporter import ProgressReporter
 class AddressBaseBasicImporter(object):
 
     def __init__(self):
-        self.headers = self.__csv_headers()
-        self.indices = self.__column_indices()
+        self.headers = self._csv_headers()
+        self.indices = self._column_indices()
         self.progress = ProgressReporter()
 
     def import_csv(self, filename):
@@ -23,7 +23,7 @@ class AddressBaseBasicImporter(object):
         with open(filename, 'rb') as csvfile:
             for row in csv.reader(csvfile):
                 if row:
-                    self.__import_row(row)
+                    self._import_row(row)
                     identifier = 'UPRN ' + row[self.indices['uprn']]
                 else:
                     identifier = '(empty row)'
@@ -32,7 +32,7 @@ class AddressBaseBasicImporter(object):
 
         self.progress.finish()
 
-    def __import_row(self, row):
+    def _import_row(self, row):
         try:
             a = Address.objects.get(uprn=row[self.indices['uprn']])
         except Address.DoesNotExist:
@@ -57,7 +57,7 @@ class AddressBaseBasicImporter(object):
 
         a.save()
 
-    def __column_indices(self):
+    def _column_indices(self):
         return {
             'uprn': self.headers.keys().index('uprn'),
             'postcode': self.headers.keys().index('postcode'),
@@ -65,7 +65,7 @@ class AddressBaseBasicImporter(object):
             'y_coord': self.headers.keys().index('y_coordinate')
         }
 
-    def __csv_headers(self):
+    def _csv_headers(self):
         return OrderedDict([
             ("uprn", "char"),
             ("os_address_toid", "char"),

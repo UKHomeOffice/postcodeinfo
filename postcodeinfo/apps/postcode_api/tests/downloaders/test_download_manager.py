@@ -16,7 +16,7 @@ def subject():
 
 class DownloadManagerTestCase(TestCase):
 
-    def __existing_record(self, headers):
+    def _existing_record(self, headers):
         existing_record = Download(url='http://my/url.html',
                                    etag=headers['etag'],
                                    last_modified=headers['last-modified'],
@@ -42,7 +42,7 @@ class DownloadManagerTestCase(TestCase):
     # describe: existing_download_record
     def test_that_a_record_that_matches_url_etag_and_last_modified_is_returned(self):
         headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-        self.assertEqual(self.__existing_record(
+        self.assertEqual(self._existing_record(
             headers), subject().existing_download_record('http://my/url.html', headers))
 
     def test_that_a_record_that_matches_url_etag_but_not_last_modified_is_not_returned(self):
@@ -50,7 +50,7 @@ class DownloadManagerTestCase(TestCase):
             'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
         headers_looked_for = {
             'etag': headers_existing['etag'], 'last-modified': '2015-01-01 23:23:23'}
-        existing_record = self.__existing_record(headers_existing)
+        existing_record = self._existing_record(headers_existing)
         self.assertEqual(None, subject().existing_download_record(
             'http://my/url.html', headers_looked_for))
 
@@ -59,7 +59,7 @@ class DownloadManagerTestCase(TestCase):
             'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
         headers_looked_for = {
             'etag': 'foobar', 'last-modified': headers_existing['last-modified']}
-        existing_record = self.__existing_record(headers_existing)
+        existing_record = self._existing_record(headers_existing)
         self.assertEqual(None, subject().existing_download_record(
             'http://my/url.html', headers_looked_for))
 

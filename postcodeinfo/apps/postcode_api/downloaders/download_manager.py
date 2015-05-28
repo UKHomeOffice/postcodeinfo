@@ -59,7 +59,7 @@ class DownloadManager(object):
         else:
             return r.headers
 
-    def __format_time_for_orm(self, given_time):
+    def _format_time_for_orm(self, given_time):
         # is it a string?
         if str(given_time) == given_time:
             obj = parser.parse(given_time)
@@ -71,13 +71,13 @@ class DownloadManager(object):
     def record_download(self, url, dirpath, headers={}):
         # create Download record storing the url, local path, last modified
         # date, and etag
-        formatted_time = self.__format_time_for_orm(headers['last-modified'])
+        formatted_time = self._format_time_for_orm(headers['last-modified'])
         dl = Download(url=url,
                       etag=headers['etag'],
                       last_modified=formatted_time)
         dl.local_filepath = self.filename(dirpath, url)
         dl.state = 'downloaded'
-        now = self.__format_time_for_orm(localtime())
+        now = self._format_time_for_orm(localtime())
         dl.last_state_change = now
         dl.save()
 
