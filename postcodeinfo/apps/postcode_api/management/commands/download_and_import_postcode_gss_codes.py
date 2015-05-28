@@ -39,36 +39,36 @@ class Command(BaseCommand):
         if not os.path.exists(options['destination_dir']):
             os.makedirs(options['destination_dir'])
 
-        downloaded_file = self.__download(
+        downloaded_file = self._download(
             options['destination_dir'], options.get('force', False))
         if downloaded_file:
-            self.__process(downloaded_file)
+            self._process(downloaded_file)
             return exit_code('OK')
         else:
             print 'nothing downloaded - nothing to import'
             return exit_code('OK')
 
-    def __download(self, destination_dir, force=False):
+    def _download(self, destination_dir, force=False):
         print 'downloading'
         downloader = PostcodeGssCodeDownloader()
         return downloader.download(destination_dir, force)
 
-    def __process(self, filepath):
+    def _process(self, filepath):
         files = ZipExtractor(filepath).unzip_if_needed('.*NSPL.*\.csv')
         for path in files:
             print 'importing ' + path
-            self.__import(path)
-            self.__cleanup(path)
+            self._import(path)
+            self._cleanup(path)
 
         if os.path.exists(filepath):
-            self.__cleanup(filepath)
+            self._cleanup(filepath)
 
         return True
 
-    def __import(self, downloaded_file):
+    def _import(self, downloaded_file):
         importer = PostcodeGssCodeImporter()
         importer.import_postcode_gss_codes(downloaded_file)
 
-    def __cleanup(self, downloaded_file):
+    def _cleanup(self, downloaded_file):
         print 'removing local file ' + downloaded_file
         os.remove(downloaded_file)

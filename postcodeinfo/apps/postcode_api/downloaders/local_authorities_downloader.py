@@ -5,7 +5,7 @@ from .download_manager import DownloadManager
 class LocalAuthoritiesDownloader(object):
 
     def download(self, target_dir='/tmp/', force=False):
-        most_recent_file_url = self.__target_href()
+        most_recent_file_url = self._target_href()
 
         dl_mgr = DownloadManager()
 
@@ -13,5 +13,5 @@ class LocalAuthoritiesDownloader(object):
                                          target_dir,
                                          force)
 
-    def __target_href(self):
+    def _target_href(self):
         return 'http://opendatacommunities.org/data/dev-local-authorities/dump'

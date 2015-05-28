@@ -9,17 +9,17 @@ from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicIm
 
 class AddressBaseBasicImporterTestCase(TestCase):
 
-    def __sample_data_file(self, filename):
+    def _sample_data_file(self, filename):
         return os.path.join(os.path.dirname(__file__), '../', 'sample_data/', filename)
 
-    def __importer(self):
+    def _importer(self):
         return AddressBaseBasicImporter()
 
-    def __import_data_from(self, file):
-        self.__importer().import_csv(self.__sample_data_file(file))
+    def _import_data_from(self, file):
+        self._importer().import_csv(self._sample_data_file(file))
 
     def test_that_address_objects_get_the_right_attributes(self):
-        self.__import_data_from('addressbase_basic_sample.csv')
+        self._import_data_from('addressbase_basic_sample.csv')
         address = Address.objects.filter(uprn='100040311658').first()
         self.assertEqual(address.postcode, 'EX6 8BP')
         self.assertEqual(address.postcode_index, 'ex68bp')
@@ -38,14 +38,14 @@ class AddressBaseBasicImporterTestCase(TestCase):
     def test_that_when_new_addresses_are_imported_then_address_records_get_created(self):
         # setup
         self.assertEqual(Address.objects.count(), 0)
-        self.__import_data_from('addressbase_basic_sample.csv')
+        self._import_data_from('addressbase_basic_sample.csv')
         # expectation
         self.assertEqual(Address.objects.count(), 5)
 
     def test_that_when_existing_addresses_are_imported_then_duplicate_address_records_dont_get_created(self):
         # setup
-        self.__import_data_from('addressbase_basic_sample.csv')
+        self._import_data_from('addressbase_basic_sample.csv')
         self.assertEqual(Address.objects.count(), 5)
-        self.__import_data_from('addressbase_basic_sample.csv')
+        self._import_data_from('addressbase_basic_sample.csv')
         # expectation
         self.assertEqual(Address.objects.count(), 5)
