@@ -19,6 +19,7 @@ def root(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
 sys.path.insert(0, root('apps'))
+sys.path.insert(1, root('lib'))
 
 TESTING = 'test' in sys.argv
 
@@ -117,6 +118,7 @@ STATICFILES_FINDERS = (
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'urlTokenAuthentication.UrlTokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
