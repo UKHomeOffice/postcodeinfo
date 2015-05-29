@@ -1,10 +1,18 @@
 # postcodeinfo
-UK Postcode to addresses, lat/long, and local authority REST API
-=======
-Address Finder
-==============
 
-Postcode lookup HTTP/REST service using [Ordnance Survey AddressBase Basic](http://www.ordnancesurvey.co.uk/business-and-government/products/addressbase.html) data. No data is included in this project due to copyright/licensing.
+[![Code Climate](https://codeclimate.com/github/ministryofjustice/postcodeinfo/badges/gpa.svg)](https://codeclimate.com/github/ministryofjustice/postcodeinfo)
+
+
+REST API for UK Postcode information 
+====================================
+Postcode lookup RESTful API service.
+
+Data is taken from:
+* [Ordnance Survey AddressBase Basic](http://www.ordnancesurvey.co.uk/business-and-government/products/addressbase.html)
+* [National Statistics Postcode List](https://geoportal.statistics.gov.uk/geoportal)
+* [Dept of Communities and Local Government list of local authorities](http://opendatacommunities.org/data/dev-local-authorities/)
+
+No data is included in this project due to copyright/licensing.
 
 
 Requirements
