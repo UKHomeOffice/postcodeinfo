@@ -220,7 +220,7 @@ Example response:
     "name": "Westminster",
     "gss_code": "E09000033"
   },
-  "coordinates": [
+  "centre": [
     -0.141587558526369,
     51.50100893654096
   ]
@@ -246,7 +246,7 @@ Example response:
     "name": "Westminster",
     "gss_code": "E09000033"
   }
-  "coordinates": [
+  "centre": [
     -0.141587558526369,
     51.50100893654096
   ]
@@ -254,3 +254,10 @@ Example response:
 
 Note: the local authority is only a best-guess when using a partial postcode - a single postcode area may span several local authorities. In this case, the most-common local authority across all the postcodes in that area will be returned.
 
+## API Client Libraries
+
+There are 'official' API client libraries available for:
+- Ruby [postcodeinfo-client-ruby](https://github.com/ministryofjustice/postcodeinfo-client-ruby)
+- Python [postcodeinfo-client-python](https://github.com/ministryofjustice/postcodeinfo-client-python)
+
+If you develop your own, feel free to let us know and we can link to it from here.
