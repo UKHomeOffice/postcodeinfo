@@ -17,6 +17,10 @@ No data is included in this project due to copyright/licensing.
 _PLEASE NOTE_ the current version only supports _mainland Great Britain_ postcodes, as Northern Ireland postcode data is published separately. We're planning to support Northern Ireland postcodes soon - if it's important to you, please
 [log an issue](https://github.com/ministryofjustice/postcodeinfo/issues)
 
+Support
+-------
+There is no incident response _yet_ - coming soon.
+
 Requirements
 ------------
 #### Developing/Contributing
@@ -241,7 +245,7 @@ This method returns a lat/lon point for the centre of the specified postcode are
 
 #### Partial postcode info - Lat/lon and Local Authority lookup
 
-You can also perform partial postcode lookups useing the partial/ endpoint:
+You can also perform partial postcode lookups using the partial/ endpoint:
 
 ```
 http://127.0.0.1:8000/postcodes/partial/sw1a1aa/
