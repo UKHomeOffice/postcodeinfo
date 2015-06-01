@@ -16,23 +16,23 @@ def create_super_user(apps, schema_editor):
 
     existing_users = User.objects.filter(username=username)
 
-    if not existing_users:
+    if username is None:
         print (
             'skipping admin user creation - '
             'no defaults set (ADMIN_USER_xyz)'
             )
     else:
-        if len(existing_users) == 0:
-            user = User.objects.create_superuser(username, email, password)
-            auth_token = Token.objects.create(user=user)
-            print 'created superuser with auth_token {token}'.format(
-                token=str(auth_token))
-        else:
+        if existing_users:
             print (
                 'user with username {username} already exists'
                 ' (auth token {token})').format(
                     username=username,
                     token=existing_users.first().auth_token)
+        else:
+            user = User.objects.create_superuser(username, email, password)
+            auth_token = Token.objects.create(user=user)
+            print 'created superuser with auth_token {token}'.format(
+                token=str(auth_token))
 
 
 class Migration(migrations.Migration):
