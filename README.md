@@ -14,6 +14,8 @@ Data is taken from:
 
 No data is included in this project due to copyright/licensing.
 
+_PLEASE NOTE_ the current version only supports _mainland Great Britain_ postcodes, as Northern Ireland postcode data is published separately. We're planning to support Northern Ireland postcodes soon - if it's important to you, please
+[log an issue](https://github.com/ministryofjustice/postcodeinfo/issues)
 
 Requirements
 ------------
