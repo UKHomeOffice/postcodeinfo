@@ -13,8 +13,6 @@ RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | 
 # APP_HOME, if you change this variable make sure you update the files in docker/ too
 ENV APP_HOME /srv/postcodeinfo
 
-RUN useradd -m -d ${APP_HOME} postcodeinfo
-
 RUN mkdir -p /var/log/gunicorn /var/log/nginx/postcodeinfo
 RUN touch /var/log/gunicorn/access.log /var/log/gunicorn/error.log
 RUN chown -R www-data:www-data /var/log/gunicorn && chmod -R g+s /var/log/gunicorn
@@ -33,7 +31,7 @@ VOLUME ["/var/log/nginx", "/var/log/gunicorn"]
 WORKDIR ${APP_HOME}
 ADD . ${APP_HOME}
 RUN rm -rf ${APP_HOME}/.git
-RUN chown -R postcodeinfo: ${APP_HOME}
+RUN chown -R www-data: ${APP_HOME}
 RUN cd ${APP_HOME} && pip install -r requirements.txt
 RUN ./manage.py collectstatic --noinput
 
@@ -50,7 +48,6 @@ RUN ./manage.py collectstatic --noinput
 #ENV DB_PORT 5432
 
 EXPOSE 80
-USER postcodeinfo
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
