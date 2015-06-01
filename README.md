@@ -253,12 +253,13 @@ Example response:
   "local_authority": {
     "name": "Westminster",
     "gss_code": "E09000033"
-  }
+  },
   "centre": [
     -0.141587558526369,
     51.50100893654096
   ]
 }
+```
 
 Note: the local authority is only a best-guess when using a partial postcode - a single postcode area may span several local authorities. In this case, the most-common local authority across all the postcodes in that area will be returned.
 
