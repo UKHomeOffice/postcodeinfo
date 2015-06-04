@@ -1,10 +1,12 @@
 import os
+import pytz
 import requests
 import responses
 import tempfile
 
 from django.test import TestCase
 from mock import patch, MagicMock
+from dateutil import parser
 
 from postcode_api.models import Download
 from postcode_api.downloaders.download_manager import DownloadManager
@@ -16,12 +18,16 @@ def subject():
 
 class DownloadManagerTestCase(TestCase):
 
+    def _format_datetime(self, header):
+        return pytz.UTC.localize( parser.parse(header) )
+
     def _existing_record(self, headers):
         existing_record = Download(url='http://my/url.html',
                                    etag=headers['etag'],
-                                   last_modified=headers['last-modified'],
+                                   last_modified=self._format_datetime(
+                                       headers['last-modified']),
                                    state='downloaded',
-                                   last_state_change='2015-04-03 02:01:00')
+                                   last_state_change='2015-04-03T02:01:00+00:00')
         existing_record.save()
         return existing_record
 
@@ -42,8 +48,9 @@ class DownloadManagerTestCase(TestCase):
     # describe: existing_download_record
     def test_that_a_record_that_matches_url_etag_and_last_modified_is_returned(self):
         headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-        self.assertEqual(self._existing_record(
-            headers), subject().existing_download_record('http://my/url.html', headers))
+        self.assertEqual(self._existing_record(headers),
+                         subject().existing_download_record('http://my/url.html',
+                                                            headers))
 
     def test_that_a_record_that_matches_url_etag_but_not_last_modified_is_not_returned(self):
         headers_existing = {
