@@ -20,10 +20,12 @@ run_postgis_container() {
   docker run -p 5432:5432 --name postcode-db -e POSTGRES_PASSWORD=postcodeinfo -e POSTGRES_USER=postcodeinfo -d mdillon/postgis:9.3
 }
 
+
 build_django_app_container() {
   printf $GREEN "Building the docker container, this might take a few minutes... " && sleep 2
   docker build -t postcodeinfo-dev .
 }
+
 
 django_manage() {
   printf $GREEN "Running ./manage.py $1"
@@ -36,6 +38,7 @@ django_manage() {
       -e "OS_FTP_USERNAME=${OS_FTP_USERNAME:-anonymous}" \
       -e "OS_FTP_PASSWORD=${OS_FTP_PASSWORD:-anonymous@}" \
       -e "DJANGO_DEBUG=${DJANGO_DEBUG:-True}" \
+      -e "DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost}" \
       -e "DB_NAME=postcodeinfo" \
       -e "DB_USERNAME=postcodeinfo" \
       -e "DB_PASSWORD=postcodeinfo" \
@@ -43,6 +46,7 @@ django_manage() {
       -e "DB_PORT=5432" \
       postcodeinfo-dev ./manage.py $1
 }
+
 
 printf $GREEN "Looking for an existing postgis container..."
 docker inspect postcode-db|grep '"Running": true' 2>&1>/dev/null || run_postgis_container
