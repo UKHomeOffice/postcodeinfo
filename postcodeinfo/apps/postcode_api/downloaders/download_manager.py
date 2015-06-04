@@ -73,7 +73,6 @@ class DownloadManager(object):
 
         return obj
 
-
     def record_download(self, url, dirpath, headers={}):
         # create Download record storing the url, local path, last modified
         # date, and etag
