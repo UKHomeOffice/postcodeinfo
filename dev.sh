@@ -35,6 +35,7 @@ django_manage() {
       -e "DB_USER=postcodeinfo" \
       -e "OS_FTP_USERNAME=${OS_FTP_USERNAME:-anonymous}" \
       -e "OS_FTP_PASSWORD=${OS_FTP_PASSWORD:-anonymous@}" \
+      -e "DJANGO_DEBUG=${DJANGO_DEBUG:-True}" \
       -e "DB_NAME=postcodeinfo" \
       -e "DB_USERNAME=postcodeinfo" \
       -e "DB_PASSWORD=postcodeinfo" \
