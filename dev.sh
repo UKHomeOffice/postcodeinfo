@@ -36,7 +36,7 @@ django_manage() {
       -e "OS_FTP_USERNAME=${OS_FTP_USERNAME:-anonymous}" \
       -e "OS_FTP_PASSWORD=${OS_FTP_PASSWORD:-anonymous@}" \
       -e "DJANGO_DEBUG=${DJANGO_DEBUG:-True}" \
-      -e "DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-}" \
+      -e "DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost}" \
       -e "DB_NAME=postcodeinfo" \
       -e "DB_USERNAME=postcodeinfo" \
       -e "DB_PASSWORD=postcodeinfo" \
