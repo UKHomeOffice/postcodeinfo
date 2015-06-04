@@ -1,5 +1,6 @@
 import requests
 import os
+import pytz
 
 from time import time, gmtime, strftime, strptime, mktime, localtime
 from datetime import datetime
@@ -60,13 +61,18 @@ class DownloadManager(object):
             return r.headers
 
     def _format_time_for_orm(self, given_time):
+        obj = None
         # is it a string?
-        if str(given_time) == given_time:
+        if isinstance(given_time, basestring):
             obj = parser.parse(given_time)
-            return obj
         else:
-            return datetime.fromtimestamp(mktime(given_time))
-            # return given_time.strftime( 'YYYY-mm-dd HH:MM:SS' )
+            obj = datetime.fromtimestamp(mktime(given_time))
+
+        if obj.tzinfo is None:
+            obj = pytz.UTC.localize(obj)
+
+        return obj
+
 
     def record_download(self, url, dirpath, headers={}):
         # create Download record storing the url, local path, last modified
@@ -98,7 +104,7 @@ class DownloadManager(object):
             return True
 
     def existing_download_record(self, url, headers):
-        last_modified = parser.parse(headers['last-modified'])
+        last_modified = self._format_time_for_orm(headers['last-modified'])
         dl = Download.objects.filter(url=url,
                                      etag=headers['etag'],
                                      last_modified=last_modified).first()
