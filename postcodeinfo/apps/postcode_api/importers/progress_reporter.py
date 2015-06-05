@@ -7,7 +7,8 @@ def lines_in_file(filename):
         ['wc', '-l', filename],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT).communicate()[0]
-    return int(output.partition(b' ')[0])
+    # allow value error if wc reports an error
+    return int(output.strip().partition(b' ')[0])
 
 
 def timestamp():

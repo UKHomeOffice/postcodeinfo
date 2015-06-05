@@ -7,26 +7,22 @@ from dateutil.parser import parse as parsedate
 from time import time, gmtime
 
 from postcode_api.models import PostcodeGssCode, Download
-from postcode_api.importers.progress_reporter import ProgressReporter
+from postcode_api.importers.progress_reporter import ImporterProgress, \
+    lines_in_file
 
 
 class PostcodeGssCodeImporter(object):
 
-    def __init__(self):
-        self.progress = ProgressReporter()
-
     def import_postcode_gss_codes(self, filename):
 
         with open(filename, "rb") as csvfile:
-            self.progress.start(filename)
-            datareader = csv.reader(csvfile)
-            # skip the header row!
-            datareader.next()
-            for row in datareader:
-                self.import_row(row)
-                self.progress.row_processed(row[0])
-
-            self.progress.finish()
+            with ImporterProgress(lines_in_file(filename)) as progress:
+                datareader = csv.reader(csvfile)
+                # skip the header row!
+                datareader.next()
+                for row in datareader:
+                    self.import_row(row)
+                    progress.increment(row[0])
 
             self.update_download(filename)
 
