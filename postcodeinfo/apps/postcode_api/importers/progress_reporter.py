@@ -1,5 +1,9 @@
 from datetime import datetime
+import logging
 import subprocess
+
+
+log = logging.getLogger(__name__)
 
 
 def lines_in_file(filename):
@@ -59,24 +63,27 @@ class ProgressReporter(object):
 
 class ImporterProgress(ProgressReporter):
 
+    def put(self, msg, level=logging.DEBUG):
+        log.log(level, msg)
+
     def on_start(self):
-        print "starting import of {self.total} lines at {timestamp}".format(
+        self.put("starting import of {self.total} lines at {timestamp}".format(
             self=self,
-            timestamp=timestamp())
+            timestamp=timestamp()))
 
     def on_increment(self, data=None):
-        print (
+        self.put((
             "{timestamp} ({self.elapsed} taken), processed: {self.progress}, "
             "remaining: {self.remaining}, "
             "time_per_row: {self.time_per_item}, "
             "est. time remaining {self.time_remaining}, {data}").format(
                 timestamp=timestamp(),
                 self=self,
-                data=data)
+                data=data))
 
     def on_finish(self, exception):
-        print (
+        self.put((
             'ALL DONE at {timestamp}\n'
             '{self.progress} lines processed in {self.elapsed}').format(
                 timestamp=timestamp(),
-                self=self)
+                self=self))

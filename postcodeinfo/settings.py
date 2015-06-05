@@ -140,6 +140,40 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'raven.contrib.django.raven_compat',
 )
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'verbose': {
+            'format': (
+                '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d'
+                '%(message)s')},
+
+        'logstash': {
+            '()': 'logstash_formatter.LogstashFormatter'}},
+
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'}},
+
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG'}}}
+
+
+if os.path.exists('/dev/log'):
+    LOGGING['handlers']['syslog'] = {
+        'level': 'DEBUG',
+        'class': 'logging.handlers.SysLogHandler',
+        'address': '/dev/log',
+        'formatter': 'logstash'}
+    LOGGING['loggers']['']['handlers'] = ['syslog']
+
+
 # .local.py overrides all the common settings.
 try:
     from .local import *
