@@ -153,33 +153,26 @@ LOGGING = {
         'logstash': {
             '()': 'logstash_formatter.LogstashFormatter'}},
 
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'},
-
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue'}},
-
     'handlers': {
-        'syslog': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.SysLogHandler',
-            'address': '/dev/log',
-            'formatter': 'logstash',
-            'filters': ['require_debug_false']
-            },
-
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-            'filters': ['require_debug_true']
-            }},
+            'formatter': 'verbose'}},
 
     'loggers': {
         '': {
-            'handlers': ['syslog', 'console'],
+            'handlers': ['console'],
             'level': 'DEBUG'}}}
+
+
+if os.path.exists('/dev/log'):
+    LOGGING['handlers']['syslog'] = {
+        'level': 'DEBUG',
+        'class': 'logging.handlers.SysLogHandler',
+        'address': '/dev/log',
+        'formatter': 'logstash'}
+    LOGGING['loggers']['']['handlers'] = ['syslog']
+
 
 # .local.py overrides all the common settings.
 try:
