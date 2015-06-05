@@ -5,16 +5,17 @@ import subprocess
 from rdflib import Graph, URIRef
 
 from postcode_api.models import LocalAuthority
-from postcode_api.importers.progress_reporter import ProgressReporter
+from postcode_api.importers.progress_reporter import ImporterProgress, \
+    lines_in_file
 
 
 class LocalAuthoritiesImporter(object):
 
     def __init__(self):
         self.graph = None
-        self.progress = ProgressReporter()
 
     def import_local_authorities(self, filename):
+        num_lines = lines_in_file(filename)
         self.graph = self._load_graph(filename)
         la_count = LocalAuthority.objects.count()
         print 'Existing LocalAuthority count = ' + str(la_count)
@@ -23,13 +24,12 @@ class LocalAuthoritiesImporter(object):
         codes = self.graph.triples(
             (None, URIRef("http://data.ordnancesurvey.co.uk/"\
                 "ontology/admingeo/gssCode"), None))
-        self.progress.start(filename)
 
-        for code_tuple in codes:
-            self._import_gss_code(code_tuple)
-            self.progress.row_processed('gssCode: ' + code_tuple[0])
+        with ImporterProgress(num_lines) as progress:
+            for code_tuple in codes:
+                self._import_gss_code(code_tuple)
+                progress.increment('gssCode: ' + code_tuple[0])
 
-        self.progress.finish()
         new_count = LocalAuthority.objects.count()
         print str(new_count - la_count) + ' local authorities added'
         print 'There are now ' + str(new_count) + ' local authorities'
@@ -55,7 +55,6 @@ class LocalAuthoritiesImporter(object):
 
     def _load_graph(self, filename):
         self.graph = Graph()
-        self.lines_in_file = self.progress.lines_in_file(filename)
         print 'parsing graph from file ' + filename
         self.graph.parse(filename, format="nt")
         print ' => ' + str(len(self.graph)) + ' tuples'

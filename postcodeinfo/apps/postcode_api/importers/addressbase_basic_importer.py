@@ -7,7 +7,8 @@ from django.contrib.gis.geos import Point
 from dateutil.parser import parse as parsedate
 
 from postcode_api.models import Address
-from postcode_api.importers.progress_reporter import ProgressReporter
+from postcode_api.importers.progress_reporter import ImporterProgress, \
+    lines_in_file
 
 
 class AddressBaseBasicImporter(object):
@@ -15,22 +16,18 @@ class AddressBaseBasicImporter(object):
     def __init__(self):
         self.headers = self._csv_headers()
         self.indices = self._column_indices()
-        self.progress = ProgressReporter()
 
     def import_csv(self, filename):
-        self.progress.start(filename)
+        with ImporterProgress(lines_in_file(filename)) as progress:
+            with open(filename, 'rb') as csvfile:
+                for row in csv.reader(csvfile):
+                    if row:
+                        self._import_row(row)
+                        identifier = 'UPRN ' + row[self.indices['uprn']]
+                    else:
+                        identifier = '(empty row)'
 
-        with open(filename, 'rb') as csvfile:
-            for row in csv.reader(csvfile):
-                if row:
-                    self._import_row(row)
-                    identifier = 'UPRN ' + row[self.indices['uprn']]
-                else:
-                    identifier = '(empty row)'
-
-                self.progress.row_processed(identifier)
-
-        self.progress.finish()
+                    progress.increment(identifier)
 
     def _import_row(self, row):
         try:
