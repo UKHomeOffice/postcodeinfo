@@ -1,5 +1,6 @@
 import os
 import csv
+import logging
 import subprocess
 
 from rdflib import Graph, URIRef
@@ -7,6 +8,9 @@ from rdflib import Graph, URIRef
 from postcode_api.models import LocalAuthority
 from postcode_api.importers.progress_reporter import ImporterProgress, \
     lines_in_file
+
+
+log = logging.getLogger(__name__)
 
 
 class LocalAuthoritiesImporter(object):
@@ -18,7 +22,7 @@ class LocalAuthoritiesImporter(object):
         num_lines = lines_in_file(filename)
         self.graph = self._load_graph(filename)
         la_count = LocalAuthority.objects.count()
-        print 'Existing LocalAuthority count = ' + str(la_count)
+        log.info('Existing LocalAuthority count = ' + str(la_count))
 
         # all subject/object pairs which are related by a gssCode
         codes = self.graph.triples(
@@ -31,8 +35,8 @@ class LocalAuthoritiesImporter(object):
                 progress.increment('gssCode: ' + code_tuple[0])
 
         new_count = LocalAuthority.objects.count()
-        print str(new_count - la_count) + ' local authorities added'
-        print 'There are now ' + str(new_count) + ' local authorities'
+        log.info(str(new_count - la_count) + ' local authorities added')
+        log.info('There are now ' + str(new_count) + ' local authorities')
 
     def _import_gss_code(self, code_tuple):
         code = str(code_tuple[2])
@@ -55,7 +59,7 @@ class LocalAuthoritiesImporter(object):
 
     def _load_graph(self, filename):
         self.graph = Graph()
-        print 'parsing graph from file ' + filename
+        log.info('parsing graph from file ' + filename)
         self.graph.parse(filename, format="nt")
-        print ' => ' + str(len(self.graph)) + ' tuples'
+        log.info(' => ' + str(len(self.graph)) + ' tuples')
         return self.graph
