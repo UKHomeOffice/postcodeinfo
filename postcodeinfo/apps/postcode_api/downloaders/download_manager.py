@@ -24,10 +24,10 @@ class DownloadManager(object):
     def retrieve(self, url, local_dir_path, force=False):
         remote_timestamp = self.get_last_modified(url)
         local_file_path = self.filename(local_dir_path, url)
-        
+
         # if we have an up-to-date local copy, there's nothing to do
         if not self.local_copy_up_to_date(local_file_path,
-                                        remote_timestamp):
+                                          remote_timestamp):
             self.get_from_s3(local_file_path, url, remote_timestamp)
 
         return local_file_path
@@ -41,16 +41,19 @@ class DownloadManager(object):
 
         if self.s3_object_up_to_date(s3_object, remote_timestamp):
             # if so, mirror it locally
+            print 'downloading from s3 to %s' % local_file_path
             s3.download(s3_object, local_file_path)
         else:
-            # nope, s3 object either not there or out of date
             # so let's grab a local copy
+            print 'downloading from %s to %s' % (url, local_file_path)
+            # nope, s3 object either not there or out of date
             self.download_to_file(url, local_file_path)
             # and upload *that* to s3 for later use
+            print 'uploading from %s to s3 key %s' % (local_file_path, s3_key)
             s3.upload(local_file_path, s3_key)
 
     def s3_adapter(self):
-        S3Adapter()
+        return S3Adapter()
 
     def get_last_modified(self, url):
         headers = self.get_headers(url)
@@ -60,9 +63,13 @@ class DownloadManager(object):
         return self.format_time_for_orm(headers['last-modified'])
 
     def local_copy_up_to_date(self, local_file_path, remote_timestamp):
-        return (self._in_local_storage(local_file_path)
-                and self.up_to_date(os.path.getmtime(local_file_path),
-                                     remote_timestamp))
+        result = (self._in_local_storage(local_file_path)
+                  and self.up_to_date(self.format_time_for_orm(
+                      os.path.getmtime(local_file_path)),
+            remote_timestamp))
+        print "local_file_path = %s" % local_file_path
+        print "local_copy_up_to_date = %s" % result
+        return result
 
     def _in_local_storage(self, local_path):
         return os.path.exists(local_path)
@@ -72,28 +79,9 @@ class DownloadManager(object):
 
     def s3_object_up_to_date(self, s3_object, remote_timestamp):
         return ((s3_object != None)
-                and self.up_to_date(s3_object.last_modified,
-                                     remote_timestamp))
-
-    # def s3_connection(self):
-    #     return S3Connection(region_name=settings.AWS['region_name'])
-
-    # def s3_bucket(self):
-    #     return self.s3_connection().get_bucket(settings.AWS['s3_bucket_name'])
-
-    # def s3_key(url):
-    #     return hashlib.sha512(url).hexdigest()
-
-    # def _file_on_s3(self, s3_key):
-    #     return self._s3_bucket().get_key(s3_key)
-
-    # def _download_from_s3(self, s3_object, local_file_path):
-    #     return s3_object.get_contents_to_filename(local_file_path)
-
-    # def upload_to_s3(self, local_file_path, s3_key):
-    #     k = Key(self.s3_bucket())
-    #     k.key = s3_key
-    #     return k.set_contents_from_string(local_file_path)
+                and self.up_to_date(self.format_time_for_orm(
+                                        s3_object.last_modified),
+                                    remote_timestamp))
 
     def download_to_dir(self, url, dirpath, headers):
         filepath = self.filename(dirpath, url)
@@ -132,6 +120,8 @@ class DownloadManager(object):
         # is it a string?
         if isinstance(given_time, basestring):
             obj = parser.parse(given_time)
+        elif isinstance(given_time, float):
+            obj = datetime.fromtimestamp(given_time)
         else:
             obj = datetime.fromtimestamp(mktime(given_time))
 
