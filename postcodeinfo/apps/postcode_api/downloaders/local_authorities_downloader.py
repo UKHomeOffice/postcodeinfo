@@ -9,7 +9,7 @@ class LocalAuthoritiesDownloader(object):
 
         dl_mgr = DownloadManager()
 
-        return dl_mgr.download_if_needed(most_recent_file_url,
+        return dl_mgr.retrieve(most_recent_file_url,
                                          target_dir,
                                          force)
 
