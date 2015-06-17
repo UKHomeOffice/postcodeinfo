@@ -25,7 +25,8 @@ class S3Adapter(object):
         return self.bucket.get_key(key) 
  
     def download(self, s3_object, local_file_path): 
-        return s3_object.get_contents_to_filename(local_file_path) 
+        s3_object.get_contents_to_filename(local_file_path) 
+        return local_file_path
  
     def upload(self, local_file_path, s3_key): 
         k = Key(self.bucket) 

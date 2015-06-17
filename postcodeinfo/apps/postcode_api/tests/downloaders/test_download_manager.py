@@ -214,4 +214,6 @@ class DownloadManagerTestCase(TestCase):
         self.assertEqual( True, isinstance(result, datetime) )
 
 
-
+    # TODO: test case when file list doesn't exist remotely - how can we handle that?
+    # It should try to retrieve ... a list of files from s3 with a given name pattern?
+    # How does it know the name pattern to use? Handle this in the downloaders, probably
