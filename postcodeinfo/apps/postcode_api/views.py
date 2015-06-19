@@ -1,7 +1,8 @@
-import json
+import json, os, rest_framework
 
 from rest_framework import viewsets
 from rest_framework import generics
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -65,3 +66,15 @@ class PostcodeView(generics.RetrieveAPIView):
 class PartialPostcodeView(PostcodeView):
 
     geom_query = 'postcode_area'
+
+
+class PingDotJsonView(generics.RetrieveAPIView):
+
+    def get(self, request, *args, **kwargs):
+        data = {
+            'version_number': os.environ.get('APPVERSION'),
+            'build_date': os.environ.get('APP_BUILD_DATE'),
+            'commit_id': os.environ.get('APP_GIT_COMMIT'),
+            'build_tag': os.environ.get('APP_BUILD_TAG')
+        }
+        return Response(data, status=status.HTTP_200_OK)
