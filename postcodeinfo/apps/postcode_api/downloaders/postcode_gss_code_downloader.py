@@ -11,15 +11,12 @@ class PostcodeGssCodeDownloader(object):
         most_recent_file_url = self._target_href()
 
         dl_mgr = DownloadManager()
-        #import pdb; pdb.set_trace()
 
         return dl_mgr.retrieve(most_recent_file_url,
-                                         target_dir,
-                                         force)
+            target_dir,
+            force)
 
     def _target_href(self):
-        # import pdb; pdb.set_trace()
-
         index_json = self._get_index_json()
         index = json.loads(index_json)
 

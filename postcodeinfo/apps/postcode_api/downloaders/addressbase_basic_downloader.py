@@ -1,5 +1,6 @@
 import ftplib
 import glob
+import logging
 import os
 
 from postcode_api.downloaders.download_manager import DownloadManager
@@ -23,7 +24,7 @@ class AddressBaseBasicDownloader(object):
                                                                 local_dir,
                                                                 force)
         except ftplib.error_perm:
-            print 'FTP error - looking for local files'
+            logging.warning('FTP error - looking for local files')
             # Ordnance Survey very kindly remove the files from our
             # FTP area 21 days after they are first put there, despite
             # there not being an update available for maybe another 2 months.
@@ -42,14 +43,14 @@ class AddressBaseBasicDownloader(object):
     def _username(self):
         username = os.environ.get('OS_FTP_USERNAME')
         if not username:
-            print 'OS_FTP_USERNAME not set!'
+            logging.warning('OS_FTP_USERNAME not set!')
 
         return username
 
     def _password(self):
         pwd = os.environ.get('OS_FTP_PASSWORD')
         if not pwd:
-            print 'OS_FTP_PASSWORD not set!'
+            logging.warning('OS_FTP_PASSWORD not set!')
 
         return pwd
 
@@ -60,16 +61,16 @@ class AddressBaseBasicDownloader(object):
 
     def local_files(self, local_dir):
         files = glob.glob(os.path.join(local_dir, '*csv.zip'))
-        print 'found {num_files} files in {path} matching {pattern}'.format(num_files=len(files), path=local_dir, pattern='*csv.zip')
+        logging.debug('found {num_files} files in {path} matching {pattern}'.format(num_files=len(files), path=local_dir, pattern='*csv.zip'))
         return files
 
     def files_from_s3(self, local_dir):
         files = []
         s3 = S3Adapter()
         s3_files = s3.bucket.list('AddressBase')
-        print 'found %i files in s3 matching %s' % (len(s3_files), 'AddressBase')
+        logging.debug( 'found %i files in s3 matching %s' % (len(s3_files), 'AddressBase') )
         for key in s3_files:
-            print 'downloading %s' % key.name
+            logging.debug( 'downloading %s' % key.name )
             files.append(s3.download(key, os.path.join(local_dir, key.name)))
 
         return files

@@ -1,3 +1,4 @@
+import logging
 import requests
 import os
 import pytz
@@ -39,17 +40,17 @@ class DownloadManager(object):
         s3_key = s3.key(url)
         s3_object = s3.file(s3_key)
 
-        if self.s3_object_up_to_date(s3_object, remote_timestamp):
+        if self.s3_object_is_up_to_date(s3_object, remote_timestamp):
             # if so, mirror it locally
-            print 'downloading from s3 to %s' % local_file_path
+            logging.info('downloading from s3 to {path}'.format(path=local_file_path))
             s3.download(s3_object, local_file_path)
         else:
             # so let's grab a local copy
-            print 'downloading from %s to %s' % (url, local_file_path)
+            logging.info('downloading from {url} to {path}'.format(url=url, path=local_file_path))
             # nope, s3 object either not there or out of date
             self.download_to_file(url, local_file_path)
             # and upload *that* to s3 for later use
-            print 'uploading from %s to s3 key %s' % (local_file_path, s3_key)
+            logging.info('uploading from {path} to s3 key {key}'.format(path=local_file_path, key=s3_key))
             s3.upload(local_file_path, s3_key)
 
     def s3_adapter(self):
@@ -63,29 +64,34 @@ class DownloadManager(object):
         return self.format_time_for_orm(headers['last-modified'])
 
     def local_copy_up_to_date(self, local_file_path, remote_timestamp):
-        result = (self._in_local_storage(local_file_path)
-                  and self.up_to_date(self.format_time_for_orm(
-                      os.path.getmtime(local_file_path)),
-            remote_timestamp))
-        print "local_file_path = %s" % local_file_path
-        print "local_copy_up_to_date = %s" % result
-        return result
+        local_copy = self._in_local_storage(local_file_path)
+        if local_copy:
+            local_mod_time = os.path.getmtime(local_file_path)
+            formatted_mod_time = self.format_time_for_orm(
+                                    local_mod_time)
+            result = self.up_to_date(formatted_mod_time,
+                                     remote_timestamp)
+            return result
+        else:
+            return False
 
     def _in_local_storage(self, local_path):
         return os.path.exists(local_path)
 
     def up_to_date(self, copy_timestamp, source_timestamp):
-        return (copy_timestamp >= source_timestamp)
+        return copy_timestamp >= source_timestamp
 
-    def s3_object_up_to_date(self, s3_object, remote_timestamp):
-        return ((s3_object != None)
-                and self.up_to_date(self.format_time_for_orm(
-                                        s3_object.last_modified),
-                                    remote_timestamp))
+    def s3_object_is_up_to_date(self, s3_object, remote_timestamp):
+        if s3_object is None:
+            return False
+        else:
+            mod_time_on_s3 = self.format_time_for_orm(s3_object.last_modified)
+            return self.up_to_date(mod_time_on_s3,
+                                   remote_timestamp)
 
     def download_to_dir(self, url, dirpath, headers):
         filepath = self.filename(dirpath, url)
-        print 'downloading file from ' + url + ' to ' + filepath
+        logging.info('downloading file from {url} to {path}'.format(url=url, path=filepath))
         chunk_size = self.chunk_size()
         content_length = headers['content-length']
         return self.download_to_file(url, filepath, chunk_size, content_length)
@@ -100,12 +106,12 @@ class DownloadManager(object):
             count = 0
             for chunk in r.iter_content(chunk_size):
                 if content_length and count % 100 == 0:
-                    print '{0} bytes of {1}'.format(count*chunk_size,
-                                                    content_length)
+                    logging.debug('{0} bytes of {1}'.format(count*chunk_size,
+                                                            content_length))
                 count = count + 1
                 fd.write(chunk)
 
-        print "downloaded to " + filepath
+        logging.info("downloaded to {path}".format(path=filepath))
         return filepath
 
     def get_headers(self, url):
