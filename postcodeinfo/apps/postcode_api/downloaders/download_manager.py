@@ -85,11 +85,10 @@ class DownloadManager(object):
     def s3_object_is_up_to_date(self, s3_object, remote_timestamp):
         if s3_object is not None:
             mod_time_on_s3 = self.format_time_for_orm(s3_object.last_modified)
-            return self.up_to_date(mod_time_on_s3,
-                                   remote_timestamp)
+            return self.up_to_date(mod_time_on_s3, remote_timestamp)
 
         return False
-        
+
     def download_to_dir(self, url, dirpath, headers):
         filepath = self.filename(dirpath, url)
         logging.info(
