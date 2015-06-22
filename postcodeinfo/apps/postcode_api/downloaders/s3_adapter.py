@@ -1,5 +1,4 @@
 import boto
-import hashlib
 
 from django.conf import settings
 
@@ -9,13 +8,18 @@ from boto.s3.key import Key
 class S3Adapter(object):
 
     def __init__(self, connection=None, bucket=None):
-        self.connection = connection or self.connect()
-        self.bucket = bucket or self.bucket()
+        self.connection = connection
+        if connection is None:
+            self.connection = self.connect()
+
+        self.bucket = bucket
+        if bucket is None:
+            self.bucket = self.get_bucket()
 
     def connect(self, region_name=settings.AWS['region_name']): 
         return boto.s3.connect_to_region(region_name) 
  
-    def bucket(self, bucket_name=settings.AWS['s3_bucket_name']): 
+    def get_bucket(self, bucket_name=settings.AWS['s3_bucket_name']): 
         return self.connection.get_bucket(bucket_name) 
  
     def key(self, url): 
