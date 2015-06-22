@@ -9,9 +9,9 @@ class LocalAuthoritiesDownloader(object):
 
         dl_mgr = DownloadManager()
 
-        return dl_mgr.download_if_needed(most_recent_file_url,
-                                         target_dir,
-                                         force)
+        return dl_mgr.retrieve(most_recent_file_url,
+                               target_dir,
+                               force)
 
     def _target_href(self):
         return 'http://opendatacommunities.org/data/dev-local-authorities/dump'

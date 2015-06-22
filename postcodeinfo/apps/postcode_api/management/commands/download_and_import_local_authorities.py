@@ -57,9 +57,6 @@ class Command(BaseCommand):
         for path in files:
             print 'importing ' + path
             result = self._import(path)
-            self._cleanup(path)
-
-        self._cleanup(filepath)
 
     def _import(self, downloaded_file):
         importer = LocalAuthoritiesImporter()

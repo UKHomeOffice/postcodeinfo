@@ -7,9 +7,11 @@ import tempfile
 from django.test import TestCase
 from mock import patch, MagicMock
 from dateutil import parser
+from datetime import datetime, timedelta
 
 from postcode_api.models import Download
 from postcode_api.downloaders.download_manager import DownloadManager
+from postcode_api.downloaders.s3_adapter import S3Adapter
 
 
 def subject():
@@ -44,49 +46,6 @@ class DownloadManagerTestCase(TestCase):
     def test_that_given_a_url_and_a_dir_it_returns_the_last_element_appended_to_the_dir(self):
         self.assertEqual(subject().filename(
             '/my/dir/path/', 'http://some.com/some/file.json'), '/my/dir/path/file.json')
-
-    # describe: existing_download_record
-    def test_that_a_record_that_matches_url_etag_and_last_modified_is_returned(self):
-        headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-        self.assertEqual(self._existing_record(headers),
-                         subject().existing_download_record('http://my/url.html',
-                                                            headers))
-
-    def test_that_a_record_that_matches_url_etag_but_not_last_modified_is_not_returned(self):
-        headers_existing = {
-            'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-        headers_looked_for = {
-            'etag': headers_existing['etag'], 'last-modified': '2015-01-01 23:23:23'}
-        existing_record = self._existing_record(headers_existing)
-        self.assertEqual(None, subject().existing_download_record(
-            'http://my/url.html', headers_looked_for))
-
-    def test_that_a_record_that_matches_url_and_last_modified_but_not_etag_is_not_returned(self):
-        headers_existing = {
-            'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-        headers_looked_for = {
-            'etag': 'foobar', 'last-modified': headers_existing['last-modified']}
-        existing_record = self._existing_record(headers_existing)
-        self.assertEqual(None, subject().existing_download_record(
-            'http://my/url.html', headers_looked_for))
-
-    # describe: download_is_needed
-    def test_that_when_given_a_thing_it_returns_false(self):
-        self.assertEqual(False, subject().download_is_needed('something'))
-
-    def test_that_when_given_nothing_it_returns_true(self):
-        self.assertEqual(True, subject().download_is_needed(None))
-
-    # describe: record_download
-    def test_that_it_creates_a_download_record_with_the_right_attributes(self):
-        headers = {'etag': '12345', 'last-modified': '2015-05-09 09:12:35'}
-        dl = subject().record_download(
-            'http://my/url.html', '/my/dir/path/', headers)
-        self.assertEqual('http://my/url.html', dl.url)
-        self.assertEqual('12345', dl.etag)
-        self.assertEqual('/my/dir/path/url.html', dl.local_filepath)
-        self.assertEqual('downloaded', dl.state)
-        self.assertEqual('http://my/url.html', dl.url)
 
     # describe: get_headers
     @patch('requests.head')
@@ -125,35 +84,134 @@ class DownloadManagerTestCase(TestCase):
         mock.assertCalledWith(
             'http://some.url/test.file', '/my/dir/path/test.file', 4192, 1234)
 
-    # describe: download_if_needed
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.download_is_needed')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.do_download')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.existing_download_record')
-    def test_that_when_download_is_needed_then_it_downloads_the_given_url_to_the_given_dir(self, mock_hdrs, mock_dl_needed, mock_do_download, mock_existing_download_record):
-        mock_dl_needed.return_value = True
-        rtn_val = subject().download_if_needed(
-            'http://some.url/test.file', '/my/dir/path/')
-        mock_do_download.assertCalledWith(
-            'http://some.url/test.file', '/my/dir/path/')
+    # describe: retrieve
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_last_modified', return_value='12345')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_from_s3')
+    def test_that_when_the_local_copy_is_not_up_to_date_then_it_gets_from_s3(self, mock_get_from_s3, mock_last_modified):
+        s = subject()
+        s._local_copy_up_to_date = MagicMock(False)
+        s.retrieve('test.url', '/local/path')
+        mock_get_from_s3.assertCalledWith('/local/path', '12345')
 
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.download_is_needed')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.do_download')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.existing_download_record')
-    def test_that_when_download_is_not_needed_then_it_does_not_download(self, mock_hdrs, mock_dl_needed, mock_do_download, mock_existing_download_record):
-        mock_dl_needed.return_value = False
-        rtn_val = subject().download_if_needed(
-            'http://some.url/test.file', '/my/dir/path/')
-        self.assertEqual(rtn_val, None)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_last_modified', return_value='12345')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_from_s3')
+    def test_that_when_the_local_copy_is_up_to_date_then_it_does_not_get_from_s3(self, mock_get_from_s3, mock_last_modified):
+        s = subject()
+        s.local_copy_up_to_date = MagicMock(True)
+        s.retrieve('test.url', '/local/path')
+        assert not mock_get_from_s3.called
 
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.download_is_needed')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.do_download')
-    @patch('postcode_api.downloaders.download_manager.DownloadManager.existing_download_record')
-    def test_that_when_download_is_not_needed_but_force_is_passed_then_it_does_download(self, mock_hdrs, mock_dl_needed, mock_do_download, mock_existing_download_record):
-        mock_dl_needed.return_value = False
-        rtn_val = subject().download_if_needed(
-            'http://some.url/test.file', '/my/dir/path/', True)
-        mock_do_download.assertCalledWith(
-            'http://some.url/test.file', '/my/dir/path/')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.filename', return_value='/my/local/filename')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_last_modified', return_value='12345')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_from_s3')
+    def test_that_it_returns_the_local_file_path(self, mock_get_from_s3, mock_last_modified, mock_filename):
+        s = subject()
+        s.local_copy_up_to_date = MagicMock(True)
+        self.assertEqual( '/my/local/filename', s.retrieve('test.url', '/local/path') )
+        
+
+    # describe: get_from_s3
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_adapter')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_last_modified', return_value='12345')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_object_is_up_to_date', return_value=True)
+    def test_that_when_the_s3_object_is_up_to_date_it_downloads_the_file_from_s3(self, mock_s3_object_is_up_to_date, mock_get_last_modified, mock_s3_adapter):
+        s = subject()
+        s.get_from_s3('test.url', '/local/path', '12345')
+        self.assertEqual(True, mock_s3_adapter().download.called )
+
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_adapter')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_object_is_up_to_date', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.download_to_file', return_value=True)
+    def test_that_when_the_s3_object_is_not_up_to_date_it_downloads_the_file_locally(self, mock_download_to_file, mock_s3_object_is_up_to_date, mock_s3_adapter):
+        s = subject()
+        s.get_from_s3('test.url', '/local/path', '12345')
+        mock_download_to_file.assertCalledWith('test.url', '/local/path')
+
+    
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_adapter')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_last_modified', return_value='12345')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_object_is_up_to_date', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.download_to_file', return_value=True)
+    def test_that_when_the_s3_object_is_not_up_to_date_it_uploads_the_local_file_to_s3(self, mock_download_to_file, mock_s3_object_is_up_to_date, mock_get_last_modified, mock_s3_adapter):
+        s = subject()
+        s.get_from_s3('test.url', '/local/path', '12345')
+        mock_s3_adapter.upload.assertCalledWith('test.url', '/local/path')
+
+    # describe: local_copy_up_to_date
+    @patch('postcode_api.downloaders.download_manager.DownloadManager._in_local_storage', return_value=True)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.up_to_date', return_value=True)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='12345')
+    @patch('os.path.getmtime', return_value='12345')
+    def test_that_when_the_file_is_in_local_storage_and_up_to_date_it_returns_true(self, mock_file_timestamp, mock_format_time_for_orm, mock_up_to_date, mock_in_local_storage):
+        self.assertEqual( True, subject().local_copy_up_to_date('local/path', 'remote timestamp') )
+
+    @patch('postcode_api.downloaders.download_manager.DownloadManager._in_local_storage', return_value=True)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.up_to_date', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='12345')
+    @patch('os.path.getmtime', return_value='12345')
+    def test_that_when_the_file_is_in_local_storage_and_not_up_to_date_it_returns_false(self, mock_file_timestamp, mock_format_time_for_orm, mock_up_to_date, mock_in_local_storage):
+        self.assertEqual( False, subject().local_copy_up_to_date('local/path', 'remote timestamp') )
+
+    @patch('postcode_api.downloaders.download_manager.DownloadManager._in_local_storage', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.up_to_date', return_value=True)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='12345')
+    @patch('os.path.getmtime', return_value='12345')
+    def test_that_when_the_file_is_not_in_local_storage_it_returns_false(self, mock_file_timestamp, mock_format_time_for_orm, mock_up_to_date, mock_in_local_storage):
+        self.assertEqual( False, subject().local_copy_up_to_date('local/path', 'remote timestamp') )
+
+    # describe: s3_object_is_up_to_date
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.up_to_date', return_value=True)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='12345')
+    @patch('os.path.getmtime', return_value='12345')
+    def test_that_when_the_s3_object_exists_and_is_up_to_date_it_returns_true(self, mock_file_timestamp, mock_format_time_for_orm, mock_up_to_date):
+        s3_object = MagicMock(last_modified='12345')
+        self.assertEqual( True, subject().s3_object_is_up_to_date(s3_object, 'remote timestamp') )
+    
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.up_to_date', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='12345')
+    @patch('os.path.getmtime', return_value='12345')
+    def test_that_when_the_s3_object_exists_and_is_not_up_to_date_it_returns_false(self, mock_file_timestamp, mock_format_time_for_orm, mock_up_to_date):
+        s3_object = MagicMock(last_modified='12345')
+        self.assertEqual( False, subject().s3_object_is_up_to_date(s3_object, 'remote timestamp') )
+
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.up_to_date', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='12345')
+    @patch('os.path.getmtime', return_value='12345')
+    def test_that_when_the_s3_object_does_not_exist_it_returns_true(self, mock_file_timestamp, mock_format_time_for_orm, mock_up_to_date):
+        self.assertEqual( False, subject().s3_object_is_up_to_date(None, 'remote timestamp') )
+    
+    # describe test_up_to_date
+    def test_that_when_copy_timestamp_is_greater_than_source_timestamp_it_returns_true(self):
+        self.assertEqual( True, subject().up_to_date( datetime.now(), datetime.now() - timedelta(hours=1) ) )
+
+    def test_that_when_copy_timestamp_is_equal_to_source_timestamp_it_returns_true(self):
+        now = datetime.now()
+        self.assertEqual( True, subject().up_to_date( now, now ) )
+
+    def test_that_when_copy_timestamp_is_less_than_source_timestamp_it_returns_false(self):
+        self.assertEqual( False, subject().up_to_date( datetime.now() - timedelta(hours=1), datetime.now() ) )
+
+    # describe: get_last_modified
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers', return_value={'last-modified':'some time ago'})
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='formatted time')
+    def test_that_it_gets_headers_with_the_given_url(self, mock_format_time_for_orm, mock_get_headers):
+        result = subject().get_last_modified('a.url')
+        mock_get_headers.assertCalledWith('a.url')
+        mock_format_time_for_orm.assertCalledWith('some time ago')
+        self.assertEqual('formatted time', result)
+
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers', return_value=[{'last-modified':'some time ago'},{'last-modified':'some other time'}])
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='formatted time')
+    def test_that_when_headers_is_a_list_it_uses_the_first_element(self, mock_format_time_for_orm, mock_get_headers):
+        result = subject().get_last_modified('a.url')
+        mock_format_time_for_orm.assertCalledWith('some time ago')
+        
+    # describe format_time_for_orm
+    def test_that_given_a_string_it_returns_a_datetime(self):
+        result = subject().format_time_for_orm('17-12-2015 00:01:02')
+        self.assertEqual( True, isinstance(result, datetime) )
+
+
+    # TODO: test case when file list doesn't exist remotely - how can we handle that?
+    # It should try to retrieve ... a list of files from s3 with a given name pattern?
+    # How does it know the name pattern to use? Handle this in the downloaders, probably

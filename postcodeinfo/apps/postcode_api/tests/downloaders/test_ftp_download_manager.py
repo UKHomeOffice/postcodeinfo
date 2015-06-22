@@ -44,9 +44,9 @@ class FTPDownloadManagerTestCase(TestCase):
             ['/my/url/1', '/my/url/2'], subject().list_files('my pattern'))
 
     # describe: download_all_if_needed
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.download_if_needed')
+    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.retrieve')
     @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.list_files')
-    def test_that_it_calls_download_if_needed_for_each_listed_file(self, mock_list_files, mock_dl_if_needed):
+    def test_that_it_calls_retrieve_for_each_listed_file(self, mock_list_files, mock_dl_if_needed):
         mock_list_files.return_value = ['file/1', 'file/2']
         mock_dl_if_needed.side_effect = ['/local/file/1', '/local/file/2']
         calls = [call('file/1', '/dir/path', False),
@@ -54,7 +54,7 @@ class FTPDownloadManagerTestCase(TestCase):
         subject().download_all_if_needed('my pattern', '/dir/path')
         mock_dl_if_needed.assert_has_calls(calls)
 
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.download_if_needed')
+    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.retrieve')
     @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.list_files')
     def test_that_it_returns_the_local_filepath_of_all_downloads_performed(self, mock_list_files, mock_dl_if_needed):
         mock_list_files.return_value = ['file/1', 'file/2']

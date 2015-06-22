@@ -34,7 +34,7 @@ class FTPDownloadManager(DownloadManager):
         downloads = []
         print '%i files matching %s' % (len(files), pattern)
         for file in files:
-            dl = self.download_if_needed(file, dirpath, force)
+            dl = self.retrieve(file, dirpath, force)
             if dl:
                 downloads.append(dl)
 

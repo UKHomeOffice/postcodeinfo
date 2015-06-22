@@ -58,10 +58,6 @@ class Command(BaseCommand):
         for path in files:
             print 'importing ' + path
             self._import(path)
-            self._cleanup(path)
-
-        if os.path.exists(filepath):
-            self._cleanup(filepath)
 
         return True
 
@@ -69,6 +65,3 @@ class Command(BaseCommand):
         importer = PostcodeGssCodeImporter()
         importer.import_postcode_gss_codes(downloaded_file)
 
-    def _cleanup(self, downloaded_file):
-        print 'removing local file ' + downloaded_file
-        os.remove(downloaded_file)
