@@ -10,6 +10,19 @@ from postcode_api.downloaders.s3_adapter import S3Adapter
 
 class AddressBaseBasicDownloader(object):
 
+    """
+    Ordnance Survey very kindly remove the files from our
+    FTP area 21 days after they are first put there, despite
+    there not being an update available for maybe another 2 months.
+    So if we try to cd to our order dir
+    and it's not there, we'll end up here.
+    So, we then look for a load of csv.zip files in local_dir
+    If there are csv.zip files locally, return them
+    If not, look on s3.
+    If they're on s3, download them and return the local paths.
+    Otherwise FAIL
+    """
+
     def __init__(self, dl_mgr=FTPDownloadManager()):
         self.download_manager = dl_mgr
 
@@ -20,21 +33,12 @@ class AddressBaseBasicDownloader(object):
 
         try:
             self.ftp_client().cwd(self._source_dir())
-            return self.download_manager.download_all_if_needed('./*_csv.zip',
-                                                                local_dir,
-                                                                force)
+            return self.download_manager.download_all_if_needed(
+                './*_csv.zip',
+                local_dir,
+                force)
         except ftplib.error_perm:
             logging.warning('FTP error - looking for local files')
-            # Ordnance Survey very kindly remove the files from our
-            # FTP area 21 days after they are first put there, despite
-            # there not being an update available for maybe another 2 months.
-            # So if we try to cd to our order dir
-            # and it's not there, we'll end up here.
-            # So, we then look for a load of csv.zip files in local_dir
-            # If there are csv.zip files locally, return them
-            # If not, look on s3.
-            # If they're on s3, download them and return the local paths.
-            # Otherwise FAIL
             return self.local_files(local_dir) or self.files_from_s3(local_dir)
 
     def ftp_client(self):
@@ -61,16 +65,19 @@ class AddressBaseBasicDownloader(object):
 
     def local_files(self, local_dir):
         files = glob.glob(os.path.join(local_dir, '*csv.zip'))
-        logging.debug('found {num_files} files in {path} matching {pattern}'.format(num_files=len(files), path=local_dir, pattern='*csv.zip'))
+        logging.debug(
+            'found {num_files} files in {path} matching {pattern}'.format(
+                num_files=len(files), path=local_dir, pattern='*csv.zip'))
         return files
 
     def files_from_s3(self, local_dir):
         files = []
         s3 = S3Adapter()
         s3_files = s3.bucket.list('AddressBase')
-        logging.debug( 'found %i files in s3 matching %s' % (len(s3_files), 'AddressBase') )
+        logging.debug('found %i files in s3 matching %s' %
+                      (len(s3_files), 'AddressBase'))
         for key in s3_files:
-            logging.debug( 'downloading %s' % key.name )
+            logging.debug('downloading %s' % key.name)
             files.append(s3.download(key, os.path.join(local_dir, key.name)))
 
         return files
