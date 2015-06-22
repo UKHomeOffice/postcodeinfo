@@ -22,8 +22,8 @@ class LocalAuthoritiesImporter(object):
 
         # all subject/object pairs which are related by a gssCode
         codes = self.graph.triples(
-            (None, URIRef("http://data.ordnancesurvey.co.uk/"\
-                "ontology/admingeo/gssCode"), None))
+            (None, URIRef("http://data.ordnancesurvey.co.uk/"
+                          "ontology/admingeo/gssCode"), None))
 
         with ImporterProgress(num_lines) as progress:
             for code_tuple in codes:

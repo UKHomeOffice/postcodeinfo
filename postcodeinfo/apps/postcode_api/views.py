@@ -1,8 +1,11 @@
-import json, os, rest_framework
+import json
+import os
+import rest_framework
 
 from rest_framework import viewsets
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -69,6 +72,7 @@ class PartialPostcodeView(PostcodeView):
 
 
 class PingDotJsonView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get(self, request, *args, **kwargs):
         data = {
