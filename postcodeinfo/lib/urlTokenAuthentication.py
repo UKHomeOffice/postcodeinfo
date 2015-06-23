@@ -1,5 +1,4 @@
-from django.contrib.auth.models import User
-from rest_framework.authentication import TokenAuthentication, exceptions
+from rest_framework.authentication import TokenAuthentication
 
 
 class UrlTokenAuthentication(TokenAuthentication):
