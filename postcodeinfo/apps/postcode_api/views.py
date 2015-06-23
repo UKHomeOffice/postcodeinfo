@@ -1,15 +1,12 @@
-import json
 import os
-import rest_framework
 
 from rest_framework import viewsets
 from rest_framework import generics
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework.response import Response
 
-from .models import Address, LocalAuthority, PostcodeGssCode
+from .models import Address, LocalAuthority
 from .serializers import AddressSerializer
 
 
