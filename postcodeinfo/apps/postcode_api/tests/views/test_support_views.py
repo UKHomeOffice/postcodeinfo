@@ -18,7 +18,6 @@ class SupportViewsTestCase(TestCase):
         response = self.client.get(
             '/ping.json', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
         parsed = json.loads(response.content)
-        self.assertIsInstance(parsed, dict)
 
     def test_that_getting_ping_json_with_a_valid_token_responds_with_HTTP_200(self):
         response = self.client.get(
@@ -34,7 +33,6 @@ class SupportViewsTestCase(TestCase):
         response = self.client.get(
             '/ping.json', {}, True, False)
         parsed = json.loads(response.content)
-        self.assertIsInstance(parsed, dict)
 
     def test_that_getting_ping_json_with_and_invalid_token_responds_with_HTTP_401(self):
         response = self.client.get(
