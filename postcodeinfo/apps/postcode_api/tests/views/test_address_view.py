@@ -10,9 +10,6 @@ from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicIm
 
 class AddressViewTestCase(TestCase):
 
-    def __init(self, args):
-        pass
-
     def setUp(self):
         self.user = User()
         self.user.save()
