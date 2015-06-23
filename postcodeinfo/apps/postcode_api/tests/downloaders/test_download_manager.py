@@ -21,7 +21,7 @@ def subject():
 class DownloadManagerTestCase(TestCase):
 
     def _format_datetime(self, header):
-        return pytz.UTC.localize( parser.parse(header) )
+        return pytz.UTC.localize(parser.parse(header))
 
     def _existing_record(self, headers):
         existing_record = Download(url='http://my/url.html',
