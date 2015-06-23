@@ -47,14 +47,14 @@ class AddressBaseBasicDownloader(object):
     def _username(self):
         username = os.environ.get('OS_FTP_USERNAME')
         if not username:
-            logging.warning('OS_FTP_USERNAME not set!')
+            logging.error('OS_FTP_USERNAME not set!')
 
         return username
 
     def _password(self):
         pwd = os.environ.get('OS_FTP_PASSWORD')
         if not pwd:
-            logging.warning('OS_FTP_PASSWORD not set!')
+            logging.error('OS_FTP_PASSWORD not set!')
 
         return pwd
 
