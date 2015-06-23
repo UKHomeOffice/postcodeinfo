@@ -1,12 +1,8 @@
 import json
-import os
 
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-
-from postcode_api.importers.addressbase_basic_importer\
-    import AddressBaseBasicImporter
 
 
 class SupportViewsTestCase(TestCase):
