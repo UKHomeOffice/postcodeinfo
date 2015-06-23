@@ -79,3 +79,28 @@ class PingDotJsonView(generics.RetrieveAPIView):
             'build_tag': os.environ.get('APP_BUILD_TAG')
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class HealthcheckDotJsonView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get(self, request, *args, **kwargs):
+        database_ok = self.is_database_ok()
+        # this should be an AND of all the checks - add more as needed
+        all_ok = database_ok
+
+        data = {
+            'database': {
+                'description': 'Postgres RDS instance',
+                'ok': database_ok},
+            'ok': all_ok
+        }
+        overall_status = status.HTTP_200_OK
+        if not all_ok:
+            overall_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data, status=overall_status)
+
+    def is_database_ok(self):
+        address = Address.objects.first()
+        return address is not None

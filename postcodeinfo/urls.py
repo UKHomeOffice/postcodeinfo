@@ -24,6 +24,9 @@ urlpatterns = patterns('',
                        url('ping',
                            views.PingDotJsonView.as_view()),
 
+                       url('healthcheck',
+                           views.HealthcheckDotJsonView.as_view()),
+
                        url(r'^', include(router.urls)),
 
                        url(r'^admin/', include(admin.site.urls)),
