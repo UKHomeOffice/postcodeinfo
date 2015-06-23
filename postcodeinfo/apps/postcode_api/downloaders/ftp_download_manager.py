@@ -1,4 +1,5 @@
 import ftplib
+import logging
 import re
 
 from dateutil import parser
@@ -32,7 +33,7 @@ class FTPDownloadManager(DownloadManager):
     def download_all_if_needed(self, pattern, dirpath, force=False):
         files = self.list_files(pattern)
         downloads = []
-        print '%i files matching %s' % (len(files), pattern)
+        logging.debug('%i files matching %s' % (len(files), pattern))
         for file in files:
             dl = self.retrieve(file, dirpath, force)
             if dl:
@@ -70,7 +71,7 @@ class FTPDownloadManager(DownloadManager):
 
     def download_to_dir(self, url, dirpath, headers):
         filepath = self.filename(dirpath, url)
-        print 'downloading file from ' + url + ' to ' + filepath
+        logging.debug('downloading file from ' + url + ' to ' + filepath)
 
         file = open(filepath, 'wb')
         counts = {'size': 0, 'chunks': 0}
@@ -88,10 +89,10 @@ class FTPDownloadManager(DownloadManager):
             counts['chunks'] += 1
             file.write(data)
             if counts['chunks'] % 100 == 0:
-                print '%i/%i bytes' % \
-                    (counts['size'], headers['content-length'])
+                logging.debug('%i/%i bytes' % \
+                    (counts['size'], headers['content-length']))
 
         self.ftp_client.retrbinary('RETR %s' % url, handle_chunk_callback)
 
-        print "downloaded to " + filepath
+        logging.debug("downloaded to " + filepath)
         return filepath
