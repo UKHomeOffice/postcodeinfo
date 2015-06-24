@@ -9,7 +9,6 @@ from postcode_api.downloaders.s3_adapter import S3Adapter
 
 
 class AddressBaseBasicDownloader(object):
-
     """
     Ordnance Survey very kindly remove the files from our
     FTP area 21 days after they are first put there, despite
