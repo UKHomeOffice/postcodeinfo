@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from .models import Address, LocalAuthority
 from .serializers import AddressSerializer
 
+from ignore_client_content_negotiation import IgnoreClientContentNegotiation
+
 
 class AddressViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Address.objects.all()
@@ -68,9 +70,12 @@ class PartialPostcodeView(PostcodeView):
     geom_query = 'postcode_area'
 
 
-class PingDotJsonView(generics.RetrieveAPIView):
+class MonitoringView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    content_negotiation_class = IgnoreClientContentNegotiation
 
+class PingDotJsonView(MonitoringView):
+    
     def get(self, request, *args, **kwargs):
         data = {
             'version_number': os.environ.get('APPVERSION'),
@@ -79,3 +84,29 @@ class PingDotJsonView(generics.RetrieveAPIView):
             'build_tag': os.environ.get('APP_BUILD_TAG')
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class HealthcheckDotJsonView(MonitoringView):
+    
+    def get(self, request, *args, **kwargs):
+        database_ok = self.is_database_ok()
+        # this should be an AND of all the checks - add more as needed
+        all_ok = database_ok
+
+        data = {
+            'database': {
+                'description': 'Postgres RDS instance',
+                'ok': database_ok},
+            'ok': all(
+                [database_ok,
+            ])
+        }
+        overall_status = status.HTTP_200_OK
+        if not all_ok:
+            overall_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data, status=overall_status)
+
+    def is_database_ok(self):
+        address = Address.objects.first()
+        return address is not None
