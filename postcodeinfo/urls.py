@@ -21,13 +21,14 @@ urlpatterns = patterns('',
                            'partial/(?P<postcode>[a-zA-Z0-9\s]+)/$',
                            views.PartialPostcodeView.as_view()),
 
-                       url('ping',
+                       url('ping.json',
                            views.PingDotJsonView.as_view()),
 
-                       url('healthcheck',
+                       url('healthcheck.json',
                            views.HealthcheckDotJsonView.as_view()),
 
                        url(r'^', include(router.urls)),
 
                        url(r'^admin/', include(admin.site.urls)),
                        )
+
