@@ -6,9 +6,12 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
 
-from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicImporter
-from postcode_api.importers.postcode_gss_code_importer import PostcodeGssCodeImporter
-from postcode_api.importers.local_authorities_importer import LocalAuthoritiesImporter
+from postcode_api.importers.addressbase_basic_importer import \
+    AddressBaseBasicImporter
+from postcode_api.importers.postcode_gss_code_importer import \
+    PostcodeGssCodeImporter
+from postcode_api.importers.local_authorities_importer import \
+    LocalAuthoritiesImporter
 
 
 class PostcodeViewTestCase(TestCase):
@@ -27,47 +30,53 @@ class PostcodeViewTestCase(TestCase):
         LocalAuthoritiesImporter().import_local_authorities(
             self._sample_data_file('local_authorities_sample.nt'))
 
+    def request(self, path, **headers):
+        token = headers.pop('token', None)
+        if token is not None:
+            headers['HTTP_AUTHORIZATION'] = token
+        return self.client.get(path, {}, True, False, **headers)
+
+    def assert_produces_parseable_json(self, response):
+        try:
+            json.loads(response.content)
+        except ValueError:
+            self.fail("Invalid JSON response: %s" % response.content)
+
+    def assert_status_code(self, response, code):
+        self.assertEqual(code, response.status_code)
+
     def _sample_data_file(self, filename):
-        return os.path.join(os.path.dirname(__file__), '../', 'sample_data/', filename)
+        return os.path.join(
+            os.path.dirname(__file__), '../', 'sample_data/', filename)
 
-    def test_that_getting_a_valid_postcode_with_a_valid_token_produces_parseable_json(self):
-        response = self.client.get(
-            '/postcodes/N28AS', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
-        parsed = json.loads(response.content)
-        self.assertIsInstance(parsed, dict)
+    def valid_postcode(self, **kwargs):
+        return self.request('/postcodes/N28AS', **kwargs)
 
-    def test_that_getting_a_valid_postcode_with_a_valid_token_responds_with_HTTP_200(self):
-        response = self.client.get(
-            '/postcodes/N28AS', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
-        self.assertEqual(response.status_code, 200)
+    def test_valid_postcode_and_valid_token(self):
+        response = self.valid_postcode(token=self.valid_token)
+        self.assert_status_code(response, 200)
+        self.assert_produces_parseable_json(response)
 
-    def test_that_getting_a_valid_postcode_with_a_space_in_and_a_valid_token_responds_with_HTTP_200(self):
-        response = self.client.get(
-            '/postcodes/N2%208AS', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
-        self.assertEqual(response.status_code, 200)
+    def test_valid_postcode_with_space_and_valid_token(self):
+        response = self.request('/postcodes/N2%208AS', token=self.valid_token)
+        self.assert_status_code(response, 200)
 
-    def test_that_getting_an_invalid_postcode_with_a_valid_token_responds_with_HTTP_404(self):
-        response = self.client.get(
-            '/postcodes/MUPP37', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
-        self.assertEqual(response.status_code, 404)
+    def test_invalid_postcode_with_valid_token_HTTP_404(self):
+        self.assert_status_code(
+            self.request('/postcodes/MUPP37', token=self.valid_token),
+            404)
 
-    def test_that_getting_a_valid_postcode_with_an_invalid_token_responds_with_HTTP_401(self):
-        response = self.client.get(
-            '/postcodes/N28AS', {}, True, False, HTTP_AUTHORIZATION='Token 1234')
-        self.assertEqual(response.status_code, 401)
+    def test_valid_postcode_with_invalid_token_HTTP_401(self):
+        self.assert_status_code(self.valid_postcode(token='Token 1234'), 401)
 
-    def test_that_response_json_contains_local_authority_name_and_gss_code(self):
-        response = self.client.get(
-            '/postcodes/N28AS', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
+    def test_json_structure(self):
+        response = self.valid_postcode(token=self.valid_token)
         parsed = json.loads(response.content)
         self.assertEqual('Barnet', parsed['local_authority']['name'])
         self.assertEqual('E09000003', parsed['local_authority']['gss_code'])
-
-    def test_that_response_json_contains_latitude_and_longitude_of_centre(self):
-        response = self.client.get(
-            '/postcodes/N28AS', {}, True, False, HTTP_AUTHORIZATION=self.valid_token)
-        parsed = json.loads(response.content)
         self.assertAlmostEqual(
-            51.59125130451485, parsed['centre']['latitude'], 4)
-        self.assertAlmostEqual(-0.16635044363607124,
-                               parsed['centre']['longitude'], 4)
+            51.59125130451485,
+            parsed['centre']['latitude'], 4)
+        self.assertAlmostEqual(
+            -0.16635044363607124,
+            parsed['centre']['longitude'], 4)
