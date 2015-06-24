@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 
@@ -77,12 +78,9 @@ class ZipExtractor(object):
         self.filepath = filepath
 
     def unzip_if_needed(self, pattern):
-        if zipfile.is_zipfile(self.filepath) == True:
-            print 'unzipping'
+        if zipfile.is_zipfile(self.filepath):
             return self.unzip(pattern)
-        else:
-            print 'not unzipping'
-            return [self.filepath]
+        return [self.filepath]
 
     def unzip(self, pattern):
         extracted_files = []
@@ -93,8 +91,8 @@ class ZipExtractor(object):
             if re.match(pattern, info.filename):
                 extracted_path = thezip.extract(info, dirname)
                 extracted_files.append(extracted_path)
-                print 'extracted ' + extracted_path
+                logging.debug('extracted ' + extracted_path)
             else:
-                print 'ignored ' + info.filename
+                logging.debug('ignored ' + info.filename)
 
         return extracted_files

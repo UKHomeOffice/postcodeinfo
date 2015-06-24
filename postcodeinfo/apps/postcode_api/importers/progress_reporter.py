@@ -70,16 +70,27 @@ class ImporterProgress(ProgressReporter):
         self.put("starting import of {self.total} lines at {timestamp}".format(
             self=self,
             timestamp=timestamp()))
+        self.percentile = self._percentile(25)
+
+    def _percentile(self, pc):
+        last = 0
+        while True:
+            current = int((self.progress / float(self.total)) * (100.0 / pc))
+            yield (current, last)
+            last = current
 
     def on_increment(self, data=None):
-        self.put((
-            "{timestamp} ({self.elapsed} taken), processed: {self.progress}, "
-            "remaining: {self.remaining}, "
-            "time_per_row: {self.time_per_item}, "
-            "est. time remaining {self.time_remaining}, {data}").format(
-                timestamp=timestamp(),
-                self=self,
-                data=data))
+        current, last = self.percentile.next()
+        if current != last:
+            self.put((
+                "{timestamp} ({self.elapsed} taken), "
+                "processed: {self.progress}, "
+                "remaining: {self.remaining}, "
+                "time_per_row: {self.time_per_item}, "
+                "est. time remaining {self.time_remaining}, {data}").format(
+                    timestamp=timestamp(),
+                    self=self,
+                    data=data))
 
     def on_finish(self, exception):
         self.put((

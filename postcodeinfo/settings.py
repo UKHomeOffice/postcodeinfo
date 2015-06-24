@@ -174,6 +174,10 @@ if os.path.exists('/dev/log'):
     LOGGING['loggers']['']['handlers'] = ['syslog']
 
 
+if TESTING:
+    LOGGING['loggers']['']['level'] = 'ERROR'
+
+
 # AWS keys
 AWS = {
     'region_name': os.environ.get('AWS_REGION_NAME', 'eu-west-1'),
@@ -181,6 +185,7 @@ AWS = {
     'secret_access_key': os.environ.get('AWS_SECRET_ACCESS_KEY'),
     's3_bucket_name': os.environ.get('S3_BUCKET_NAME')
 }
+
 
 # .local.py overrides all the common settings.
 try:
