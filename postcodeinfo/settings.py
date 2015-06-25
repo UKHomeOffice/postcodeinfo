@@ -151,7 +151,7 @@ LOGGING = {
                 '%(message)s')},
 
         'logstash': {
-            '()': 'logstash_formatter.LogstashFormatter'}},
+            '()': 'logstash_formatter.LogstashFormatterV1'}},
 
     'handlers': {
         'console': {
