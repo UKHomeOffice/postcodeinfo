@@ -1,15 +1,10 @@
 import os
 from django.test import TestCase
-from mock import patch, MagicMock
+from mock import patch
 
-import responses
-import requests
 import ftplib
-from ftplib import FTP
 
 from postcode_api.downloaders.addressbase_basic_downloader import AddressBaseBasicDownloader
-from postcode_api.downloaders.download_manager import DownloadManager
-from postcode_api.downloaders.ftp_download_manager import FTPDownloadManager
 
 
 class AddressBaseBasicDownloaderTestCase(TestCase):
@@ -30,7 +25,7 @@ class AddressBaseBasicDownloaderTestCase(TestCase):
 
     @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager')
     def test_that_it_changes_to_the_source_dir(self, mock):
-        target_dir = os.environ.setdefault('OS_FTP_ORDER_DIR', 'my/dir')
+        os.environ.setdefault('OS_FTP_ORDER_DIR', 'my/dir')
 
         self._downloader(mock).download()
         mock.ftp_client.cwd.assertCalledWith('my/dir')
@@ -61,21 +56,17 @@ class AddressBaseBasicDownloaderTestCase(TestCase):
         self.assertEqual( ['files from s3'], dl.download('/some/other/dir', False) )
 
     # describe: local_files
-    @patch('glob.glob')
-    def test_that_it_globs_for_zipped_csv_files_in_local_dir(self, mock):
-        self._downloader(mock).local_files('/local/dir/')
-        mock.assertCalledWith('/local/dir/*csv.zip')
-
     @patch('glob.glob', return_value=['f1','f2'])
     def test_that_it_globs_for_zipped_csv_files_in_local_dir(self, mock):
         result = self._downloader(mock).local_files('/local/dir/')
+        mock.assertCalledWith('/local/dir/*csv.zip')
         self.assertEqual(['f1','f2'], result)
 
     # describe: files_from_s3
     @patch('postcode_api.downloaders.s3_adapter.S3Adapter')
     def test_that_it_lists_addressbase_files_in_the_s3_adapters_bucket(self, mock):
         dl = self._downloader(mock)
-        result = dl.files_from_s3
+        dl.files_from_s3
         mock.bucket.list.assertCalledWith('AddressBase')
 
 

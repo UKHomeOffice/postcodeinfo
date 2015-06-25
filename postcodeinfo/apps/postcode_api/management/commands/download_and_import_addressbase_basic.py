@@ -1,8 +1,5 @@
 import os
-import re
-from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError
-from StringIO import StringIO
+from django.core.management.base import BaseCommand
 
 from postcode_api.downloaders.addressbase_basic_downloader \
     import AddressBaseBasicDownloader
@@ -61,7 +58,7 @@ class Command(BaseCommand):
 
     def _process(self, filepath):
         files = ZipExtractor(filepath).unzip_if_needed(
-                    '.*AddressBase_.*\.csv')
+            '.*AddressBase_.*\.csv')
 
         for path in files:
             print 'importing ' + path
@@ -72,4 +69,3 @@ class Command(BaseCommand):
     def _import(self, downloaded_file):
         importer = AddressBaseBasicImporter()
         importer.import_csv(downloaded_file)
-

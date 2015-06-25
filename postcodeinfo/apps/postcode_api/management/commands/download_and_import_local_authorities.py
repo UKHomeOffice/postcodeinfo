@@ -1,7 +1,5 @@
 import os
-from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError
-from StringIO import StringIO
+from django.core.management.base import BaseCommand
 
 from postcode_api.downloaders.local_authorities_downloader \
     import LocalAuthoritiesDownloader
@@ -56,7 +54,7 @@ class Command(BaseCommand):
 
         for path in files:
             print 'importing ' + path
-            result = self._import(path)
+            self._import(path)
 
     def _import(self, downloaded_file):
         importer = LocalAuthoritiesImporter()

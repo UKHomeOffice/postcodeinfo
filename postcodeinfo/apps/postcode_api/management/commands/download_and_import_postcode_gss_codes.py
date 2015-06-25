@@ -1,9 +1,5 @@
 import os
-import re
-from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError
-from StringIO import StringIO
-
+from django.core.management.base import BaseCommand
 
 from postcode_api.utils import ZipExtractor
 from postcode_api.downloaders.postcode_gss_code_downloader \

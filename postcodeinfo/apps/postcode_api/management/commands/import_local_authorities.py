@@ -1,14 +1,7 @@
 import os
-import rdflib
 
 from multiprocessing import Pool
-
-from collections import OrderedDict
-
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.gis.geos import Point
-
-from dateutil.parser import parse as parsedate
 
 from postcode_api.importers.local_authorities_importer \
     import LocalAuthoritiesImporter

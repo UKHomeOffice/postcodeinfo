@@ -1,11 +1,7 @@
-import json
-
 from django.contrib.gis.db import models
-
 from django.db.models import Count
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from django.template.defaultfilters import slugify
 
 from .utils import AddressFormatter
 

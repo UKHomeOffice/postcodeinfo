@@ -1,14 +1,8 @@
-import os
-import requests
-import responses
-import tempfile
-import ftplib
 import __builtin__
 
 from django.test import TestCase
 from mock import call, patch, MagicMock, ANY
 
-from postcode_api.models import Download
 from postcode_api.downloaders.ftp_download_manager import FTPDownloadManager
 
 
@@ -20,13 +14,13 @@ class FTPDownloadManagerTestCase(TestCase):
 
     @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager.ftp_login')
     def test_that_open_logs_into_the_given_host_with_the_given_username_and_password(self, mock_ftp_login):
-        rtn = subject().open('my.ftp.host', 'my_username', 'my_password')
+        subject().open('my.ftp.host', 'my_username', 'my_password')
         mock_ftp_login.assertCalledWith(
             'my.ftp.host', 'my_username', 'my_password')
 
     @patch('ftplib.FTP')
     def test_that_ftp_login_logs_into_the_given_host_with_the_given_username_and_password(self, mock_ftp):
-        rtn = subject().ftp_login('my.ftp.host', 'my_username', 'my_password')
+        subject().ftp_login('my.ftp.host', 'my_username', 'my_password')
         mock_ftp.assertCalledWith('my.ftp.host')
         mock_ftp.login.assertCalledWith('my_username', 'my_password')
 
