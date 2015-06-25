@@ -7,7 +7,7 @@ GDAL==1.10.1
 gunicorn==19.3.0
 html5lib==0.99999
 isodate==0.5.1
-logstash-formatter==0.5.14
+git+git://github.com/andyhd/python-logstash-formatter.git@f23c58d880408604a560c5cabb07119fc8a08386
 mock==1.0.1
 numpy==1.8.2
 psycopg2==2.6
