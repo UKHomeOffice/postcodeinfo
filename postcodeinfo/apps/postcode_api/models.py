@@ -1,9 +1,16 @@
 from django.contrib.gis.db import models
-from django.db.models import Count
-from django.db.models.signals import pre_save
+from django.db.models import Count, signals
 from django.dispatch import receiver
 
 from .utils import AddressFormatter
+
+
+class AddressManager(models.GeoManager):
+
+    def bulk_create(self, objs, batch_size=None):
+        for obj in objs:
+            signals.pre_save.send(sender=Address, instance=obj)
+        super(AddressManager, self).bulk_create(objs, batch_size=batch_size)
 
 
 class Address(models.Model):
@@ -38,7 +45,7 @@ class Address(models.Model):
     primary_class = models.CharField(max_length=1)
     process_date = models.DateField()
 
-    objects = models.GeoManager()
+    objects = AddressManager()
 
     def __unicode__(self):
         return u"%s - %s" % (self.uprn, self.postcode)
@@ -52,7 +59,7 @@ class Address(models.Model):
         return AddressFormatter.format(self)
 
 
-@receiver(pre_save, sender=Address)
+@receiver(signals.pre_save, sender=Address)
 def address_pre_save(sender, instance, *args, **kwargs):
     instance.postcode_area = instance.postcode.split(' ')[0].lower()
 
