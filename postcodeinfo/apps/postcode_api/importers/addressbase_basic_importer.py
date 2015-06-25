@@ -1,6 +1,4 @@
-import os
 import csv
-import time
 
 from collections import OrderedDict
 from django.contrib.gis.geos import Point
