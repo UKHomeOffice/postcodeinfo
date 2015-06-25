@@ -108,6 +108,8 @@ Alternatively, you can download and/or import the three required datasets indivi
 
 Available from [http://www.ordnancesurvey.co.uk/business-and-government/help-and-support/products/how-to-buy.html](Ordnance Survey)
 
+The interface is complex and tricky to navigate - instructions on how to order exactly what is needed are in [docs/ordering-addressbase.md]
+
 OR 
 
 Automatically download the latest version with:
