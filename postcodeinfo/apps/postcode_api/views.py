@@ -29,7 +29,6 @@ class PostcodeView(generics.RetrieveAPIView):
 
     def __format_json(cls, geom, local_authority):
         centre = geom.centroid.coords
-        lat_long = {'latitude': centre[1], 'longitude': centre[0]}
 
         if local_authority:
             local_authority = {
@@ -38,7 +37,10 @@ class PostcodeView(generics.RetrieveAPIView):
             }
 
         data = {
-            'centre': lat_long,
+            'centre': {
+                'type': 'Point',
+                'coordinates': centre
+            },
             'local_authority': local_authority
         }
         return data

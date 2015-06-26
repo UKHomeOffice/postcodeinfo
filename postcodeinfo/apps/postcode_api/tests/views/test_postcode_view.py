@@ -49,34 +49,96 @@ class PostcodeViewTestCase(TestCase):
         return os.path.join(
             os.path.dirname(__file__), '../', 'sample_data/', filename)
 
-    def valid_postcode(self, **kwargs):
-        return self.request('/postcodes/N28AS', **kwargs)
-
-    def test_valid_postcode_and_valid_token(self):
-        response = self.valid_postcode(token=self.valid_token)
-        self.assert_status_code(response, 200)
-        self.assert_produces_parseable_json(response)
-
-    def test_valid_postcode_with_space_and_valid_token(self):
-        response = self.request('/postcodes/N2%208AS', token=self.valid_token)
-        self.assert_status_code(response, 200)
-
-    def test_invalid_postcode_with_valid_token_HTTP_404(self):
-        self.assert_status_code(
-            self.request('/postcodes/MUPP37', token=self.valid_token),
-            404)
-
-    def test_valid_postcode_with_invalid_token_HTTP_401(self):
-        self.assert_status_code(self.valid_postcode(token='Token 1234'), 401)
-
-    def test_json_structure(self):
-        response = self.valid_postcode(token=self.valid_token)
+    def assert_json_structure(self, response):
         parsed = json.loads(response.content)
         self.assertEqual('Barnet', parsed['local_authority']['name'])
         self.assertEqual('E09000003', parsed['local_authority']['gss_code'])
-        self.assertAlmostEqual(
-            51.59125130451485,
-            parsed['centre']['latitude'], 4)
-        self.assertAlmostEqual(
-            -0.16635044363607124,
-            parsed['centre']['longitude'], 4)
+        lon, lat = parsed['centre']['coordinates']
+        self.assertAlmostEqual(51.59125130451485, lat)
+        self.assertAlmostEqual(-0.16635044363607124, lon)
+
+
+def valid_token(url):
+
+    def response(self):
+        return self.request(url, token=self.valid_token)
+
+    return response
+
+
+def invalid_token(url):
+
+    def response(self):
+        return self.request(url, token='Token 1234')
+
+    return response
+
+
+def status_code(code):
+
+    def assertion(self, response):
+        self.assert_status_code(response, code)
+
+    return assertion
+
+
+def json_ok(self, response):
+    self.assert_json_structure(response)
+
+
+def postcode(pcode):
+    return '/postcodes/%s' % pcode
+
+
+def partial(postcode):
+    return '/postcodes/partial/%s' % postcode
+
+
+cases = {
+
+    # full postcodes
+    'test_valid_postcode_and_valid_token': {
+        'view': valid_token(postcode('N28AS')),
+        'assert': [status_code(200), json_ok]},
+
+    'test_valid_postcode_with_space_and_valid_token': {
+        'view': valid_token(postcode('N2%208AS')),
+        'assert': [status_code(200)]},
+
+    'test_invalid_postcode_with_valid_token': {
+        'view': valid_token(postcode('MUPP37')),
+        'assert': [status_code(404)]},
+
+    'test_valid_postcode_and_invalid_token': {
+        'view': invalid_token(postcode('N28AS')),
+        'assert': [status_code(401)]},
+
+    # partial postcodes
+    'test_valid_partial_postcode_valid_token': {
+        'view': valid_token(partial('N2')),
+        'assert': [status_code(200), json_ok]},
+
+    'test_invalid_partial_postcode_valid_token_HTTP_404': {
+        'view': valid_token(partial('N2MUPP37')),
+        'assert': [status_code(404)]},
+
+    'test_valid_partial_postcode_invalid_token_HTTP_401': {
+        'view': invalid_token(partial('N2')),
+        'assert': [status_code(401)]}
+}
+
+
+def make_test(case):
+    view = case['view']
+    assertions = case['assert']
+
+    def case_test(self):
+        response = view(self)
+        for assertion in assertions:
+            assertion(self, response)
+
+    return case_test
+
+
+for name, case in cases.iteritems():
+    setattr(PostcodeViewTestCase, name, make_test(case))
