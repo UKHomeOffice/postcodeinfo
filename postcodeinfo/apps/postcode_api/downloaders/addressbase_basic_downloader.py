@@ -73,8 +73,6 @@ class AddressBaseBasicDownloader(object):
         files = []
         s3 = S3Adapter()
         s3_files = s3.bucket.list('AddressBase')
-        logging.debug('found %i files in s3 matching %s' %
-                      (len(s3_files), 'AddressBase'))
         for key in s3_files:
             logging.debug('downloading %s' % key.name)
             files.append(s3.download(key, os.path.join(local_dir, key.name)))
