@@ -83,6 +83,7 @@ def status_code(code):
 
 
 def json_ok(self, response):
+    self.assert_produces_parseable_json(response)
     self.assert_json_structure(response)
 
 
