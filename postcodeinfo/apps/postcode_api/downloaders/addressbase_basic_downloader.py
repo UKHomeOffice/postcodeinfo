@@ -3,7 +3,6 @@ import glob
 import logging
 import os
 
-from postcode_api.downloaders.download_manager import DownloadManager
 from postcode_api.downloaders.ftp_download_manager import FTPDownloadManager
 from postcode_api.downloaders.s3_adapter import S3Adapter
 

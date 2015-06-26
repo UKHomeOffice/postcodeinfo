@@ -1,7 +1,4 @@
-import os
-import csv
 import logging
-import subprocess
 
 from rdflib import Graph, URIRef
 

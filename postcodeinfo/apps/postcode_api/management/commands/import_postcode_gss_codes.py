@@ -2,8 +2,6 @@ import os
 
 from multiprocessing import Pool
 
-from collections import OrderedDict
-
 from django.core.management.base import BaseCommand, CommandError
 
 from postcode_api.importers.postcode_gss_code_importer \

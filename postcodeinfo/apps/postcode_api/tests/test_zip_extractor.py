@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from mock import patch, MagicMock
+from mock import patch
 
 from postcode_api.utils import ZipExtractor
 
@@ -21,5 +21,5 @@ class ZipExtractorTestCase(TestCase):
 
     def test_that_when_not_given_a_zip_file_it_does_not_unzip(self):
         with patch('zipfile.is_zipfile', return_value=False):
-            rtn = ZipExtractor('/my/test/file').unzip_if_needed('*')
+            ZipExtractor('/my/test/file').unzip_if_needed('*')
             assert not self.mock_unzip.called

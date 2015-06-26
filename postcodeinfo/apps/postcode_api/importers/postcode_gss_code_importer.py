@@ -1,10 +1,6 @@
-import os
 import csv
-import time
 
-
-from dateutil.parser import parse as parsedate
-from time import time, gmtime
+from time import gmtime
 
 from postcode_api.models import PostcodeGssCode, Download
 from postcode_api.importers.progress_reporter import ImporterProgress, \

@@ -4,7 +4,6 @@ from mock import patch
 from mock import MagicMock
 
 import responses
-import requests
 
 from postcode_api.downloaders.postcode_gss_code_downloader\
     import PostcodeGssCodeDownloader

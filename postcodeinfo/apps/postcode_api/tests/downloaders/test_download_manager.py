@@ -1,6 +1,5 @@
 import os
 import pytz
-import requests
 import responses
 import tempfile
 
@@ -11,7 +10,6 @@ from datetime import datetime, timedelta
 
 from postcode_api.models import Download
 from postcode_api.downloaders.download_manager import DownloadManager
-from postcode_api.downloaders.s3_adapter import S3Adapter
 
 
 def subject():
@@ -50,7 +48,7 @@ class DownloadManagerTestCase(TestCase):
     # describe: get_headers
     @patch('requests.head')
     def test_that_it_makes_a_head_request_to_the_given_url_and_follows_redirects(self, mock):
-        returned = subject().get_headers('http://some.url/')
+        subject().get_headers('http://some.url/')
         mock.assertCalledWith('http://some.url/', allow_redirects=True)
 
     @responses.activate
@@ -203,7 +201,7 @@ class DownloadManagerTestCase(TestCase):
     @patch('postcode_api.downloaders.download_manager.DownloadManager.get_headers', return_value=[{'last-modified':'some time ago'},{'last-modified':'some other time'}])
     @patch('postcode_api.downloaders.download_manager.DownloadManager.format_time_for_orm', return_value='formatted time')
     def test_that_when_headers_is_a_list_it_uses_the_first_element(self, mock_format_time_for_orm, mock_get_headers):
-        result = subject().get_last_modified('a.url')
+        subject().get_last_modified('a.url')
         mock_format_time_for_orm.assertCalledWith('some time ago')
         
     # describe format_time_for_orm

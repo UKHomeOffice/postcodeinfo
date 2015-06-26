@@ -2,9 +2,6 @@ import ftplib
 import logging
 import re
 
-from dateutil import parser
-from ftplib import FTP
-
 from postcode_api.downloaders.download_manager import DownloadManager
 
 

@@ -1,9 +1,8 @@
-import re
 import os
 
 from django.test import TestCase
 
-from postcode_api.models import Address, PostcodeGssCode, LocalAuthority
+from postcode_api.models import LocalAuthority
 from postcode_api.importers.local_authorities_importer import LocalAuthoritiesImporter
 
 

@@ -3,12 +3,11 @@ import requests
 import os
 import pytz
 
-from time import time, gmtime, strftime, strptime, mktime, localtime
+from time import mktime
 from datetime import datetime
 from dateutil import parser
 
 
-from postcode_api.models import Download
 from postcode_api.downloaders.s3_adapter import S3Adapter
 
 
