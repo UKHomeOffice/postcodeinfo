@@ -82,24 +82,16 @@ class AddressBaseBasicImporter(object):
         total_rows = lines_in_file(filename)
         batch_size = int( os.environ.get( 'BATCH_IMPORT_NUM_ROWS', (total_rows // 10) or 1 ) )
 
-        uprns = []
         rows = csv_rows(filename, fieldnames=self.fieldnames)
 
         print( 'reading all data and getting uprns' )
-        i = 0
         print 'getting batches of size %i' % batch_size
         batches = batch(rows, batch_size)
-        print batches
-
+        
         for this_batch in batches:
             batch_list = list(this_batch)
             print '**** starting batch ****'
-            for row in batch_list:
-                print 'row %i' % i 
-                if row:
-                    uprns.append( row['uprn'] )
-                i = i + 1
-
+            uprns = self._get_all_uprns(batch_list)
 
             # get all existing addresses with a uprn in this batch
             print( 'looking for existing addresses with uprns in this batch' )
@@ -112,6 +104,14 @@ class AddressBaseBasicImporter(object):
             self._save()
 
             print 'batch done'
+
+    def _get_all_uprns(self, batch_list):
+        uprns = []
+        for row in batch_list:
+            if row:
+                uprns.append( row['uprn'] )
+
+        return uprns
 
     def _get_existing_addresses_in_batch_as_dict(self, uprns):
         print( 'querying db for existing uprns')
@@ -156,11 +156,6 @@ class AddressBaseBasicImporter(object):
         self.deletes = []
 
     def _process(self, row, existing_address_dict):
-        #try:
-        #    address = Address.objects.get(uprn=row['uprn'])
-        #except Address.DoesNotExist:
-        #    address = Address(uprn=row['uprn'])
-
         if row['uprn'] in existing_address_dict:
             address = existing_address_dict[row['uprn']]
         else:
