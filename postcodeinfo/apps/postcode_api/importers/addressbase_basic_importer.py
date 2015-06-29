@@ -1,5 +1,6 @@
 import csv
 import itertools
+import logging
 import os
 
 from dateutil.parser import parse as parsedate
@@ -33,6 +34,9 @@ def batch(iterable, size):
     while True:
         chunk = itertools.islice(it, size)
         yield itertools.chain((next(chunk),), chunk)
+
+def _get_all_uprns(batch_list):
+    return [row['uprn'] for row in batch_list if row]
 
 
 class AddressBaseBasicImporter(object):
@@ -72,7 +76,8 @@ class AddressBaseBasicImporter(object):
         self.fieldnames = map(lambda (k, _): k, self.fields)
 
     def _append(self, change_type, address):
-        collection = {'I': self.inserts,
+        collection = {
+         'I': self.inserts,
          'U': self.updates,
          'D': self.deletes}[change_type]
 
@@ -80,88 +85,76 @@ class AddressBaseBasicImporter(object):
 
     def import_csv(self, filename):
         total_rows = lines_in_file(filename)
-        batch_size = int( os.environ.get( 'BATCH_IMPORT_NUM_ROWS', (total_rows // 10) or 1 ) )
+        batch_size = int(os.environ.get( 'BATCH_IMPORT_NUM_ROWS', (total_rows // 10) or 1 ))
         bulk_create_batch_size = int(os.environ.get('BULK_CREATE_BATCH_SIZE', 1000))
 
         rows = csv_rows(filename, fieldnames=self.fieldnames)
 
-        print( 'reading all data and getting uprns' )
-        print 'getting batches of size {i}'.format(i=batch_size)
+        logging.debug( 'reading all data and getting uprns' )
+        logging.debug( 'getting batches of size {i}'.format(i=batch_size) )
         batches = batch(rows, batch_size)
         
-        for this_batch in batches:
-            batch_list = list(this_batch)
-            print '**** starting batch ****'
-            uprns = self._get_all_uprns(batch_list)
+        for current_batch in batches:
+            batch_list = list(current_batch)
+            logging.debug('**** starting batch ****')
+            uprns = _get_all_uprns(batch_list)
 
-            # get all existing addresses with a uprn in this batch
-            print( 'looking for existing addresses with uprns in this batch' )
+            logging.debug( 'looking for existing addresses with uprns in this batch' )
             existing_address_dict = self._get_existing_addresses_in_batch_as_dict(uprns)
 
-            print 'constructing model objects'
+            logging.debug('constructing model objects')
             self._construct_model_objects( batch_list, existing_address_dict, total_rows)
 
-            print '**** saving ****'
+            logging.debug('**** saving ****')
             self._save(bulk_create_batch_size)
 
-            print 'batch done'
+            logging.debug('batch done')
 
-    def _get_all_uprns(self, batch_list):
-        uprns = []
-        for row in batch_list:
-            if row:
-                uprns.append( row['uprn'] )
-
-        return uprns
 
     def _get_existing_addresses_in_batch_as_dict(self, uprns):
-        print( 'querying db for existing uprns')
+        logging.debug( 'querying db for existing uprns')
         existing_addresses = Address.objects.filter(uprn__in=uprns)
             
-        print( 'building hash' )
+        logging.debug( 'building hash' )
         return dict ((o.uprn, o) for o in existing_addresses)
 
     def _construct_model_objects(self, batch_list, existing_address_dict, total_rows):
         with ImporterProgress(total_rows) as progress:
             for row in batch_list:
                 if row:
-                    address = self._process(row, existing_address_dict)
+                    address = self._existing_or_new_address(row, existing_address_dict)
+                    address = self._apply_changes_to_instance(address, row)
                     self._append(row['change_type'], address)
                     progress.increment(row['uprn'])
-                else:
-                    print( 'row empty!' )
 
     def _save(self, bulk_create_batch_size):
-        print 'bulk_create_batch_size = {batch_size}'.format(batch_size=bulk_create_batch_size)
+        logging.debug('bulk_create_batch_size = {batch_size}'.format(batch_size=bulk_create_batch_size))
 
         to_delete = [obj.pk for obj in self.updates + self.deletes]
 
         with transaction.atomic():
-            print 'deleting %i addresses' % len(to_delete)
+            logging.debug('deleting %i addresses' % len(to_delete))
             Address.objects.filter(pk__in=to_delete).delete()
 
             # delete inserts which are already in the db and re-insert them
             inserts = [obj.pk for obj in self.inserts]
-            print 'deleting {num} existing addresses to insert in batches of {batch_size}'.format(num=len(inserts), batch_size=bulk_create_batch_size)
+            logging.debug('deleting {num} existing addresses to insert in batches of {batch_size}'.format(num=len(inserts), batch_size=bulk_create_batch_size))
             Address.objects.filter(pk__in=inserts).delete()
 
-            print 'bulk_creating {num} updates in batches of {batch_size}'.format(num=len(inserts), batch_size=bulk_create_batch_size)
+            logging.debug('bulk_creating {num} updates in batches of {batch_size}'.format(num=len(inserts), batch_size=bulk_create_batch_size))
             Address.objects.bulk_create(self.updates, bulk_create_batch_size)
 
-            print 'bulk_creating %i inserts' % len(self.inserts)
+            logging.debug('bulk_creating %i inserts' % len(self.inserts))
             Address.objects.bulk_create(self.inserts, bulk_create_batch_size)
 
         self.inserts = []
         self.updates = []
         self.deletes = []
 
-    def _process(self, row, existing_address_dict):
-        # try/except is faster in Python than testing each key
-        try:
-            address = existing_address_dict[row['uprn']]
-        except KeyError:
-            address = Address(uprn=row['uprn'])
+    def _existing_or_new_address(self, row, existing_address_dict):
+        return existing_address_dict.get(row['uprn'], Address(uprn=row['uprn']))
 
+    def _apply_changes_to_instance(self, address, row):
         for i, (field, data_type) in enumerate(self.fields):
             if data_type == 'char':
                 setattr(address, field, row[field])

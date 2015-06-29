@@ -14,11 +14,8 @@ class Command(BaseCommand):
         if len(args) == 0:
             raise CommandError('You must specify at least one CSV file')
 
-        # p = Pool()
-        # p.map(import_csv, args)
-        for i in range(len(args)):
-            import_csv(args[i])
-
+        p = Pool()
+        p.map(import_csv, args)
 
 def import_csv(filename):
     if not os.access(filename, os.R_OK):
