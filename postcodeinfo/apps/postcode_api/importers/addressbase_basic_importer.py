@@ -1,8 +1,10 @@
 import csv
 import itertools
+import os
 
 from dateutil.parser import parse as parsedate
 from django.contrib.gis.geos import Point
+from django.db import transaction
 
 from postcode_api.models import Address
 from postcode_api.importers.progress_reporter import ImporterProgress, \
@@ -70,42 +72,91 @@ class AddressBaseBasicImporter(object):
         self.fieldnames = map(lambda (k, _): k, self.fields)
 
     def _append(self, change_type, address):
-        {'I': self.inserts,
+        collection = {'I': self.inserts,
          'U': self.updates,
-         'D': self.deletes}[change_type].append(address)
+         'D': self.deletes}[change_type]
+
+        collection.append(address)
 
     def import_csv(self, filename):
         total_rows = lines_in_file(filename)
-        batch_size = (total_rows // 50) or 1
-        with ImporterProgress(total_rows) as progress:
-            rows = csv_rows(filename, fieldnames=self.fieldnames)
-            for rows in batch(rows, batch_size):
-                for row in rows:
+        batch_size = int( os.environ.get( 'BATCH_IMPORT_NUM_ROWS', (total_rows // 10) or 1 ) )
+
+        uprns = []
+        rows = csv_rows(filename, fieldnames=self.fieldnames)
+
+        print( 'reading all data and getting uprns' )
+        i = 0
+        print 'getting batches of size %i' % batch_size
+        batches = batch(rows, batch_size)
+        print batches
+
+        for this_batch in batches:
+            batch_list = list(this_batch)
+            print '**** starting batch ****'
+            for row in batch_list:
+                print 'row %i' % i 
+                if row:
+                    uprns.append( row['uprn'] )
+                i = i + 1
+
+
+            # get all existing addresses with a uprn in this batch
+            print( 'looking for existing addresses with uprns in this batch' )
+            existing_addresses = Address.objects.filter(uprn__in=uprns)
+            
+            print( 'building hash' )
+            existing_address_dict = dict ((o.uprn, o) for o in existing_addresses)
+
+            print 'processing batch'
+            with ImporterProgress(total_rows) as progress:
+                for row in batch_list:
                     if row:
-                        address = self._process(row)
+                        address = self._process(row, existing_address_dict)
                         self._append(row['change_type'], address)
                         progress.increment(row['uprn'])
-                self._save()
+                    else:
+                        print( 'row empty!' )
+
+            print '**** saving ****'
+            self._save()
+
+            print 'batch done'
 
     def _save(self):
+        bulk_create_batch_size = int(os.environ.get('BULK_CREATE_BATCH_SIZE', 1000))
+        print( 'bulk_create_batch_size = %i' % bulk_create_batch_size )
+
         to_delete = [obj.pk for obj in self.updates + self.deletes]
-        Address.objects.filter(pk__in=to_delete).delete()
 
-        # delete inserts which are already in the db and re-insert them
-        inserts = [obj.pk for obj in self.inserts]
-        Address.objects.filter(pk__in=inserts).delete()
+        with transaction.atomic():
+            print 'deleting %i addresses' % len(to_delete)
+            Address.objects.filter(pk__in=to_delete).delete()
 
-        Address.objects.bulk_create(self.updates)
-        Address.objects.bulk_create(self.inserts)
+            # delete inserts which are already in the db and re-insert them
+            inserts = [obj.pk for obj in self.inserts]
+            print 'deleting %i existing addresses to insert' % len(inserts)
+            Address.objects.filter(pk__in=inserts).delete()
+
+            print 'bulk_creating %i updates' % len(self.updates)
+            Address.objects.bulk_create(self.updates, bulk_create_batch_size)
+
+            print 'bulk_creating %i inserts' % len(self.inserts)
+            Address.objects.bulk_create(self.inserts, bulk_create_batch_size)
 
         self.inserts = []
         self.updates = []
         self.deletes = []
 
-    def _process(self, row):
-        try:
-            address = Address.objects.get(uprn=row['uprn'])
-        except Address.DoesNotExist:
+    def _process(self, row, existing_address_dict):
+        #try:
+        #    address = Address.objects.get(uprn=row['uprn'])
+        #except Address.DoesNotExist:
+        #    address = Address(uprn=row['uprn'])
+
+        if row['uprn'] in existing_address_dict:
+            address = existing_address_dict[row['uprn']]
+        else:
             address = Address(uprn=row['uprn'])
 
         for i, (field, data_type) in enumerate(self.fields):
