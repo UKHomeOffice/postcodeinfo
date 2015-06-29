@@ -119,12 +119,7 @@ class AddressBaseBasicImporter(object):
         existing_addresses = Address.objects.filter(uprn__in=uprns)
             
         print( 'building hash' )
-        # return dict ((o.uprn, o) for o in existing_addresses)
-        d = dict.fromkeys(uprns, None)
-        for o in existing_addresses:
-            d[o.uprn] = o
-        
-        return d
+        return dict ((o.uprn, o) for o in existing_addresses)
 
     def _construct_model_objects(self, batch_list, existing_address_dict, total_rows):
         with ImporterProgress(total_rows) as progress:
