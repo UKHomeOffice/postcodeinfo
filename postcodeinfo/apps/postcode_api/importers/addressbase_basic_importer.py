@@ -103,29 +103,36 @@ class AddressBaseBasicImporter(object):
 
             # get all existing addresses with a uprn in this batch
             print( 'looking for existing addresses with uprns in this batch' )
-            existing_addresses = Address.objects.filter(uprn__in=uprns)
-            
-            print( 'building hash' )
-            existing_address_dict = dict ((o.uprn, o) for o in existing_addresses)
+            existing_address_dict = self._get_existing_addresses_in_batch_as_dict(uprns)
 
-            print 'processing batch'
-            with ImporterProgress(total_rows) as progress:
-                for row in batch_list:
-                    if row:
-                        address = self._process(row, existing_address_dict)
-                        self._append(row['change_type'], address)
-                        progress.increment(row['uprn'])
-                    else:
-                        print( 'row empty!' )
+            print 'constructing model objects'
+            self._construct_model_objects( batch_list, existing_address_dict, total_rows)
 
             print '**** saving ****'
             self._save()
 
             print 'batch done'
 
+    def _get_existing_addresses_in_batch_as_dict(self, uprns):
+        print( 'querying db for existing uprns')
+        existing_addresses = Address.objects.filter(uprn__in=uprns)
+            
+        print( 'building hash' )
+        return dict ((o.uprn, o) for o in existing_addresses)
+
+    def _construct_model_objects(self, batch_list, existing_address_dict, total_rows):
+        with ImporterProgress(total_rows) as progress:
+            for row in batch_list:
+                if row:
+                    address = self._process(row, existing_address_dict)
+                    self._append(row['change_type'], address)
+                    progress.increment(row['uprn'])
+                else:
+                    print( 'row empty!' )
+
     def _save(self):
         bulk_create_batch_size = int(os.environ.get('BULK_CREATE_BATCH_SIZE', 1000))
-        print( 'bulk_create_batch_size = %i' % bulk_create_batch_size )
+        print 'bulk_create_batch_size = {batch_size}'.format(batch_size=bulk_create_batch_size)
 
         to_delete = [obj.pk for obj in self.updates + self.deletes]
 
@@ -135,10 +142,10 @@ class AddressBaseBasicImporter(object):
 
             # delete inserts which are already in the db and re-insert them
             inserts = [obj.pk for obj in self.inserts]
-            print 'deleting %i existing addresses to insert' % len(inserts)
+            print 'deleting {num} existing addresses to insert in batches of {batch_size}'.format(num=len(inserts), batch_size=bulk_create_batch_size)
             Address.objects.filter(pk__in=inserts).delete()
 
-            print 'bulk_creating %i updates' % len(self.updates)
+            print 'bulk_creating {num} updates in batches of {batch_size}'.format(num=len(inserts), batch_size=bulk_create_batch_size)
             Address.objects.bulk_create(self.updates, bulk_create_batch_size)
 
             print 'bulk_creating %i inserts' % len(self.inserts)
