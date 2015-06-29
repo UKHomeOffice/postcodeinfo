@@ -27,6 +27,8 @@ How to order AddressBase from Ordnance Survey
    b. So, enter any positive integer in this box - support suggested 100 or 1000
  12. Make sure that the price at the bottom is no longer greyed-out, and showing ‘£0.00 non-chargeable’
  13. Click ‘Add to basket’
+ 14. Click 'Checkout' - you will be prompted to enter your password again.
+ 15. Click 'Place order'
 
 Sometime later, there should be an email sent to tools@digital.justice.gov.uk containing an order number for this order
 
