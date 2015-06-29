@@ -17,7 +17,6 @@ class Command(BaseCommand):
         p = Pool()
         p.map(import_csv, args)
 
-
 def import_csv(filename):
     if not os.access(filename, os.R_OK):
         raise CommandError('CSV file could not be read')
