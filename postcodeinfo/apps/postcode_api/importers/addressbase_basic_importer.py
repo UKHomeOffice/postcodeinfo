@@ -81,11 +81,12 @@ class AddressBaseBasicImporter(object):
     def import_csv(self, filename):
         total_rows = lines_in_file(filename)
         batch_size = int( os.environ.get( 'BATCH_IMPORT_NUM_ROWS', (total_rows // 10) or 1 ) )
+        bulk_create_batch_size = int(os.environ.get('BULK_CREATE_BATCH_SIZE', 1000))
 
         rows = csv_rows(filename, fieldnames=self.fieldnames)
 
         print( 'reading all data and getting uprns' )
-        print 'getting batches of size %i' % batch_size
+        print 'getting batches of size {i}'.format(i=batch_size)
         batches = batch(rows, batch_size)
         
         for this_batch in batches:
@@ -101,7 +102,7 @@ class AddressBaseBasicImporter(object):
             self._construct_model_objects( batch_list, existing_address_dict, total_rows)
 
             print '**** saving ****'
-            self._save()
+            self._save(bulk_create_batch_size)
 
             print 'batch done'
 
@@ -118,7 +119,12 @@ class AddressBaseBasicImporter(object):
         existing_addresses = Address.objects.filter(uprn__in=uprns)
             
         print( 'building hash' )
-        return dict ((o.uprn, o) for o in existing_addresses)
+        # return dict ((o.uprn, o) for o in existing_addresses)
+        d = dict.fromkeys(uprns, None)
+        for o in existing_addresses:
+            d[o.uprn] = o
+        
+        return d
 
     def _construct_model_objects(self, batch_list, existing_address_dict, total_rows):
         with ImporterProgress(total_rows) as progress:
@@ -130,8 +136,7 @@ class AddressBaseBasicImporter(object):
                 else:
                     print( 'row empty!' )
 
-    def _save(self):
-        bulk_create_batch_size = int(os.environ.get('BULK_CREATE_BATCH_SIZE', 1000))
+    def _save(self, bulk_create_batch_size):
         print 'bulk_create_batch_size = {batch_size}'.format(batch_size=bulk_create_batch_size)
 
         to_delete = [obj.pk for obj in self.updates + self.deletes]
@@ -156,9 +161,10 @@ class AddressBaseBasicImporter(object):
         self.deletes = []
 
     def _process(self, row, existing_address_dict):
-        if row['uprn'] in existing_address_dict:
+        # try/except is faster in Python than testing each key
+        try:
             address = existing_address_dict[row['uprn']]
-        else:
+        except KeyError:
             address = Address(uprn=row['uprn'])
 
         for i, (field, data_type) in enumerate(self.fields):
