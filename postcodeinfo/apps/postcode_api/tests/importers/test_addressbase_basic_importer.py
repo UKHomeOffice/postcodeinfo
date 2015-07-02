@@ -14,11 +14,13 @@ from postcode_api.importers.addressbase_basic_importer import \
 class AddressBaseBasicImporterTest(django.test.TransactionTestCase):
 
     def setUp(self):
-        Address.objects.all().delete()
         self.importer = AddressBaseBasicImporter()
         self.sample_data = join(
             dirname(__file__),
             '../sample_data/addressbase_basic_sample.csv')
+
+    def tearDown(self):
+        Address.objects.all().delete()
 
     def test_import(self):
         self.importer.import_csv(self.sample_data)

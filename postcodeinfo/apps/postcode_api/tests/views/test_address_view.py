@@ -1,14 +1,15 @@
 import json
 import os
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.contrib.auth.models import User
+from postcode_api.models import Address
 from rest_framework.authtoken.models import Token
 
 from postcode_api.importers.addressbase_basic_importer import AddressBaseBasicImporter
 
 
-class AddressViewTestCase(TestCase):
+class AddressViewTestCase(TransactionTestCase):
 
     def setUp(self):
         self.user = User()
@@ -17,6 +18,9 @@ class AddressViewTestCase(TestCase):
         token.save()
         self.valid_token = 'Token ' + str(self.user.auth_token)
         self._import_data_from('addressbase_basic_sample.csv')
+
+    def tearDown(self):
+        Address.objects.all().delete()
 
     def _sample_data_file(self, filename):
         return os.path.join(os.path.dirname(__file__), '../', 'sample_data/', filename)

@@ -1,6 +1,4 @@
-import csv
-import glob
-import itertools
+import tempfile
 import logging
 import os
 import subprocess
@@ -12,19 +10,12 @@ from django.conf import settings
 BRITISH_NATIONAL_GRID = 27700
 
 
-
 def split_file(path, num_lines):
-    split_dir = os.path.join(os.path.dirname(path), 'splits')
-    if not os.path.exists(split_dir):
-        os.makedirs(split_dir)
-
-    filename = os.path.basename(path)
-    split_file_prefix = os.path.join(split_dir, filename + '-')
-    cmd = ["/usr/bin/split", "-l", str(num_lines), path, split_file_prefix]
-    runProcess(cmd)
-    logging.debug('globbing for ' + split_file_prefix + '*')
-    return glob.glob(split_file_prefix + '*')
-
+    split_dir = tempfile.mkdtemp()
+    runProcess(['/usr/bin/split', '-l', str(num_lines), path, split_dir + '/'])
+    for filename in map(lambda name: os.path.join(split_dir, name), os.listdir(split_dir)):
+        yield filename
+        os.remove(filename)
 
 def get_all_uprns(batch_list):
     return [row['uprn'] for row in batch_list if row]
@@ -36,13 +27,7 @@ def runProcess(exe, **kwargs):
         'executing {cmd} with env {env}'.format(cmd=str(exe), env=env))
     p = subprocess.Popen(
         exe, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
-    while(True):
-        retcode = p.poll()  # returns None while subprocess is running
-        line = p.stdout.readline()
-        if line:
-            print line
-        if(retcode is not None):
-            break
+    p.wait()
 
 
 class AddressBaseBasicImporter(object):
@@ -88,12 +73,8 @@ class AddressBaseBasicImporter(object):
         batch_size = int(
             os.environ.get('BATCH_IMPORT_NUM_ROWS', 100000))
 
-        split_files = split_file(filename, batch_size)
-
-        for file_to_import in split_files:
-            logging.debug("importing csv {filename}".format(filename=filename))
-            self.import_file(file_to_import)
-            os.remove(file_to_import)
+        for split in split_file(filename, batch_size):
+            self.import_file(split)
 
     def import_file(self, filepath):
         logging.debug("importing file {filepath}".format(filepath=filepath))
