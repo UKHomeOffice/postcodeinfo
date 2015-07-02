@@ -25,7 +25,7 @@ class LargeTableChangeList(ChangeList):
             self.list_max_show_all = MAX_SHOW_ALL_ALLOWED
 
     def get_results(self, request):
-        paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
+        paginator = self.model_admin.get_paginator(request, self.queryset, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
 
@@ -33,23 +33,23 @@ class LargeTableChangeList(ChangeList):
         # Perform a slight optimization: Check to see whether any filters were
         # given. If not, use paginator.hits to calculate the number of objects,
         # because we've already done paginator.hits and the value is cached.
-        if not self.query_set.query.where:
+        if not self.queryset.query.where:
             full_result_count = result_count
         else:
             try:
                 cursor = connection.cursor()
                 cursor.execute("SELECT reltuples FROM pg_class WHERE relname = %s",
-                    [self.root_query_set.query.model._meta.db_table])
+                    [self.root_queryset.query.model._meta.db_table])
                 full_result_count = int(cursor.fetchone()[0])
             except:
-                full_result_count = self.root_query_set.count()
+                full_result_count = self.root_queryset.count()
 
         can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
         # Get the list of objects to display on this page.
         if (self.show_all and can_show_all) or not multi_page:
-            result_list = self.query_set._clone()
+            result_list = self.queryset._clone()
         else:
             try:
                 result_list = paginator.page(self.page_num + 1).object_list
@@ -106,7 +106,7 @@ class AddressAdmin(admin.OSMGeoAdmin, admin.ModelAdmin):
     show_full_result_count = False
     list_display = ('uprn', 'building_number', 'building_name',
                     'thoroughfare_name', 'post_town', 'postcode_index')
-    ordering = ('postcode_index',)
+    ordering = ('postcode_index','uprn')
     paginator = LargeTablePaginator
 
     def get_changelist(self, request, **kwargs):

@@ -45,11 +45,6 @@ class Address(models.Model):
     primary_class = models.CharField(max_length=1)
     process_date = models.DateField()
 
-    class Meta:
-        index_together = [
-            ['postcode_index', 'uprn']
-        ]
-
     objects = AddressManager()
 
     def __unicode__(self):
@@ -58,7 +53,10 @@ class Address(models.Model):
     class Meta:
         verbose_name_plural = 'addresses'
         ordering = ['building_number', 'building_name', 'sub_building_name']
-
+        index_together = [
+            ['postcode_index', 'uprn']
+        ]
+        
     @property
     def formatted_address(self):
         return AddressFormatter.format(self)
