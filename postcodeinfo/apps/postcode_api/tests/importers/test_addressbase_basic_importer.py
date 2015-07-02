@@ -12,6 +12,7 @@ from postcode_api.importers.addressbase_basic_importer import \
 class AddressBaseBasicImporterTest(django.test.TestCase):
 
     def setUp(self):
+        # Address.objects.delete()
         self.importer = AddressBaseBasicImporter()
         self.sample_data = join(
             dirname(__file__),

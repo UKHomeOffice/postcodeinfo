@@ -1,6 +1,10 @@
 #!/bin/bash
 
 function exec_sql {
+  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -q -t -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
+}
+
+function exec_in_transaction {
   echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -q -t --single-transaction -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
 }
 
@@ -139,5 +143,5 @@ done
 
 exec_sql "SELECT CHANGE_TYPE, COUNT(*) AS num_to_import FROM tmp_addressbase_import GROUP BY CHANGE_TYPE;"
 echo "converting data"
-exec_sql "$CONVERT_DATA_SQL"
+exec_in_transaction "$CONVERT_DATA_SQL"
 exec_sql "$CLEANUP_SQL"
