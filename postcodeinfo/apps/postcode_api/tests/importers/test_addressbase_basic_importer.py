@@ -8,11 +8,13 @@ from postcode_api.models import Address
 from postcode_api.importers.addressbase_basic_importer import \
     AddressBaseBasicImporter
 
-
-class AddressBaseBasicImporterTest(django.test.TestCase):
+# extends TransactionTestCase and explicitly deletes all addresses
+# in setUp because the importer shell script does its own 
+# manual transaction handling, and the two interfere
+class AddressBaseBasicImporterTest(django.test.TransactionTestCase):
 
     def setUp(self):
-        # Address.objects.delete()
+        Address.objects.all().delete()
         self.importer = AddressBaseBasicImporter()
         self.sample_data = join(
             dirname(__file__),
