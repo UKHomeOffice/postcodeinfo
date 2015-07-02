@@ -1,8 +1,10 @@
 import json
 import os
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.contrib.auth.models import User
+from postcode_api.models import Address
+
 from rest_framework.authtoken.models import Token
 
 
@@ -14,7 +16,7 @@ from postcode_api.importers.local_authorities_importer import \
     LocalAuthoritiesImporter
 
 
-class PostcodeViewTestCase(TestCase):
+class PostcodeViewTestCase(TransactionTestCase):
 
     def setUp(self):
         self.user = User()
@@ -29,6 +31,9 @@ class PostcodeViewTestCase(TestCase):
             self._sample_data_file('NSPL_barnet_sample.csv'))
         LocalAuthoritiesImporter().import_local_authorities(
             self._sample_data_file('local_authorities_sample.nt'))
+
+    def tearDown(self):
+        Address.objects.all().delete()
 
     def request(self, path, **headers):
         token = headers.pop('token', None)
