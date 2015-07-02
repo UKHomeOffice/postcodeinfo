@@ -45,6 +45,11 @@ class Address(models.Model):
     primary_class = models.CharField(max_length=1)
     process_date = models.DateField()
 
+    class Meta:
+        index_together = [
+            ['postcode_index', 'uprn']
+        ]
+
     objects = AddressManager()
 
     def __unicode__(self):
