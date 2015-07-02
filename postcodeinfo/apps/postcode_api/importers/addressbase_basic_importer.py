@@ -39,7 +39,8 @@ def runProcess(exe, **kwargs):
     while(True):
         retcode = p.poll()  # returns None while subprocess is running
         line = p.stdout.readline()
-        print line
+        if line:
+            print line
         if(retcode is not None):
             break
 
