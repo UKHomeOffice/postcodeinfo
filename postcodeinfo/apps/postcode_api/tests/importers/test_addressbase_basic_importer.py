@@ -35,10 +35,10 @@ class AddressBaseBasicImporterTest(django.test.TestCase):
         self.assertEqual(50, address.building_number)
         self.assertEqual('osgb1000002280373585', address.os_address_toid)
         self.assertEqual('BEATTY CRESCENT', address.thoroughfare_name)
-        self.assertEqual('KIRKCALDY', address.locality)
+        self.assertEqual('KIRKCALDY', address.post_town)
         self.assertEqual(
             '50 Beatty Crescent\nKirkcaldy\nKY1 2HS',
             address.formatted_address)
         lon, lat = address.point.coords
-        self.assertAlmostEqual(56.1278406895, lat)
-        self.assertAlmostEqual(-3.1481688137, lon)
+        self.assertAlmostEqual(56.1277867963, lat)
+        self.assertAlmostEqual(-3.1481671533, lon)
