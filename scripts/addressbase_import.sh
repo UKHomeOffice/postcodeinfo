@@ -1,14 +1,14 @@
 #!/bin/bash
 
 function exec_sql {
-  # echo "executing $1"
-  echo "PGPASSWORD=${DB_PASSWORD} psql -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}"
-  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
-  echo "done!"
+  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -q -t --single-transaction -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
 }
 
 function import_file {
   sql="\COPY tmp_addressbase_import FROM '$1' WITH CSV"
+  # restore this line if you need to mix a \copy command in with
+  # other sql statements in the same execution, as it needs to be
+  # terminated with a newline and a double backslash
   #sql=$sql$'\n'"\\\\"$'\n'
   exec_sql "$sql"
 }
@@ -16,39 +16,38 @@ function import_file {
 # read -d'' reads multiple lines from stdin ignoring newlines
 # see http://serverfault.com/a/72511 for more details of how this works
 read -d '' CREATE_TABLE_SQL <<"EOF"
+  DROP TABLE IF EXISTS tmp_addressbase_import;
 
--- UPRN is unquoted in the import, hence it has to be a bigint here
-DROP TABLE IF EXISTS tmp_addressbase_import;
+  -- UPRN is unquoted in the import, hence it has to be a bigint here
+  CREATE UNLOGGED TABLE tmp_addressbase_import ( 
+    UPRN bigint, 
+    OS_ADDRESS_TOID varchar(40), 
+    RM_UDPRN integer, 
+    ORGANISATION_NAME varchar(120), 
+    DEPARTMENT_NAME varchar(120), 
+    PO_BOX_NUMBER varchar(12), 
+    BUILDING_NAME varchar(100), 
+    SUB_BUILDING_NAME varchar(60), 
+    BUILDING_NUMBER integer, 
+    DEPENDENT_THOROUGHFARE_NAME varchar(160), 
+    THOROUGHFARE_NAME varchar(160), 
+    POST_TOWN varchar(60), 
+    DOUBLE_DEPENDENT_LOCALITY varchar(70), 
+    DEPENDENT_LOCALITY varchar(70), 
+    POSTCODE varchar(16), 
+    POSTCODE_TYPE char(2), 
+    X_COORDINATE float, 
+    Y_COORDINATE float, 
+    RPC integer, 
+    CHANGE_TYPE char(2), 
+    START_DATE date, 
+    LAST_UPDATE_DATE date, 
+    ENTRY_DATE date, 
+    CLASS char(2), 
+    PROCESS_DATE date
+  );
 
-CREATE UNLOGGED TABLE tmp_addressbase_import ( 
-  UPRN bigint, 
-  OS_ADDRESS_TOID varchar(40), 
-  RM_UDPRN integer, 
-  ORGANISATION_NAME varchar(120), 
-  DEPARTMENT_NAME varchar(120), 
-  PO_BOX_NUMBER varchar(12), 
-  BUILDING_NAME varchar(100), 
-  SUB_BUILDING_NAME varchar(60), 
-  BUILDING_NUMBER integer, 
-  DEPENDENT_THOROUGHFARE_NAME varchar(160), 
-  THOROUGHFARE_NAME varchar(160), 
-  POST_TOWN varchar(60), 
-  DOUBLE_DEPENDENT_LOCALITY varchar(70), 
-  DEPENDENT_LOCALITY varchar(70), 
-  POSTCODE varchar(16), 
-  POSTCODE_TYPE char(2), 
-  X_COORDINATE float, 
-  Y_COORDINATE float, 
-  RPC integer, 
-  CHANGE_TYPE char(2), 
-  START_DATE date, 
-  LAST_UPDATE_DATE date, 
-  ENTRY_DATE date, 
-  CLASS char(2), 
-  PROCESS_DATE date
-);
-
-TRUNCATE TABLE tmp_addressbase_import;
+  TRUNCATE TABLE tmp_addressbase_import;
 EOF
 
 
