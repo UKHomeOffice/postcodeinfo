@@ -12,25 +12,6 @@ from django.conf import settings
 BRITISH_NATIONAL_GRID = 27700
 
 
-def unicode_csv_reader(utf8_data, fieldnames=None, **kwargs):
-    csv_reader = csv.DictReader(utf8_data, fieldnames=fieldnames, **kwargs)
-    for row in csv_reader:
-        yield {key: unicode(cell, 'utf-8') for key, cell in row.items()}
-
-
-def csv_rows(filename, fieldnames=None, **kw):
-    with open(filename, 'rb') as csv_file:
-        for row in unicode_csv_reader(csv_file, fieldnames=fieldnames, **kw):
-            yield row
-
-
-def batch(iterable, size):
-    "batch([1,2,3,4,5,6,7], 3) => [[1,2,3],[4,5,6],[7]]"
-    it = iter(iterable)
-    while True:
-        chunk = itertools.islice(it, size)
-        yield itertools.chain((next(chunk),), chunk)
-
 
 def split_file(path, num_lines):
     split_dir = os.path.join(os.path.dirname(path), 'splits')
@@ -93,12 +74,6 @@ class AddressBaseBasicImporter(object):
         ("process_date", "date"),
     ]
 
-    def __init__(self):
-        self.inserts = []
-        self.updates = []
-        self.deletes = []
-        self.fieldnames = map(lambda (k, _): k, self.fields)
-
     def _append(self, change_type, address):
         collection = {
             'I': self.inserts,
@@ -115,6 +90,7 @@ class AddressBaseBasicImporter(object):
         split_files = split_file(filename, batch_size)
 
         for file_to_import in split_files:
+            logging.debug("importing csv {filename}".format(filename=filename))
             self.import_file(file_to_import)
             os.remove(file_to_import)
 
@@ -125,7 +101,7 @@ class AddressBaseBasicImporter(object):
         # need to explicitly pass through the DB_NAME as an env var here,
         # because when running tests, Django automatically changes the name in settings to
         # 'test_xyz', but *doesn't* alter the DB_NAME env var - so we have to override it
-        # otherwise tests that try to import stuff will fail
+        # otherwise tests that try to import stuff in setup then read it back, will fail
         env = {'DB_NAME': settings.DATABASES['default']['NAME'],
                'DB_HOST': settings.DATABASES['default']['HOST'],
                'DB_USERNAME': settings.DATABASES['default']['USER'],
