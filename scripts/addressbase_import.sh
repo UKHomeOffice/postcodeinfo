@@ -1,13 +1,16 @@
 #!/bin/bash
 
 function exec_sql {
-  echo "executing $1"
-  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -U ${DB_USERNAME} -h ${DB_HOST} 
+  # echo "executing $1"
+  echo "PGPASSWORD=${DB_PASSWORD} psql -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}"
+  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
   echo "done!"
 }
 
 function import_file {
-  exec_sql "\COPY tmp_addressbase_import FROM '$1' WITH CSV"  
+  sql="\COPY tmp_addressbase_import FROM '$1' WITH CSV"
+  #sql=$sql$'\n'"\\\\"$'\n'
+  exec_sql "$sql"
 }
 
 # read -d'' reads multiple lines from stdin ignoring newlines
@@ -15,7 +18,9 @@ function import_file {
 read -d '' CREATE_TABLE_SQL <<"EOF"
 
 -- UPRN is unquoted in the import, hence it has to be a bigint here
-CREATE UNLOGGED TABLE IF NOT EXISTS tmp_addressbase_import ( 
+DROP TABLE IF EXISTS tmp_addressbase_import;
+
+CREATE UNLOGGED TABLE tmp_addressbase_import ( 
   UPRN bigint, 
   OS_ADDRESS_TOID varchar(40), 
   RM_UDPRN integer, 
@@ -51,9 +56,8 @@ EOF
 # as for an insert or update, we can just delete and (re-)insert
 read -d '' CONVERT_DATA_SQL <<"EOF"
   SELECT 'removing any existing addresses with UPRNs in the import file' AS status;
-  DELETE FROM postcode_api_address WHERE uprn IN (
-    SELECT cast(UPRN AS varchar(12)) FROM tmp_addressbase_import
-  );
+  DELETE FROM postcode_api_address USING tmp_addressbase_import
+    WHERE postcode_api_address.uprn = cast(tmp_addressbase_import.UPRN AS varchar(12));
 
   SELECT 'removing any change_type "D" import records' AS status;
   DELETE FROM tmp_addressbase_import WHERE CHANGE_TYPE = 'D';
@@ -112,7 +116,7 @@ read -d '' CONVERT_DATA_SQL <<"EOF"
     ENTRY_DATE, 
     CLASS, 
     PROCESS_DATE,
-    split_part(POSTCODE, ' ', 1)
+    lower(split_part(POSTCODE, ' ', 1))
   FROM tmp_addressbase_import;
 
   TRUNCATE TABLE tmp_addressbase_import;
@@ -124,16 +128,17 @@ read -d '' CLEANUP_SQL <<"EOF"
 EOF
 
 
-exec_sql $CREATE_TABLE_SQL
+echo "creating temporary import table"
+exec_sql "$CREATE_TABLE_SQL"
 
 for filename in $@; do
 
   echo "importing ${filename}"
   import_file $filename
-  exec_sql "SELECT COUNT(*) FROM tmp_addressbase_import;"
-  echo "converting data"
-  echo $CONVERT_DATA_SQL
-  exec_sql "$CONVERT_DATA_SQL"
+  
 done
 
-exec_sql $CLEANUP_SQL
+exec_sql "SELECT CHANGE_TYPE, COUNT(*) AS num_to_import FROM tmp_addressbase_import GROUP BY CHANGE_TYPE;"
+echo "converting data"
+exec_sql "$CONVERT_DATA_SQL"
+exec_sql "$CLEANUP_SQL"

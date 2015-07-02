@@ -1,15 +1,11 @@
 import csv
+import glob
 import itertools
 import logging
 import os
+import subprocess
 
-from dateutil.parser import parse as parsedate
-from django.contrib.gis.geos import Point
-from django.db import transaction
-
-from postcode_api.models import Address
-from postcode_api.importers.progress_reporter import ImporterProgress, \
-    lines_in_file
+from django.conf import settings
 
 
 #: EPSG projection code
@@ -36,8 +32,35 @@ def batch(iterable, size):
         yield itertools.chain((next(chunk),), chunk)
 
 
+def split_file(path, num_lines):
+    split_dir = os.path.join(os.path.dirname(path), 'splits')
+    if not os.path.exists(split_dir):
+        os.makedirs(split_dir)
+
+    filename = os.path.basename(path)
+    split_file_prefix = os.path.join(split_dir, filename + '-')
+    cmd = ["/usr/bin/split", "-l", str(num_lines), path, split_file_prefix]
+    runProcess(cmd)
+    logging.debug('globbing for ' + split_file_prefix + '*')
+    return glob.glob(split_file_prefix + '*')
+
+
 def get_all_uprns(batch_list):
     return [row['uprn'] for row in batch_list if row]
+
+
+def runProcess(exe, **kwargs):
+    env = kwargs.pop('env', {})
+    logging.debug(
+        'executing {cmd} with env {env}'.format(cmd=str(exe), env=env))
+    p = subprocess.Popen(
+        exe, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    while(True):
+        retcode = p.poll()  # returns None while subprocess is running
+        line = p.stdout.readline()
+        print line
+        if(retcode is not None):
+            break
 
 
 class AddressBaseBasicImporter(object):
@@ -85,99 +108,28 @@ class AddressBaseBasicImporter(object):
         collection.append(address)
 
     def import_csv(self, filename):
-        total_rows = lines_in_file(filename)
+        logging.debug("importing csv {filename}".format(filename=filename))
         batch_size = int(
-            os.environ.get('BATCH_IMPORT_NUM_ROWS', (total_rows // 10) or 1))
-        bulk_create_batch_size = int(
-            os.environ.get('BULK_CREATE_BATCH_SIZE', 1000))
+            os.environ.get('BATCH_IMPORT_NUM_ROWS', 100000))
 
-        rows = csv_rows(filename, fieldnames=self.fieldnames)
+        split_files = split_file(filename, batch_size)
 
-        logging.debug('reading all data and getting uprns')
-        logging.debug('getting batches of size {i}'.format(i=batch_size))
-        batches = batch(rows, batch_size)
+        for file_to_import in split_files:
+            self.import_file(file_to_import)
+            os.remove(file_to_import)
 
-        for current_batch in batches:
-            batch_list = list(current_batch)
-            logging.debug('**** starting batch ****')
-            uprns = get_all_uprns(batch_list)
-
-            logging.debug(
-                'looking for existing addresses with uprns in this batch')
-            existing_address_dict = self._get_existing_addresses_in_batch_as_dict(
-                uprns)
-
-            logging.debug('constructing model objects')
-            self._construct_model_objects(
-                batch_list, existing_address_dict, total_rows)
-
-            logging.debug('**** saving ****')
-            self._save(bulk_create_batch_size)
-
-            logging.debug('batch done')
-
-    def _get_existing_addresses_in_batch_as_dict(self, uprns):
-        logging.debug('querying db for existing uprns')
-        existing_addresses = Address.objects.filter(uprn__in=uprns)
-
-        logging.debug('building hash')
-        return dict((o.uprn, o) for o in existing_addresses)
-
-    def _construct_model_objects(self, batch_list, existing_address_dict, total_rows):
-        with ImporterProgress(total_rows) as progress:
-            for row in batch_list:
-                if row:
-                    address = self._existing_or_new_address(
-                        row, existing_address_dict)
-                    address = self._apply_changes_to_instance(address, row)
-                    self._append(row['change_type'], address)
-                    progress.increment(row['uprn'])
-
-    def _save(self, bulk_create_batch_size):
-        logging.debug('bulk_create_batch_size = {batch_size}'.format(
-            batch_size=bulk_create_batch_size))
-
-        to_delete = [obj.pk for obj in self.updates + self.deletes]
-
-        with transaction.atomic():
-            logging.debug('deleting %i addresses' % len(to_delete))
-            Address.objects.filter(pk__in=to_delete).delete()
-
-            # delete inserts which are already in the db and re-insert them
-            inserts = [obj.pk for obj in self.inserts]
-            logging.debug('deleting {num} existing addresses to insert in batches of {batch_size}'.format(
-                num=len(inserts), batch_size=bulk_create_batch_size))
-            Address.objects.filter(pk__in=inserts).delete()
-
-            logging.debug('bulk_creating {num} updates in batches of {batch_size}'.format(
-                num=len(inserts), batch_size=bulk_create_batch_size))
-            Address.objects.bulk_create(self.updates, bulk_create_batch_size)
-
-            logging.debug('bulk_creating %i inserts' % len(self.inserts))
-            Address.objects.bulk_create(self.inserts, bulk_create_batch_size)
-
-        self.inserts = []
-        self.updates = []
-        self.deletes = []
-
-    def _existing_or_new_address(self, row, existing_address_dict):
-        return existing_address_dict.get(row['uprn'], Address(uprn=row['uprn']))
-
-    def _apply_changes_to_instance(self, address, row):
-        for i, (field, data_type) in enumerate(self.fields):
-            if data_type == 'char':
-                setattr(address, field, row[field])
-            if data_type == 'int' and row[field] != '':
-                setattr(address, field, int(row[field]))
-            if data_type == 'date' and row[field] != '':
-                setattr(address, field, parsedate(row[field]))
-
-        address.postcode_index = row['postcode'].replace(' ', '').lower()
-
-        address.point = Point(
-            float(row['x_coordinate']),
-            float(row['y_coordinate']),
-            srid=BRITISH_NATIONAL_GRID
-        )
-
-        return address
+    def import_file(self, filepath):
+        logging.debug("importing file {filepath}".format(filepath=filepath))
+        script = os.path.join(
+            settings.BASE_DIR, 'scripts/', 'addressbase_import.sh')
+        # need to explicitly pass through the DB_NAME as an env var here,
+        # because when running tests, Django automatically changes the name in settings to
+        # 'test_xyz', but *doesn't* alter the DB_NAME env var - so we have to override it
+        # otherwise tests that try to import stuff will fail
+        env = {'DB_NAME': settings.DATABASES['default']['NAME'],
+               'DB_HOST': settings.DATABASES['default']['HOST'],
+               'DB_USERNAME': settings.DATABASES['default']['USER'],
+               'DB_PASSWORD': settings.DATABASES['default']['PASSWORD']
+               }
+        runProcess(
+            [script, filepath], env=env)
