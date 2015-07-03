@@ -12,10 +12,17 @@ BRITISH_NATIONAL_GRID = 27700
 
 def split_file(path, num_lines):
     split_dir = tempfile.mkdtemp()
-    runProcess(['/usr/bin/split', '-l', str(num_lines), path, split_dir + '/'])
-    for filename in map(lambda name: os.path.join(split_dir, name), os.listdir(split_dir)):
-        yield filename
-        os.remove(filename)
+    split_file_prefix = "{split_dir}/{filename}-".format(
+        split_dir=split_dir, filename=os.path.basename(path))
+    runProcess(
+        ['/usr/bin/split', '-l', str(num_lines), path, split_file_prefix])
+
+    for filename in os.listdir(split_dir):
+        filepath = os.path.join(split_dir, filename)
+        yield filepath
+        os.remove(filepath)
+
+    os.rmdir(split_dir)
 
 def get_all_uprns(batch_list):
     return [row['uprn'] for row in batch_list if row]
@@ -83,7 +90,8 @@ class AddressBaseBasicImporter(object):
         # need to explicitly pass through the DB_NAME as an env var here,
         # because when running tests, Django automatically changes the name in settings to
         # 'test_xyz', but *doesn't* alter the DB_NAME env var - so we have to override it
-        # otherwise tests that try to import stuff in setup then read it back, will fail
+        # otherwise tests that try to import stuff in setup then read it back,
+        # will fail
         env = {'DB_NAME': settings.DATABASES['default']['NAME'],
                'DB_HOST': settings.DATABASES['default']['HOST'],
                'DB_USERNAME': settings.DATABASES['default']['USER'],
