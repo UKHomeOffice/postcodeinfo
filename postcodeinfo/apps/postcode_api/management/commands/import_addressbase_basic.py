@@ -1,6 +1,8 @@
 import os
 
-from multiprocessing import Pool
+from index_suppressor import IndexSuppressor
+
+# from multiprocessing import Pool
 from django.core.management.base import BaseCommand, CommandError
 
 from postcode_api.importers.addressbase_basic_importer \
@@ -14,8 +16,9 @@ class Command(BaseCommand):
         if len(args) == 0:
             raise CommandError('You must specify at least one CSV file')
 
-        p = Pool()
-        p.map(import_csv, args)
+        with IndexSuppressor('postcode_api_address'):
+            for filepath in args:
+                import_csv(filepath)
 
 def import_csv(filename):
     if not os.access(filename, os.R_OK):

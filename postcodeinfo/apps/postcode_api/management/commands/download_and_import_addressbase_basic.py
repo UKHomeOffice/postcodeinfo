@@ -1,6 +1,8 @@
 import os
 from django.core.management.base import BaseCommand
 
+from index_suppressor import IndexSuppressor
+
 from postcode_api.downloaders.addressbase_basic_downloader \
     import AddressBaseBasicDownloader
 from postcode_api.importers.addressbase_basic_importer \
@@ -28,7 +30,7 @@ class Command(BaseCommand):
                             dest='force',
                             default=False,
                             help='Force download '
-                                 'even if previous download exists')
+                            'even if previous download exists')
 
     def handle(self, *args, **options):
 
@@ -50,11 +52,12 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def _process_all(self, files):
-        if isinstance(files, list):
-            for filepath in files:
-                self._process(filepath)
-        else:
-            self._process(files)
+        with IndexSuppressor('postcode_api_address'):
+            if isinstance(files, list):
+                for filepath in files:
+                    self._process(filepath)
+            else:
+                self._process(files)
 
     def _process(self, filepath):
         files = ZipExtractor(filepath).unzip_if_needed(
