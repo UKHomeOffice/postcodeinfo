@@ -11,9 +11,9 @@ BRITISH_NATIONAL_GRID = 27700
 
 
 def split_file(path, num_lines):
-    split_dir = tempfile.mkdtemp()
-    split_file_prefix = "{split_dir}/{filename}-".format(
-        split_dir=split_dir, filename=os.path.basename(path))
+    filename = os.path.basename(path)
+    split_dir = tempfile.mkdtemp(prefix=filename + '-')
+    split_file_prefix = "{split_dir}/"
     runProcess(
         ['/usr/bin/split', '-l', str(num_lines), path, split_file_prefix])
 
