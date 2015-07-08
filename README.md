@@ -276,5 +276,6 @@ Note: the local authority is only a best-guess when using a partial postcode - a
 There are 'official' API client libraries available for:
 - Ruby [postcodeinfo-client-ruby](https://github.com/ministryofjustice/postcodeinfo-client-ruby)
 - Python [postcodeinfo-client-python](https://github.com/ministryofjustice/postcodeinfo-client-python)
+- PHP [postcodeinfo-client-php](https://github.com/ministryofjustice/postcodeinfo-client-php)
 
 If you develop your own, feel free to let us know and we can link to it from here.
