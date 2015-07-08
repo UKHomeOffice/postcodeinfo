@@ -110,5 +110,5 @@ class HealthcheckDotJsonView(MonitoringView):
         return Response(data, status=overall_status)
 
     def is_database_ok(self):
-        address = Address.objects.first()
+        address = Address.objects.order_by('uprn').first()
         return address is not None
