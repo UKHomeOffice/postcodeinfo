@@ -24,6 +24,7 @@ ADD ./docker/nginx.conf /etc/nginx/nginx.conf
 # install service files for runit
 ADD ./docker/nginx.service /etc/service/nginx/run
 ADD ./docker/gunicorn.service /etc/service/gunicorn/run
+ADD ./docker/syslog-format.conf /etc/syslog-ng/conf.d/001-format.conf
 
 # Define mountable directories.
 VOLUME ["/var/log/nginx", "/var/log/gunicorn"]
