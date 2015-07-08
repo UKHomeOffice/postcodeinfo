@@ -3,7 +3,7 @@
 rm -f htmlcov/*
 rm -f .coverage
 
-coverage run --source='.' ./manage.py test
+coverage run --source='.' ./manage.py test postcodeinfo/apps/postcode_api/tests/
 
 PARMS=--omit='*migrations*'
 echo "Coverage results:"
