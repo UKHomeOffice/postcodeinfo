@@ -94,7 +94,7 @@ class DownloadManager(object):
             'downloading file from {url} to {path}'.format(
                 url=url, path=filepath))
         chunk_size = self.chunk_size()
-        content_length = headers['content-length']
+        content_length = headers.get('content-length', None)
         return self.download_to_file(url, filepath, chunk_size, content_length)
 
     def download_to_file(self,
