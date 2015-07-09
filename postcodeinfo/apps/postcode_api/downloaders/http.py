@@ -8,6 +8,7 @@ import logging
 import os
 import tempfile
 
+import pytz
 import requests
 
 
@@ -75,4 +76,7 @@ class HttpDownloader(object):
 
         if src is None:
             src = self.url
-        return dateparser.parse(self._get_headers(src)['last-modified'])
+        dt = dateparser.parse(self._get_headers(src)['last-modified'])
+        if dt.tzinfo is None:
+            dt = pytz.UTC.localize(dt)
+        return dt

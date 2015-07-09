@@ -10,6 +10,7 @@ import re
 import tempfile
 
 from dateutil import parser as dateparser
+import pytz
 
 from .http import HttpDownloader
 
@@ -90,7 +91,10 @@ class FtpDownloader(HttpDownloader):
         Get the last modified datetime of the remote file
         """
 
-        return dateparser.parse(self._headers[src]['last-modified'])
+        dt = dateparser.parse(self._headers[src]['last-modified'])
+        if dt.tzinfo is None:
+            dt = pytz.UTC.localize(dt)
+        return dt
 
     @property
     def ftp(self):

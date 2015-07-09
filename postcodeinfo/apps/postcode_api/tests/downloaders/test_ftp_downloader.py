@@ -3,6 +3,7 @@ import mock
 import unittest
 
 from dateutil import parser as dateparser
+import pytz
 
 from postcode_api.downloaders.ftp import FtpDownloader
 
@@ -108,7 +109,7 @@ class FTPDownloaderTest(unittest.TestCase):
                 [mock.call('a')] * content_length)
 
     def test_last_modified(self):
-        dt = dateparser.parse('27 Apr 10:26')
+        dt = pytz.UTC.localize(dateparser.parse('27 Apr 10:26'))
         with mock.patch('ftplib.FTP') as ftp_class:
 
             ftp = ftp_class.return_value

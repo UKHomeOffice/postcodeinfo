@@ -9,6 +9,7 @@ import boto
 from boto.s3.key import Key
 from dateutil import parser as dateparser
 from django.conf import settings
+import pytz
 
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,12 @@ class S3Cache(object):
 
         key_name = src.split('/')[-1]
         key = self.bucket.get_key(key_name)
-        last_modified = lambda k: dateparser.parse(k.last_modified)
+
+        def last_modified(k):
+            dt = dateparser.parse(k.last_modified)
+            if dt.tzinfo is None:
+                dt = pytz.UTC.localize(dt)
+            return dt
 
         if key and last_modified(key) >= self.last_modified(src):
 
