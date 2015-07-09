@@ -2,14 +2,9 @@ import os
 from django.core.management.base import BaseCommand
 
 from postcode_api.utils import ZipExtractor
-from postcode_api.downloaders.postcode_gss_code_downloader \
-    import PostcodeGssCodeDownloader
+from postcode_api.downloaders import PostcodeGssCodeDownloader
 from postcode_api.importers.postcode_gss_code_importer \
     import PostcodeGssCodeImporter
-
-
-def exit_code(key):
-    return {'OK': 0, 'GENERIC_ERROR': 1}[key]
 
 
 class Command(BaseCommand):
@@ -22,27 +17,16 @@ class Command(BaseCommand):
                             dest='destination_dir',
                             default='/tmp/postcode_gss_codes/')
 
-        # Named (optional) arguments
-        parser.add_argument('--force',
-                            action='store_true',
-                            dest='force',
-                            default=False,
-                            help='Force download '
-                                 'even if previous download exists')
-
     def handle(self, *args, **options):
 
         if not os.path.exists(options['destination_dir']):
             os.makedirs(options['destination_dir'])
 
-        downloaded_file = self._download(
-            options['destination_dir'], options.get('force', False))
-        if downloaded_file:
-            self._process(downloaded_file)
-            return exit_code('OK')
+        downloaded_files = self._download(options['destination_dir'])
+        if downloaded_files:
+            self._process(downloaded_files)
         else:
             print 'nothing downloaded - nothing to import'
-            return exit_code('OK')
 
     def _download(self, destination_dir, force=False):
         print 'downloading'
@@ -50,6 +34,8 @@ class Command(BaseCommand):
         return downloader.download(destination_dir, force)
 
     def _process(self, filepath):
+        if instanceof(filepath, list):
+            filepath = filepath[0]
         files = ZipExtractor(filepath).unzip_if_needed('.*NSPL.*\.csv')
         for path in files:
             print 'importing ' + path
@@ -60,4 +46,3 @@ class Command(BaseCommand):
     def _import(self, downloaded_file):
         importer = PostcodeGssCodeImporter()
         importer.import_postcode_gss_codes(downloaded_file)
-

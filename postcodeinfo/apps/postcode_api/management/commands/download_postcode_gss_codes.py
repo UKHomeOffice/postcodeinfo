@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from postcode_api.downloaders.postcode_gss_code_downloader \
-  import PostcodeGssCodeDownloader
+from postcode_api.downloaders import PostcodeGssCodeDownloader
 
 
 class Command(BaseCommand):
@@ -13,5 +12,4 @@ class Command(BaseCommand):
             destination_dir = args[0]
 
         downloader = PostcodeGssCodeDownloader()
-        downloaded_file = downloader.download(destination_dir)
-        return downloaded_file
+        downloaded_files = downloader.download(destination_dir)

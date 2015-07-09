@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from postcode_api.downloaders.addressbase_basic_downloader \
-    import AddressBaseBasicDownloader
+from postcode_api.downloaders import AddressBaseBasicDownloader
 
 
 class Command(BaseCommand):
@@ -13,5 +12,4 @@ class Command(BaseCommand):
             destination_dir = args[0]
 
         downloader = AddressBaseBasicDownloader()
-        downloaded_file = downloader.download(destination_dir)
-        return downloaded_file
+        downloaded_files = downloader.download(destination_dir)
