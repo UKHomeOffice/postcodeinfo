@@ -66,8 +66,8 @@ class FTPDownloadManager(DownloadManager):
         }
         return dic
 
-    def download_to_dir(self, url, dirpath, headers):
-        filepath = self.filename(dirpath, url)
+
+    def download_to_file(self, url, filepath, chunk_size=4192, content_length=None):
         logging.debug('downloading file from ' + url + ' to ' + filepath)
 
         file = open(filepath, 'wb')
@@ -86,8 +86,8 @@ class FTPDownloadManager(DownloadManager):
             counts['chunks'] += 1
             file.write(data)
             if counts['chunks'] % 100 == 0:
-                logging.debug('%i/%i bytes' % \
-                    (counts['size'], headers['content-length']))
+                logging.debug('%i/%s bytes' % \
+                    (counts['size'], str(content_length)))
 
         self.ftp_client.retrbinary('RETR %s' % url, handle_chunk_callback)
 
