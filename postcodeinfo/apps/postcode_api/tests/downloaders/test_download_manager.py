@@ -7,6 +7,7 @@ from django.test import TestCase
 from mock import patch, MagicMock
 from dateutil import parser
 from datetime import datetime, timedelta
+from socket import error as SocketError
 
 from postcode_api.models import Download
 from postcode_api.downloaders.download_manager import DownloadManager
@@ -134,6 +135,14 @@ class DownloadManagerTestCase(TestCase):
         s = subject()
         s.get_from_s3('test.url', '/local/path', '12345')
         mock_s3_adapter.upload.assertCalledWith('test.url', '/local/path')
+
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_adapter')
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.s3_object_is_up_to_date', return_value=False)
+    @patch('postcode_api.downloaders.download_manager.DownloadManager.download_to_file', return_value=True)
+    def test_that_when_the_s3_upload_fails_it_silently_ignores_the_error(self, mock_download_to_file, mock_s3_object_is_up_to_date, mock_s3_adapter):
+        mock_s3_adapter.upload.side_effect = SocketError(104, 'Connection reset by peer')
+        s = subject()
+        s.get_from_s3('test.url', '/local/path', '12345')
 
     # describe: local_copy_up_to_date
     @patch('postcode_api.downloaders.download_manager.DownloadManager._in_local_storage', return_value=True)

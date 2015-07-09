@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import requests
 import os
@@ -52,7 +53,14 @@ class DownloadManager(object):
 
             logging.info('uploading from {path} to s3 key {key}'.format(
                 path=local_file_path, key=s3_key))
-            s3.upload(local_file_path, s3_key)
+            try:
+                s3.upload(local_file_path, s3_key)
+            except:
+                # were not bothered about a problem in the upload as we 
+                # already have the file locally and can import from that
+                logging.error('uploading from {path} to s3 key {key}'.format(
+                path=local_file_path, key=s3_key), exc_info=True)
+
 
     def s3_adapter(self):
         return S3Adapter()
