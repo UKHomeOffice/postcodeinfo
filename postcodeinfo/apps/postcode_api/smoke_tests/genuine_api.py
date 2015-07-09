@@ -1,3 +1,4 @@
+import logging
 import requests
 import urllib
 import urlparse
@@ -12,21 +13,15 @@ class GenuineApi(object):
     def _full_url(self, endpoint):
         url = urlparse.urljoin(self.root_url, endpoint)
         params = {'token': self.auth_token, 'format': 'json'}
-        # the given endpoint might already contain a query string,
-        # so we have to do this convoluted dict-merging thing
-        # Must use parse_sql as parse_qs raturns each param as a
-        # single-element array, which means urlencode then preserves
-        # the [] when converting it back to a query string
-        qs_as_dict = urlparse.parse_qsl(urlparse.urlsplit(url).query)
-        combined_query = urllib.urlencode(
-            dict(qs_as_dict + params.items()))
-        # ParseResult is immutable, so we have to set the query like this
-        url_parts = list(urlparse.urlparse(url))
-        url_parts[4] = combined_query
 
-        return urlparse.urlunparse(url_parts)
+        url_parts = list(urlparse.urlsplit(url))
+
+        query_dict = dict(urlparse.parse_qsl(url_parts[3]))
+        url_parts[3] = urllib.urlencode(dict(query_dict, **params))
+
+        return urlparse.urlunsplit(url_parts)
 
     def get(self, endpoint):
-        u = self._full_url(endpoint)
-        print 'hitting ' + u
-        return requests.get(u)
+        api_url = self._full_url(endpoint)
+        logging.debug('hitting ' + api_url)
+        return requests.get(api_url)
