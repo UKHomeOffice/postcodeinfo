@@ -19,7 +19,7 @@ class AddressBaseBasicDownloaderTest(unittest.TestCase):
         else:
             self.env = env
 
-        return mock.patch.dict('os.environ', self.env)
+        return mock.patch.dict('os.environ', self.env, clear=True)
 
     def test_passes_ftp_credentials(self):
         with mock.patch('ftplib.FTP') as ftp_class, self.mock_env():
