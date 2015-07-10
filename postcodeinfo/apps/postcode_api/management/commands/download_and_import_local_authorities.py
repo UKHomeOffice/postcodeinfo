@@ -1,15 +1,10 @@
 import os
 from django.core.management.base import BaseCommand
 
-from postcode_api.downloaders.local_authorities_downloader \
-    import LocalAuthoritiesDownloader
+from postcode_api.downloaders import LocalAuthoritiesDownloader
 from postcode_api.importers.local_authorities_importer \
     import LocalAuthoritiesImporter
 from postcode_api.utils import ZipExtractor
-
-
-def exit_code(key):
-    return {'OK': 0, 'GENERIC_ERROR': 1}[key]
 
 
 class Command(BaseCommand):
@@ -22,34 +17,25 @@ class Command(BaseCommand):
                             dest='destination_dir',
                             default='/tmp/local_authorities/')
 
-        # Named (optional) arguments
-        parser.add_argument('--force',
-                            action='store_true',
-                            dest='force',
-                            default=False,
-                            help='Force download '
-                                 'even if previous download exists')
-
     def handle(self, *args, **options):
 
         if not os.path.exists(options['destination_dir']):
             os.makedirs(options['destination_dir'])
 
-        downloaded_file = self._download(
-            options['destination_dir'], options.get('force', False))
-        if downloaded_file:
-            self._process(downloaded_file)
-            return exit_code('OK')
+        downloaded_files = self._download(options['destination_dir'])
+        if downloaded_files:
+            self._process(downloaded_files)
         else:
             print 'nothing downloaded - nothing to import'
-            return exit_code('OK')
 
-    def _download(self, destination_dir, force=False):
+    def _download(self, destination_dir):
         print 'downloading'
         downloader = LocalAuthoritiesDownloader()
-        return downloader.download(destination_dir, force)
+        return downloader.download(destination_dir)
 
     def _process(self, filepath):
+        if isinstance(filepath, list):
+            filepath = filepath[0]
         files = ZipExtractor(filepath).unzip_if_needed('.*\.nt')
 
         for path in files:
@@ -59,7 +45,3 @@ class Command(BaseCommand):
     def _import(self, downloaded_file):
         importer = LocalAuthoritiesImporter()
         importer.import_local_authorities(downloaded_file)
-
-    def _cleanup(self, downloaded_file):
-        print 'removing local file ' + downloaded_file
-        os.remove(downloaded_file)

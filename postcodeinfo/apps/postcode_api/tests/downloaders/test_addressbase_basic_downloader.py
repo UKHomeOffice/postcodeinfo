@@ -1,72 +1,50 @@
-import os
-from django.test import TestCase
-from mock import patch
+# -*- encoding: utf-8 -*-
+import mock
+import unittest
 
-import ftplib
-
-from postcode_api.downloaders.addressbase_basic_downloader import AddressBaseBasicDownloader
+from postcode_api.downloaders import AddressBaseBasicDownloader
 
 
-class AddressBaseBasicDownloaderTestCase(TestCase):
+class AddressBaseBasicDownloaderTest(unittest.TestCase):
 
-    def _downloader(self, mock_dl_mgr):
-        return AddressBaseBasicDownloader(mock_dl_mgr)
+    def mock_env(self, env=None):
+        if env is None:
+            ftpuser = 'ftpuser'
+            ftppass = 'ftppass'
+            ftpdir = 'my/dir'
+            self.env = {
+                'OS_FTP_USERNAME': ftpuser,
+                'OS_FTP_PASSWORD': ftppass,
+                'OS_FTP_ORDER_DIR': ftpdir}
+        else:
+            self.env = env
 
-    def _sample_data_file(self, filename):
-        return os.path.join(os.path.dirname(__file__), '../', 'sample_data/', filename)
+        return mock.patch.dict('os.environ', self.env, clear=True)
 
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager')
-    def test_that_it_opens_an_ftp_connection_with_the_right_parameters(self, mock):
-        ftpuser = os.environ.setdefault('OS_FTP_USERNAME', 'ftpuser')
-        ftppwd = os.environ.setdefault('OS_FTP_PASSWORD', 'ftppwd')
+    def test_passes_ftp_credentials(self):
+        with mock.patch('ftplib.FTP') as ftp_class, self.mock_env():
+            ftp = ftp_class.return_value
+            AddressBaseBasicDownloader().download()
+            ftp_class.assertCalledWith('osmmftp.os.uk')
+            ftp.login.assertCalledWith(
+                self.env['OS_FTP_USERNAME'], self.env['OS_FTP_PASSWORD'])
+            ftp.cwd.assertCalledWith(self.env['OS_FTP_ORDER_DIR'])
 
-        self._downloader(mock).download()
-        mock.open.assertCalledWith('osmmftp.os.uk', ftpuser, ftppwd)
+    def test_complains_if_ftp_credentials_not_set(self):
+        logger = 'postcode_api.downloaders.addressbase_basic.log'
+        with mock.patch('ftplib.FTP'), \
+                mock.patch(logger) as log, \
+                self.mock_env({}):
 
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager')
-    def test_that_it_changes_to_the_source_dir(self, mock):
-        os.environ.setdefault('OS_FTP_ORDER_DIR', 'my/dir')
+            AddressBaseBasicDownloader().download()
 
-        self._downloader(mock).download()
-        mock.ftp_client.cwd.assertCalledWith('my/dir')
+            log.error.assert_has_calls([
+                mock.call('OS_FTP_USERNAME not set!'),
+                mock.call('OS_FTP_PASSWORD not set!')])
 
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager')
-    def test_that_it_downloads_all_if_needed_with_the_right_parameters(self, mock):
-        self._downloader(mock).download('/my/local/dir', True)
-        mock.download_all_if_needed.assertCalledWith('/my/local/dir', True)
-
-        self._downloader(mock).download('/some/other/dir', False)
-        mock.download_all_if_needed.assertCalledWith('/some/other/dir', False)
-
-    @patch('postcode_api.downloaders.addressbase_basic_downloader.AddressBaseBasicDownloader.local_files', return_value=['local_files'])
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager')
-    def test_that_when_the_ftp_call_raises_an_exception_and_local_files_exist_it_returns_the_local_files(self, mock, mock_local_files):
-        dl = self._downloader(mock)
-        dl.ftp_client().cwd.side_effect = ftplib.error_perm
-        self.assertEqual( ['local_files'], dl.download('/some/other/dir', False) )
-
-
-    @patch('postcode_api.downloaders.addressbase_basic_downloader.AddressBaseBasicDownloader.files_from_s3', return_value=['files from s3'])
-    @patch('postcode_api.downloaders.addressbase_basic_downloader.AddressBaseBasicDownloader.local_files', return_value=[])
-    @patch('postcode_api.downloaders.ftp_download_manager.FTPDownloadManager')
-    def test_that_when_the_ftp_call_raises_an_exception_and_local_files_dont_exist_it_returns_the_files_from_s3(self, mock, mock_local_files, mock_s3_files):
-        dl = self._downloader(mock)
-        dl.ftp_client().cwd.side_effect = ftplib.error_perm
-        #dl.ftp_client.cwd.side_effect=ftplib.error_perm
-        self.assertEqual( ['files from s3'], dl.download('/some/other/dir', False) )
-
-    # describe: local_files
-    @patch('glob.glob', return_value=['f1','f2'])
-    def test_that_it_globs_for_zipped_csv_files_in_local_dir(self, mock):
-        result = self._downloader(mock).local_files('/local/dir/')
-        mock.assertCalledWith('/local/dir/*csv.zip')
-        self.assertEqual(['f1','f2'], result)
-
-    # describe: files_from_s3
-    @patch('postcode_api.downloaders.s3_adapter.S3Adapter')
-    def test_that_it_lists_addressbase_files_in_the_s3_adapters_bucket(self, mock):
-        dl = self._downloader(mock)
-        dl.files_from_s3
-        mock.bucket.list.assertCalledWith('AddressBase')
-
-
+    def test_downloads_files_matching_pattern(self):
+        with mock.patch('ftplib.FTP') as ftp_class, self.mock_env():
+            ftp = ftp_class.return_value
+            AddressBaseBasicDownloader().download()
+            self.assertTrue(ftp.dir.called)
+            self.assertEqual('*_csv.zip', ftp.dir.call_args[0][0])

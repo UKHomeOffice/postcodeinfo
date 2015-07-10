@@ -1,55 +1,60 @@
-import os
-from django.test import TestCase
-from mock import patch
-from mock import MagicMock
+import datetime
+import mock
+import unittest
 
-import responses
-
-from postcode_api.downloaders.postcode_gss_code_downloader\
-    import PostcodeGssCodeDownloader
-from postcode_api.downloaders.download_manager\
-    import DownloadManager
+from postcode_api.downloaders.postcode_gss_code import PostcodeGssCodeDownloader
 
 
-class PostcodeGssCodeDownloaderTestCase(TestCase):
-
-    def _downloader(self):
-        return PostcodeGssCodeDownloader()
-
-    def _downloader_with_mocked_index_json(self):
-        dl = self._downloader()
-        dl._get_index_json = MagicMock(return_value=self._mock_geoportal_response())
-        return dl
-
-    def _sample_data_file(self, filename):
-        return os.path.join(os.path.dirname(__file__),
-                            '../',
-                            'sample_data/',
-                            filename)
+class PostcodeGssCodeDownloaderTest(unittest.TestCase):
 
     def _mock_geoportal_response(self):
-        return open(self._sample_data_file('os_geoportal_response.json'),
-                    'rb').read()
+        return open(
+            self._sample_data_file('os_geoportal_response.json'),
+            'rb').read()
 
-    @patch.object(DownloadManager, 'retrieve')
-    def test_that_retrieve_is_called(self, mock):
-        self._downloader_with_mocked_index_json().download()
-        self.assertTrue(mock.called)
-        mock.assertCalledWith('http://mock/url', '/tmp/', False)
+    def mock_open(self):
+        open_name = 'postcode_api.downloaders.http.open'
+        self.mocked_file = mock.mock_open()
+        return mock.patch(open_name, self.mocked_file, create=True)
 
-    @patch.object(DownloadManager, 'retrieve')
-    def test_that_a_given_target_dir_is_passed_to_the_downloader(self, mock):
-        self._downloader_with_mocked_index_json().download('/my/target/dir/')
-        mock.assertCalledWith('http://mock/url', '/my/target/dir/', False)
+    def test_downloads_latest_record(self):
 
-    @patch.object(DownloadManager, 'retrieve')
-    def test_that_a_given_force_value_is_passed_to_the_downloader(self, mock):
-        self._downloader_with_mocked_index_json().download('/tmp/', True)
-        mock.assertCalledWith('http://mock/url', '/tmp/', True)
+        with mock.patch.object(PostcodeGssCodeDownloader, 'download_file'), \
+                mock.patch('requests.get') as http_get:
 
-    @responses.activate
-    @patch.object(DownloadManager, 'retrieve')
-    def test_that_it_downloads_the_most_recent_file_url_from_the_os_geoportal(self, mock):
-        self._downloader_with_mocked_index_json().download()
-        mock.assertCalledWith(
-            'https://geoportal.statistics.gov.uk/Docs/PostCodes/NSPL_AUG_2014_csv.zip', '/tmp/', True)
+            latest = datetime.datetime(2015, 7, 7)
+            older = datetime.datetime(2015, 5, 2)
+
+            mock_index = mock.MagicMock()
+            title = 'National Statistics Postcode Lookup (UK)'
+            mock_index.json.return_value = {
+                'records': [
+                    {
+                        'title': title,
+                        'updated': latest,
+                        'links': [
+                            {
+                                'type': 'open',
+                                'href': 'http://example.com/csv1'},
+                            {
+                                'type': 'details',
+                                'href': 'http://example.com/nope'}]},
+                    {
+                        'title': title,
+                        'updated': older,
+                        'links': [
+                            {
+                                'type': 'open',
+                                'href': 'http://example.com/csv2'}]}]}
+
+            def index_then_csv(*args, **kwargs):
+                if '/rest/find/document' in args[0]:
+                    return mock_index
+                return mock.MagicMock()
+
+            http_get.side_effect = index_then_csv
+
+            downloader = PostcodeGssCodeDownloader()
+            downloader.download('/tmp')
+
+            self.assertEqual(1, mock_index.json.call_count)
