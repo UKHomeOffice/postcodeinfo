@@ -28,10 +28,10 @@ class Command(BaseCommand):
         else:
             print 'nothing downloaded - nothing to import'
 
-    def _download(self, destination_dir, force=False):
+    def _download(self, destination_dir):
         print 'downloading'
         downloader = PostcodeGssCodeDownloader()
-        return downloader.download(destination_dir, force)
+        return downloader.download(destination_dir)
 
     def _process(self, filepath):
         if isinstance(filepath, list):
