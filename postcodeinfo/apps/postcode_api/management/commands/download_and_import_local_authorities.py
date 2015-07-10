@@ -34,7 +34,7 @@ class Command(BaseCommand):
         return downloader.download(destination_dir)
 
     def _process(self, filepath):
-        if instanceof(filepath, list):
+        if isinstance(filepath, list):
             filepath = filepath[0]
         files = ZipExtractor(filepath).unzip_if_needed('.*\.nt')
 
