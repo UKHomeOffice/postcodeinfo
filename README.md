@@ -221,7 +221,7 @@ Example response:
 ]
 ```
 
-#### Postcode info - Lat/lon and Local Authority lookup
+#### Postcode info - Lon/lat and Local Authority lookup
 
 ```
 http://127.0.0.1:8000/postcodes/sw1a1aa/
@@ -231,21 +231,23 @@ Example response:
 
 ```json
 {
-  "type": "Point",
   "local_authority": {
     "name": "Westminster",
     "gss_code": "E09000033"
   },
-  "centre": [
-    -0.141587558526369,
-    51.50100893654096
-  ]
+  "centre": {
+    "type": "Point",
+    "coordinates": [
+      -0.141587558526369,
+      51.50100893654096
+    ]
+  }
 }
 ```
 
-This method returns a lat/lon point for the centre of the specified postcode area only.
+This method returns a lon/lat point for the centre of the specified postcode area only.
 
-#### Partial postcode info - Lat/lon and Local Authority lookup
+#### Partial postcode info - Lon/lat and Local Authority lookup
 
 You can also perform partial postcode lookups using the partial/ endpoint:
 
@@ -257,15 +259,17 @@ Example response:
 
 ```json
 {
-  "type": "Point",
   "local_authority": {
     "name": "Westminster",
     "gss_code": "E09000033"
   },
-  "centre": [
-    -0.141587558526369,
-    51.50100893654096
-  ]
+  "centre": {
+    "type": "Point",
+    "coordinates": [
+      -0.141587558526369,
+      51.50100893654096
+    ]
+  }
 }
 ```
 
