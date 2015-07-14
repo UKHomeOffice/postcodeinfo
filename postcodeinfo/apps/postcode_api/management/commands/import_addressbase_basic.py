@@ -1,7 +1,5 @@
 import os
 
-from index_suppressor import IndexSuppressor
-
 # from multiprocessing import Pool
 from django.core.management.base import BaseCommand, CommandError
 
@@ -16,16 +14,13 @@ class Command(BaseCommand):
         if len(args) == 0:
             raise CommandError('You must specify at least one CSV file')
 
-        import_all( args )
+        import_csv(args)
 
 
-def import_csv(filename):
-    if not os.access(filename, os.R_OK):
-        raise CommandError('CSV file could not be read')
+def import_csv(filenames):
+    for filename in filenames:
+        if not os.access(filename, os.R_OK):
+            raise CommandError('CSV file could not be read')
 
     importer = AddressBaseBasicImporter()
-    importer.import_csv(filename)
-
-def import_all(filepaths):
-    importer = AddressBaseBasicImporter()
-    importer.import_all(filepaths)
+    importer.import_csv(list(filenames))
