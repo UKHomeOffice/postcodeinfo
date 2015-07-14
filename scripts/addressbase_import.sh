@@ -1,5 +1,10 @@
 #!/bin/bash
 
+OFFLINE_TABLE_NAME='postcode_api_address_offline'
+PREV_LIVE_TABLE_NAME='postcode_api_address_prev_live'
+TEMP_TABLE_NAME='tmp_addressbase_import'
+LIVE_TABLE_NAME='postcode_api_address'
+
 function exec_sql {
   echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -q -t -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
 }
@@ -9,7 +14,7 @@ function exec_in_transaction {
 }
 
 function import_file {
-  sql="\COPY tmp_addressbase_import FROM '$1' WITH CSV"
+  sql="\COPY $TEMP_TABLE_NAME FROM '$1' WITH CSV"
   # restore this line if you need to mix a \copy command in with
   # other sql statements in the same execution, as it needs to be
   # terminated with a newline and a double backslash
@@ -17,13 +22,32 @@ function import_file {
   exec_sql "$sql"
 }
 
+function copy_indexes_sql {
+  exec_sql "select indexdef from pg_indexes where tablename = '$LIVE_TABLE_NAME'" \
+  | sed 's/CREATE INDEX .* ON /CREATE INDEX ON /g' \
+  | sed 's/CREATE UNIQUE INDEX .* ON /CREATE UNIQUE INDEX ON /g' \
+  | sed "s/$LIVE_TABLE_NAME/$OFFLINE_TABLE_NAME/g" \
+  | sed 's/$/;/' \
+  | sed 's/^;//'
+}
+
+# args: 
+#   table name on which indexes will be renamed
+#   table name to replace in index names
+#   table name to substitute into index names
+function rename_indexes_sql {
+  exec_sql "select indexdef from pg_indexes where tablename = '$1'" \
+  | sed 's/.*INDEX \([^ ]*\).*/ALTER INDEX \1 RENAME TO ZZZ_\1;/' \
+  | sed "s/ZZZ_${2}_/${3}_/"
+}
+
 # read -d'' reads multiple lines from stdin ignoring newlines
 # see http://serverfault.com/a/72511 for more details of how this works
-read -d '' CREATE_TABLE_SQL <<"EOF"
-  DROP TABLE IF EXISTS tmp_addressbase_import;
+CREATE_TABLE_SQL="
+  DROP TABLE IF EXISTS $TEMP_TABLE_NAME;
 
   -- UPRN is unquoted in the import, hence it has to be a bigint here
-  CREATE UNLOGGED TABLE tmp_addressbase_import ( 
+  CREATE UNLOGGED TABLE $TEMP_TABLE_NAME ( 
     UPRN bigint, 
     OS_ADDRESS_TOID varchar(40), 
     RM_UDPRN integer, 
@@ -51,22 +75,29 @@ read -d '' CREATE_TABLE_SQL <<"EOF"
     PROCESS_DATE date
   );
 
-  TRUNCATE TABLE tmp_addressbase_import;
-EOF
+  TRUNCATE TABLE $TEMP_TABLE_NAME;
+"
 
 
 # yes, get rid of any address named in the import, regardless of change type
 # as for an insert or update, we can just delete and (re-)insert
-read -d '' CONVERT_DATA_SQL <<"EOF"
-  SELECT 'removing any existing addresses with UPRNs in the import file' AS status;
-  DELETE FROM postcode_api_address USING tmp_addressbase_import
-    WHERE postcode_api_address.uprn = cast(tmp_addressbase_import.UPRN AS varchar(12));
+CONVERT_DATA_SQL="
+  DROP TABLE IF EXISTS $OFFLINE_TABLE_NAME;
 
-  SELECT 'removing any change_type "D" import records' AS status;
-  DELETE FROM tmp_addressbase_import WHERE CHANGE_TYPE = 'D';
+  SELECT 'creating offline table' AS status;
+  CREATE TABLE $OFFLINE_TABLE_NAME AS 
+    SELECT * from $LIVE_TABLE_NAME WHERE uprn NOT IN (
+      SELECT cast(UPRN AS varchar(12)) from $TEMP_TABLE_NAME WHERE CHANGE_TYPE='D'
+    );
 
-  SELECT 'converting import data into live address table' AS status;
-  INSERT INTO postcode_api_address (
+  SELECT 'removing uprns seen in the import from offline table' AS status;
+  DELETE FROM $OFFLINE_TABLE_NAME WHERE uprn IN (
+    SELECT cast(UPRN AS varchar(12)) FROM $TEMP_TABLE_NAME
+  );
+
+  SELECT 'converting import data into offline address table' AS status;
+  INSERT INTO $OFFLINE_TABLE_NAME
+  (
     uprn,
     os_address_toid,
     rm_udprn,
@@ -120,28 +151,52 @@ read -d '' CONVERT_DATA_SQL <<"EOF"
     CLASS, 
     PROCESS_DATE,
     lower(split_part(POSTCODE, ' ', 1))
-  FROM tmp_addressbase_import;
+  FROM $TEMP_TABLE_NAME;
 
-  TRUNCATE TABLE tmp_addressbase_import;
-EOF
-
-read -d '' CLEANUP_SQL <<"EOF"
-  SELECT 'removing tmp import table' AS status;
-  DROP TABLE tmp_addressbase_import;
-EOF
+  TRUNCATE TABLE $TEMP_TABLE_NAME;
+"
 
 
-echo "creating temporary import table"
-exec_sql "$CREATE_TABLE_SQL"
+function cleanup_tables_sql {
+  echo "
+    SELECT 'removing tmp import table' AS status;
+    DROP TABLE $TEMP_TABLE_NAME;
 
-for filename in $@; do
+    SELECT 'copying indexes onto offline table' AS status;
+    `copy_indexes_sql`
 
-  echo "importing ${filename}"
-  import_file $filename
+    SELECT 'renaming tables' AS status;
+    SELECT 'dropping $PREV_LIVE_TABLE_NAME' AS status;
+    DROP TABLE IF EXISTS $PREV_LIVE_TABLE_NAME;
+    SELECT 'renaming $LIVE_TABLE_NAME to $PREV_LIVE_TABLE_NAME' AS status;
+    ALTER TABLE $LIVE_TABLE_NAME RENAME TO $PREV_LIVE_TABLE_NAME;
+    $(rename_indexes_sql $LIVE_TABLE_NAME $LIVE_TABLE_NAME $PREV_LIVE_TABLE_NAME)
+
+    SELECT 'renaming $OFFLINE_TABLE_NAME to $LIVE_TABLE_NAME' AS status;
+    ALTER TABLE $OFFLINE_TABLE_NAME RENAME TO $LIVE_TABLE_NAME;
+    $(rename_indexes_sql $OFFLINE_TABLE_NAME $OFFLINE_TABLE_NAME $LIVE_TABLE_NAME)
+  "
+}
+
+
+if [ $# -eq 0 ]
+  then 
+    echo "No arguments supplied"
+    exit 1
+else
+  echo "creating temporary import table"
+  exec_sql "$CREATE_TABLE_SQL"
+
+  for filename in $@; do
+    echo "importing ${filename}"
+    import_file $filename
+  done
+
+  exec_sql "SELECT CHANGE_TYPE, COUNT(*) AS num_to_import FROM $TEMP_TABLE_NAME GROUP BY CHANGE_TYPE;"
+  echo "converting data"
+  exec_in_transaction "$CONVERT_DATA_SQL" && \
+    exec_in_transaction "$(cleanup_tables_sql)"
+fi
   
-done
 
-exec_sql "SELECT CHANGE_TYPE, COUNT(*) AS num_to_import FROM tmp_addressbase_import GROUP BY CHANGE_TYPE;"
-echo "converting data"
-exec_in_transaction "$CONVERT_DATA_SQL"
-exec_sql "$CLEANUP_SQL"
+

@@ -16,9 +16,8 @@ class Command(BaseCommand):
         if len(args) == 0:
             raise CommandError('You must specify at least one CSV file')
 
-        with IndexSuppressor('postcode_api_address'):
-            for filepath in args:
-                import_csv(filepath)
+        import_all( args )
+
 
 def import_csv(filename):
     if not os.access(filename, os.R_OK):
@@ -26,3 +25,7 @@ def import_csv(filename):
 
     importer = AddressBaseBasicImporter()
     importer.import_csv(filename)
+
+def import_all(filepaths):
+    importer = AddressBaseBasicImporter()
+    importer.import_all(filepaths)

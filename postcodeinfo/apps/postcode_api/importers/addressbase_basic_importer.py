@@ -24,6 +24,7 @@ def split_file(path, num_lines):
 
     os.rmdir(split_dir)
 
+
 def get_all_uprns(batch_list):
     return [row['uprn'] for row in batch_list if row]
 
@@ -75,6 +76,9 @@ class AddressBaseBasicImporter(object):
 
         collection.append(address)
 
+    def import_all(self, filepaths):
+        self.import_file(filepaths)
+
     def import_csv(self, filename):
         logging.debug("importing csv {filename}".format(filename=filename))
         batch_size = int(
@@ -92,10 +96,13 @@ class AddressBaseBasicImporter(object):
         # 'test_xyz', but *doesn't* alter the DB_NAME env var - so we have to override it
         # otherwise tests that try to import stuff in setup then read it back,
         # will fail
-        env = {'DB_NAME': settings.DATABASES['default']['NAME'],
-               'DB_HOST': settings.DATABASES['default']['HOST'],
-               'DB_USERNAME': settings.DATABASES['default']['USER'],
-               'DB_PASSWORD': settings.DATABASES['default']['PASSWORD']
-               }
+        env = self._db_env()
         runProcess(
             [script, filepath], env=env)
+
+    def _db_env(self):
+        return {'DB_NAME': settings.DATABASES['default']['NAME'],
+                'DB_HOST': settings.DATABASES['default']['HOST'],
+                'DB_USERNAME': settings.DATABASES['default']['USER'],
+                'DB_PASSWORD': settings.DATABASES['default']['PASSWORD']
+                }
