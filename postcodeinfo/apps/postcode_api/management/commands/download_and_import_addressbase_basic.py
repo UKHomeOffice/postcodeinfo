@@ -36,23 +36,23 @@ class Command(BaseCommand):
         return downloader.download(destination_dir)
 
     def _process_all(self, files):
-        with IndexSuppressor('postcode_api_address'):
-            if isinstance(files, list):
-                for filepath in files:
-                    self._process(filepath)
-            else:
-                self._process(files)
+        if isinstance(files, list):
+            files_to_process = []
+            for filepath in files:
+                extracted_files = ZipExtractor(filepath).unzip_if_needed(
+                    '.*AddressBase_.*\.csv')
+                files_to_process += extracted_files
+            self._import(files_to_process)
+        else:
+            self._process(files)
 
     def _process(self, filepath):
         files = ZipExtractor(filepath).unzip_if_needed(
             '.*AddressBase_.*\.csv')
 
-        for path in files:
-            print 'importing ' + path
-            self._import(path)
+        self._import(files)
 
-        return True
-
-    def _import(self, downloaded_file):
+    def _import(self, downloaded_files):
         importer = AddressBaseBasicImporter()
-        importer.import_csv(downloaded_file)
+        importer.import_all(downloaded_files)
+
