@@ -50,6 +50,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.gis',
 
+    'axes',
+
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_gis',
@@ -65,6 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.FailedLoginMiddleware'
 )
 
 ROOT_URLCONF = 'postcodeinfo.urls'
@@ -186,6 +189,12 @@ AWS = {
     's3_bucket_name': os.environ.get('S3_BUCKET_NAME')
 }
 
+# django-axes is used for locking out user/ipaddress combinations who have
+# more than a certain number of failed logins
+AXES_LOGIN_FAILURE_LIMIT=5
+AXES_LOCK_OUT_AT_FAILURE=True
+AXES_COOLOFF_TIME=1 # <- after 1 hour, they can try again
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP=True 
 
 # .local.py overrides all the common settings.
 try:
