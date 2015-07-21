@@ -58,7 +58,8 @@ class S3Cache(object):
             log.debug('downloading from s3 key {key_name} to {dest}'.format(
                 key_name=key_name, dest=dest))
 
-            return key.get_contents_to_filename(dest)
+            key.get_contents_to_filename(dest)
+            return dest
 
         result = super(S3Cache, self).download_file(src, dest)
 
