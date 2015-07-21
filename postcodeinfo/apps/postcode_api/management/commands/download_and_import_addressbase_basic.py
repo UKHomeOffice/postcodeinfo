@@ -1,8 +1,6 @@
 import os
 from django.core.management.base import BaseCommand
 
-from index_suppressor import IndexSuppressor
-
 from postcode_api.downloaders import AddressBaseBasicDownloader
 from postcode_api.importers.addressbase_basic_importer \
     import AddressBaseBasicImporter
@@ -55,4 +53,3 @@ class Command(BaseCommand):
     def _import(self, downloaded_files):
         importer = AddressBaseBasicImporter()
         importer.import_all(downloaded_files)
-
