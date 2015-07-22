@@ -52,4 +52,4 @@ class Command(BaseCommand):
 
     def _import(self, downloaded_files):
         importer = AddressBaseBasicImporter()
-        importer.import_all(downloaded_files)
+        importer.import_csv(downloaded_files)
