@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from mock import patch
 
 from postcode_api.utils import ZipExtractor
