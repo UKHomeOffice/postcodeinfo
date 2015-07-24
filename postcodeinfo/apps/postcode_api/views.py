@@ -76,8 +76,9 @@ class MonitoringView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     content_negotiation_class = IgnoreClientContentNegotiation
 
+
 class PingDotJsonView(MonitoringView):
-    
+
     def get(self, request, *args, **kwargs):
         data = {
             'version_number': os.environ.get('APPVERSION'),
@@ -89,7 +90,7 @@ class PingDotJsonView(MonitoringView):
 
 
 class HealthcheckDotJsonView(MonitoringView):
-    
+
     def get(self, request, *args, **kwargs):
         database_ok = self.is_database_ok()
         # this should be an AND of all the checks - add more as needed
@@ -101,7 +102,7 @@ class HealthcheckDotJsonView(MonitoringView):
                 'ok': database_ok},
             'ok': all(
                 [database_ok,
-            ])
+                 ])
         }
         overall_status = status.HTTP_200_OK
         if not all_ok:

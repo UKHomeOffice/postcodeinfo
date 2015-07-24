@@ -2,13 +2,15 @@
 from django.contrib.gis.db import models
 from django.db.models import Count, signals
 from django.dispatch import receiver
-from .utils import AddressFormatter
 from rest_framework.authtoken.models import Token
 
-# override the default token generation in rest framework
-# as it just hex-encodes a random number. This was
+# override the default token generation in rest framework
+# as it just hex-encodes a random number. This was
 # flagged up in pen-testing as a weakness.
 from .custom_token_generators import custom_generate_key
+from .utils import AddressFormatter
+
+
 Token.generate_key = custom_generate_key
 
 
