@@ -1,8 +1,17 @@
+# -*- coding: utf-8 -*-
 from django.contrib.gis.db import models
 from django.db.models import Count, signals
 from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
+# override the default token generation in rest framework
+# as it just hex-encodes a random number. This was
+# flagged up in pen-testing as a weakness.
+from .custom_token_generators import generate_sha512_key
 from .utils import AddressFormatter
+
+
+Token.generate_key = generate_sha512_key
 
 
 class AddressManager(models.GeoManager):
@@ -56,7 +65,7 @@ class Address(models.Model):
         index_together = [
             ['postcode_index', 'uprn']
         ]
-        
+
     @property
     def formatted_address(self):
         return AddressFormatter.format(self)

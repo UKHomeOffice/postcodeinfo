@@ -13,6 +13,7 @@ mock==1.0.1
 numpy==1.8.2
 psycopg2==2.6
 py==1.4.28
+pycrypto==2.6.1
 pycurl==7.19.3
 pyparsing==2.0.3
 pytest==2.7.1
