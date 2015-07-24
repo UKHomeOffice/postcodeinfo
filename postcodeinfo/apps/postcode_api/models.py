@@ -7,11 +7,11 @@ from rest_framework.authtoken.models import Token
 # override the default token generation in rest framework
 # as it just hex-encodes a random number. This was
 # flagged up in pen-testing as a weakness.
-from .custom_token_generators import custom_generate_key
+from .custom_token_generators import generate_sha512_key
 from .utils import AddressFormatter
 
 
-Token.generate_key = custom_generate_key
+Token.generate_key = generate_sha512_key
 
 
 class AddressManager(models.GeoManager):
