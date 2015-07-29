@@ -38,6 +38,9 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
 
+# Enable secure cookies in non-debug mode
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
 
 # Application definition
 
