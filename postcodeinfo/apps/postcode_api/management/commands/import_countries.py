@@ -11,7 +11,7 @@ class Command(BaseCommand):
     args = '<csv_file csv_file...>'
 
     def handle(self, *args, **options):
-        if len(args) == 0:
+        if not args:
             raise CommandError('You must specify at least one CSV file')
 
         import_csv(args)
