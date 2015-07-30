@@ -9,43 +9,10 @@ LIVE_TABLE_NAME='postcode_api_address'
 BRITISH_NATIONAL_GRID=27700
 WGS84=4326
 
-function exec_sql {
-  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -q -t -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
-}
+# bring in general-purpose functions
+source `dirname $0`/offline_table_import_functions.sh
 
-function exec_in_transaction {
-  echo "$1" | PGPASSWORD=${DB_PASSWORD} psql -q -t --single-transaction -U ${DB_USERNAME} -h ${DB_HOST} -d ${DB_NAME}
-}
-
-function import_file {
-  sql="\COPY $TEMP_TABLE_NAME FROM '$1' WITH CSV"
-  # restore this line if you need to mix a \copy command in with
-  # other sql statements in the same execution, as it needs to be
-  # terminated with a newline and a double backslash
-  #sql=$sql$'\n'"\\\\"$'\n'
-  exec_sql "$sql"
-}
-
-function copy_indexes_sql {
-  exec_sql "select indexdef from pg_indexes where tablename = '$LIVE_TABLE_NAME'" \
-  | sed 's/CREATE INDEX .* ON /CREATE INDEX ON /g' \
-  | sed 's/CREATE UNIQUE INDEX .* ON /CREATE UNIQUE INDEX ON /g' \
-  | sed "s/$LIVE_TABLE_NAME/$OFFLINE_TABLE_NAME/g" \
-  | sed 's/$/;/' \
-  | sed 's/^;//'
-}
-
-# args: 
-#   table name on which indexes will be renamed
-#   table name to replace in index names
-#   table name to substitute into index names
-function rename_indexes_sql {
-  exec_sql "select indexdef from pg_indexes where tablename = '$1'" \
-  | sed 's/.*INDEX \([^ ]*\).*/ALTER INDEX \1 RENAME TO ZZZ_\1;/' \
-  | sed "s/ZZZ_${2}_/${3}_/"
-}
-
-function create_table_sql {
+function create_tmp_table_sql {
   echo "
     DROP TABLE IF EXISTS $TEMP_TABLE_NAME;
 
@@ -161,25 +128,7 @@ function convert_data_sql {
 }
 
 
-function cleanup_tables_sql {
-  echo "
-    SELECT 'removing tmp import table' AS status;
-    DROP TABLE $TEMP_TABLE_NAME;
 
-    SELECT 'copying indexes onto offline table' AS status;
-    `copy_indexes_sql`
-
-    SELECT 'renaming tables' AS status;
-    SELECT 'dropping $PREV_LIVE_TABLE_NAME' AS status;
-    DROP TABLE IF EXISTS $PREV_LIVE_TABLE_NAME;
-    SELECT 'renaming $LIVE_TABLE_NAME to $PREV_LIVE_TABLE_NAME' AS status;
-    ALTER TABLE $LIVE_TABLE_NAME RENAME TO $PREV_LIVE_TABLE_NAME;
-    $(rename_indexes_sql $LIVE_TABLE_NAME $LIVE_TABLE_NAME $PREV_LIVE_TABLE_NAME)
-
-    SELECT 'renaming $OFFLINE_TABLE_NAME to $LIVE_TABLE_NAME' AS status;
-    ALTER TABLE $OFFLINE_TABLE_NAME RENAME TO $LIVE_TABLE_NAME;
-  "
-}
 
 # Main processing actually starts here
 if [ $# -eq 0 ]
@@ -187,21 +136,7 @@ if [ $# -eq 0 ]
     echo "No arguments supplied"
     exit 1
 else
-  echo "creating temporary import table"
-  exec_sql "$(create_table_sql)"
-
-  for filename in $@; do
-    echo "importing ${filename}"
-    import_file $filename
-  done
-
-  exec_sql "SELECT CHANGE_TYPE, COUNT(*) AS num_to_import FROM $TEMP_TABLE_NAME GROUP BY CHANGE_TYPE;"
-  echo "converting data"
-  # NOTE: the rename_indexes_sql must be generated AFTER
-  # the cleanup_tables_sql has been run!
-  exec_in_transaction "$(convert_data_sql)" && \
-   exec_in_transaction "$(cleanup_tables_sql)" && \
-   exec_in_transaction "$(rename_indexes_sql $LIVE_TABLE_NAME $OFFLINE_TABLE_NAME $LIVE_TABLE_NAME)"
+  run_import "$@"
 fi
 
 

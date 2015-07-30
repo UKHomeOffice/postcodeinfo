@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework.response import Response
 
-from .models import Address, LocalAuthority
+from .models import Address, Country, LocalAuthority
 from .serializers import AddressSerializer
 
 from ignore_client_content_negotiation import IgnoreClientContentNegotiation
@@ -27,7 +27,7 @@ class PostcodeView(generics.RetrieveAPIView):
 
     geom_query = 'postcode_index'
 
-    def __format_json(cls, geom, local_authority):
+    def __format_json(cls, geom, local_authority, country):
         centre = geom.centroid.coords
 
         if local_authority:
@@ -36,31 +36,43 @@ class PostcodeView(generics.RetrieveAPIView):
                 'gss_code': local_authority.gss_code
             }
 
+        if country:
+            country = {
+                'name': country.name,
+                'gss_code': country.gss_code
+            }
+
         data = {
             'centre': {
                 'type': 'Point',
                 'coordinates': centre
             },
-            'local_authority': local_authority
+            'local_authority': local_authority,
+            'country': country
         }
         return data
 
-    def __get_geometry(self, postcode):
+    def _get_geometry(self, postcode):
         geom = Address.objects.filter(
             **{self.geom_query: postcode}).collect(field_name='point')
         return geom
 
-    def __get_local_authority(self, postcode):
+    def _get_local_authority(self, postcode):
         local_authority = LocalAuthority.objects.for_postcode(postcode)
         return local_authority
 
+    def _get_country(self, postcode):
+        country = Country.objects.for_postcode(postcode)
+        return country
+
     def get(self, request, *args, **kwargs):
         postcode = kwargs.get('postcode', '').replace(' ', '').lower()
-        geom = self.__get_geometry(postcode)
+        geom = self._get_geometry(postcode)
 
         if geom:
-            local_authority = self.__get_local_authority(postcode)
-            data = self.__format_json(geom, local_authority)
+            local_authority = self._get_local_authority(postcode)
+            country = self._get_country(postcode)
+            data = self.__format_json(geom, local_authority, country)
 
             return Response(data, status=status.HTTP_200_OK)
 

@@ -1,40 +1,7 @@
-import logging
-import os
-import subprocess
-
-from django.conf import settings
-
-
-def runProcess(exe, **kwargs):
-    env = kwargs.pop('env', {})
-    logging.debug(
-        'executing {cmd} with env {env}'.format(cmd=str(exe), env=env))
-    p = subprocess.Popen(
-        exe, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
-    p.wait()
-
+from postcode_api.importers.psql_import_adapter import PSQLImportAdapter
 
 class AddressBaseBasicImporter(object):
 
     def import_csv(self, filepaths):
-        logging.debug("importing file(s) {filepaths}".format(filepaths=filepaths))
-        script = os.path.join(
-            settings.BASE_DIR, 'scripts/', 'addressbase_import.sh')
-        # need to explicitly pass through the DB_NAME as an env var here,
-        # because when running tests, Django automatically changes the name in settings to
-        # 'test_xyz', but *doesn't* alter the DB_NAME env var - so we have to override it
-        # otherwise tests that try to import stuff in setup then read it back,
-        # will fail
-        env = self._db_env()
-        if not isinstance(filepaths, list):
-            filepaths = [filepaths]
+        PSQLImportAdapter().import_csv('addressbase_import.sh', filepaths)
 
-        runProcess(
-            [script] + filepaths, env=env)
-
-    def _db_env(self):
-        return {'DB_NAME': settings.DATABASES['default']['NAME'],
-                'DB_HOST': settings.DATABASES['default']['HOST'],
-                'DB_USERNAME': settings.DATABASES['default']['USER'],
-                'DB_PASSWORD': settings.DATABASES['default']['PASSWORD']
-                }

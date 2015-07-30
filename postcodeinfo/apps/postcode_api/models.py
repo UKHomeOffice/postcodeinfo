@@ -80,6 +80,7 @@ class PostcodeGssCode(models.Model):
     postcode_index = models.CharField(
         max_length=7, db_index=True, primary_key=True)
     local_authority_gss_code = models.CharField(max_length=9, db_index=True)
+    country_gss_code = models.CharField(max_length=9, db_index=True, null=True)
 
 
 class LocalAuthorityManager(models.Manager):
@@ -100,9 +101,21 @@ class LocalAuthorityManager(models.Manager):
                 annotate(count=Count('local_authority_gss_code')).\
                 order_by("-count")
 
-            most_likely_gss_code = gss_codes.first()[
-                'local_authority_gss_code']
-            return self.filter(gss_code=most_likely_gss_code).first()
+            most_likely_gss_code = gss_codes.first()
+            if most_likely_gss_code:
+                return LocalAuthority.objects.get(
+                    gss_code=most_likely_gss_code[
+                        'local_authority_gss_code'])
+
+
+class CountryManager(models.Manager):
+
+    def for_postcode(self, postcode):
+        postcode_to_gss_code_mapping = PostcodeGssCode.objects.filter(
+            postcode_index=postcode).first()
+        if postcode_to_gss_code_mapping:
+            gss_code = postcode_to_gss_code_mapping.country_gss_code
+            return self.get(gss_code=gss_code)
 
 
 class LocalAuthority(models.Model):
@@ -110,6 +123,13 @@ class LocalAuthority(models.Model):
     name = models.CharField(max_length=128, db_index=True)
 
     objects = LocalAuthorityManager()
+
+
+class Country(models.Model):
+    gss_code = models.CharField(max_length=9, db_index=True, primary_key=True)
+    name = models.CharField(max_length=128, db_index=True)
+
+    objects = CountryManager()
 
 
 class Download(models.Model):
