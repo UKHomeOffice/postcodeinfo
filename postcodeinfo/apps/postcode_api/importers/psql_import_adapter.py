@@ -30,8 +30,7 @@ class PSQLImportAdapter(object):
         if not isinstance(filepaths, list):
             filepaths = [filepaths]
 
-        runProcess(
-            [script] + filepaths, env=env)
+        runProcess([script] + filepaths, env=env)
 
     def _db_env(self):
         return {
