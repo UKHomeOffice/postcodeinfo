@@ -12,13 +12,6 @@ class CountriesImporter(object):
             with open(data_file) as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    country = self.find_or_create_country(row['CTRY14CD'])
+                    country, created = Country.objects.get_or_create(gss_code=row['CTRY14CD'])
                     country.name = row['CTRY14NM']
                     country.save()
-
-    def find_or_create_country(self, gss_code):
-        try:
-            c = Country.objects.get(gss_code=gss_code)
-        except Country.DoesNotExist:
-            c = Country(gss_code=gss_code)
-        return c

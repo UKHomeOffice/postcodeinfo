@@ -37,7 +37,7 @@ class LocalAuthoritiesImporter(object):
 
     def _import_gss_code(self, code_tuple):
         code = str(code_tuple[2])
-        local_authority = self._find_or_create_local_authority(code)
+        local_authority, created = LocalAuthority.objects.get_or_create(gss_code=code)
         name = self.graph.value(subject=code_tuple[0], predicate=URIRef(
             "http://www.w3.org/2000/01/rdf-schema#label"))
         self._update_local_authority_name_if_needed(local_authority, name)
@@ -46,13 +46,6 @@ class LocalAuthoritiesImporter(object):
         if local_authority.name != name:
             local_authority.name = name
             local_authority.save()
-
-    def _find_or_create_local_authority(self, gss_code):
-        try:
-            a = LocalAuthority.objects.get(gss_code=gss_code)
-        except LocalAuthority.DoesNotExist:
-            a = LocalAuthority(gss_code=gss_code)
-        return a
 
     def _load_graph(self, filename):
         self.graph = Graph()
