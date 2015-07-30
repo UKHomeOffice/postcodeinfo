@@ -11,8 +11,8 @@ from postcode_api.importers.postcode_gss_code_importer import PostcodeGssCodeImp
 from postcode_api.utils import ZipExtractor
 
 def rerun_nspl_import(apps, schema_editor):
-  if settings.DEBUG:
-      print 'running in debug - skipping re-import of NSPL'
+  if settings.DEBUG or settings.TESTING:
+      print 'not in production - skipping re-import of NSPL'
   else:
     destination_dir = dest_dir('/tmp/postcode_gss_codes/')
     filepath = PostcodeGssCodeDownloader().download(destination_dir)

@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 
 class S3Cache(object):
+
     """
     Download files unless they already exist in S3 and are newer than the files
     on the server.
@@ -45,7 +46,14 @@ class S3Cache(object):
         """
 
         key_name = src.split('/')[-1]
-        key = self.bucket.get_key(key_name)
+        try:
+            key = self.bucket.get_key(key_name)
+        except Exception as e:
+            logging.exception('could not get_key {key_name} '
+                              'from s3 bucket {bucket_name} '.format(
+                                  key_name=key_name,
+                                  bucket_name=self.bucket_name))
+            return super(S3Cache, self).download_file(src, dest)
 
         def last_modified(k):
             dt = dateparser.parse(k.last_modified)
