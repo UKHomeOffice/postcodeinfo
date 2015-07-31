@@ -11,7 +11,13 @@ def runProcess(exe, **kwargs):
         'executing {cmd} with env {env}'.format(cmd=str(exe), env=env))
     p = subprocess.Popen(
         exe, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
-    p.wait()
+    while True:
+        line = p.stdout.readline()
+        if line != '':
+            #the real code does filtering here
+            logging.debug(line.rstrip())
+        else:
+            break
 
 
 class PSQLImportAdapter(object):
