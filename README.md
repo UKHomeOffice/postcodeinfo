@@ -221,7 +221,7 @@ Example response:
 ]
 ```
 
-#### Postcode info - Lon/lat and Local Authority lookup
+#### Postcode info - Lon/lat, Local Authority and Country lookup
 
 ```
 http://127.0.0.1:8000/postcodes/sw1a1aa/
@@ -231,6 +231,10 @@ Example response:
 
 ```json
 {
+  "country": {
+    "gss_code": "E92000001",
+    "name": "England"
+  },
   "local_authority": {
     "name": "Westminster",
     "gss_code": "E09000033"
