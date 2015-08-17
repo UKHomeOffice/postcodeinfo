@@ -25,15 +25,16 @@ class LocalAuthoritiesImporterTestCase(TestCase):
 
     def test_that_when_new_local_authorities_are_imported_then_local_authority_records_get_created(self):
         # setup
-        self.assertEqual(LocalAuthority.objects.count(), 0)
+        initial_la_count = LocalAuthority.objects.count()
         self._import_data_from('local_authorities_sample.nt')
         # expectation
-        self.assertEqual(LocalAuthority.objects.count(), 7)
+        self.assertEqual(LocalAuthority.objects.count(), initial_la_count + 7)
 
     def test_that_when_existing_local_authorities_are_imported_then_duplicate_local_authority_records_dont_get_created(self):
         # setup
+        initial_la_count = LocalAuthority.objects.count()
         self._import_data_from('local_authorities_sample.nt')
-        self.assertEqual(LocalAuthority.objects.count(), 7)
+        self.assertEqual(LocalAuthority.objects.count(), initial_la_count + 7)
         self._import_data_from('local_authorities_sample.nt')
         # expectation
-        self.assertEqual(LocalAuthority.objects.count(), 7)
+        self.assertEqual(LocalAuthority.objects.count(), initial_la_count + 7)
