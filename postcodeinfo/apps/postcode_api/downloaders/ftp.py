@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 
 
 class FtpDownloader(HttpDownloader):
+
     """
     Downloads files from a FTP server
     """
@@ -104,6 +105,23 @@ class FtpDownloader(HttpDownloader):
             if self.path is not None:
                 self._ftp.cwd(self.path)
         return self._ftp
+
+    # NOTE: 'latest' in this case means 'last file when sorted alphabetically'
+    # as the AddressBase file names all contain a timestamp in YYYY-MM-DD
+    # format
+    def find_dir_with_latest_file_matching(self, pattern):
+
+        def parse_relative_path(path):
+            elements = path.split('/')
+            return {'dir': elements[0], 'file': elements[-1]}
+
+        all_matching_files = self._list(pattern)
+        if all_matching_files:
+            parsed_file_list = map(parse_relative_path, all_matching_files)
+            latest = sorted(parsed_file_list,
+                            key=lambda parsed_path: parsed_path['file'])[-1]
+
+            return latest['dir']
 
     def _list(self, pattern):
         files = {}

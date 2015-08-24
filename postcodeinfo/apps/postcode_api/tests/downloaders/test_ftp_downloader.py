@@ -119,3 +119,11 @@ class FTPDownloaderTest(unittest.TestCase):
             downloader._list('*.zip')
             last_modified = downloader.last_modified('1.zip')
             self.assertEqual(dt, last_modified)
+
+    def test_find_dir_with_latest_file_matching(self):
+        mock_files = ['dir-a/file-2014-05-06', 'dir-b/file-2015-06-07', 'dir-c/file-2015-10-29']
+
+        with mock.patch('ftplib.FTP'):
+            downloader = FtpDownloader('host', 'user', 'pass')
+            downloader._list = mock.MagicMock(return_value=mock_files)
+            self.assertEqual( downloader.find_dir_with_latest_file_matching('*/file-*'), 'dir-c' )
