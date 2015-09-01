@@ -25,6 +25,7 @@ def last_modified(filename):
 
 
 class LocalCache(object):
+
     """
     Download files unless they already exist locally and are newer than the
     files on the server.
@@ -36,7 +37,10 @@ class LocalCache(object):
         newer than the remote file.
         """
 
-        if exists(dest) and last_modified(dest) >= self.last_modified(src):
-            return dest
+        if exists(dest):
+            dest_mod_date = last_modified(dest)
+            src_mod_date = self.last_modified(src)
+            if src_mod_date and dest_mod_date >= src_mod_date:
+                return dest
 
         return super(LocalCache, self).download_file(src, dest)
