@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 
 class HttpDownloader(object):
+
     """
     Downloads files from a HTTP server.
     """
@@ -76,7 +77,9 @@ class HttpDownloader(object):
 
         if src is None:
             src = self.url
-        dt = dateparser.parse(self._get_headers(src)['last-modified'])
-        if dt.tzinfo is None:
-            dt = pytz.UTC.localize(dt)
-        return dt
+        hdrs = self._get_headers(src)
+        if hdrs.get('last-modified'):
+            dt = dateparser.parse(hdrs['last-modified'])
+            if dt.tzinfo is None:
+                dt = pytz.UTC.localize(dt)
+            return dt
