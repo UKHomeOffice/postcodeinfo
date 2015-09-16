@@ -44,6 +44,8 @@ class HttpDownloader(object):
         """
 
         def download():
+            log.debug 'downloading {src} to {dest}'.format(
+                src=src, dest=dest)
             data = requests.get(src, stream=True)
             with open(dest, 'wb') as f:
                 for i, chunk in enumerate(data.iter_content(self.chunk_size)):
