@@ -40,7 +40,9 @@ class LocalCache(object):
         if exists(dest):
             dest_mod_date = last_modified(dest)
             src_mod_date = self.last_modified(src)
-            if src_mod_date and dest_mod_date >= src_mod_date:
+
+            if (src_mod_date and dest_mod_date
+                    and dest_mod_date >= src_mod_date):
                 return dest
 
         return super(LocalCache, self).download_file(src, dest)

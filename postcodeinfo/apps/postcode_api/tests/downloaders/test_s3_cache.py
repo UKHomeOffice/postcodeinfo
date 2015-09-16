@@ -56,3 +56,9 @@ class S3CacheTest(unittest.TestCase):
                 downloader.download('/tmp')
 
                 self.assertEqual(use_local, get.called)
+
+    def test_that_an_empty_last_modified_does_not_cause_a_crash(self):
+        mock_obj = mock.MagicMock('mock object', last_modified=None)
+        cache = S3Cache()
+        last_mod = cache._last_modified_with_timezone(mock_obj)
+        self.assertEqual(last_mod, None)

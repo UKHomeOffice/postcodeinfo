@@ -46,6 +46,7 @@ class S3Cache(object):
         """
 
         key_name = src.split('/')[-1]
+        
         try:
             key = self.bucket.get_key(key_name)
         except Exception as e:
@@ -55,30 +56,40 @@ class S3Cache(object):
                                   bucket_name=self.bucket_name))
             return super(S3Cache, self).download_file(src, dest)
 
-        def last_modified(k):
-            dt = dateparser.parse(k.last_modified)
-            if dt.tzinfo is None:
-                dt = pytz.UTC.localize(dt)
-            return dt
-
-        if key and last_modified(key) >= self.last_modified(src):
-
+        if self._download_needed(src, key):
             log.debug('downloading from s3 key {key_name} to {dest}'.format(
                 key_name=key_name, dest=dest))
-
             key.get_contents_to_filename(dest)
             return dest
 
         result = super(S3Cache, self).download_file(src, dest)
 
-        log.debug('uploading {dest} to s3 key {key_name}'.format(
-            key_name=key_name, dest=dest))
+        self._upload(dest, key_name)
 
-        key = Key(self.bucket, key_name)
+        return result
+
+    def _download_needed(self, src, key):
+        src_last_modified = self.last_modified(src)
+        dest_last_modified = self._last_modified_with_timezone(key)
+        return (key and dest_last_modified
+                and dest_last_modified >= src_last_modified)
+
+    def _upload(self, filename, keyname):
+        log.debug('uploading {filename} to s3 key {keyname}'.format(
+            keyname=keyname, filename=filename))
+
+        key = Key(self.bucket, keyname)
         try:
-            key.set_contents_from_filename(dest)
+            key.set_contents_from_filename(filename)
         except boto.exception.S3ResponseError:
             # ignore problems in the upload as we have the file locally
             pass
 
-        return result
+    def _last_modified_with_timezone(self, k):
+        try:
+            dt = dateparser.parse(k.last_modified)
+            if dt.tzinfo is None:
+                dt = pytz.UTC.localize(dt)
+            return dt
+        except:
+            pass
