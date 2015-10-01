@@ -61,11 +61,5 @@ class AddressBaseBasicDownloader(LocalCache, S3Cache, FtpDownloader):
             os.environ.get('OS_FTP_USERNAME'),
             os.environ.get('OS_FTP_PASSWORD'),
             '../from-os/')
-        # full_files = tmp_ftp._list('*/AddressBase_FULL_*')
-        # parsed_file_list = map(lambda fname: {'dir': fname.split(
-        #     '/')[0], 'file': fname.split('/')[-1]}, full_files)
-        # latest = sorted(parsed_file_list, key=lambda key: key['file'])[-1]
 
-        latest = tmp_ftp.find_dir_with_latest_file_matching('*/AddressBase_FULL_*')
-        if latest:
-            return latest['dir']
+        return tmp_ftp.find_dir_with_latest_file_matching('*/AddressBase_FULL_*')
