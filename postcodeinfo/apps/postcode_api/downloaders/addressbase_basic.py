@@ -57,9 +57,12 @@ class AddressBaseBasicDownloader(LocalCache, S3Cache, FtpDownloader):
         # have to create new object rather than exploiting the
         # inheritance heirarchy, as this method is called during
         # initialisation
+        root_path = '../from-os/'
         tmp_ftp = FtpDownloader('osmmftp.os.uk',
             os.environ.get('OS_FTP_USERNAME'),
             os.environ.get('OS_FTP_PASSWORD'),
-            '../from-os/')
+            root_path)
 
-        return tmp_ftp.find_dir_with_latest_file_matching('*/AddressBase_FULL_*')
+        latest_dir = tmp_ftp.find_dir_with_latest_file_matching('*/AddressBase_FULL_*')
+        if latest_dir:
+            return root_path + latest_dir
