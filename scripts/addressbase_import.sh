@@ -24,8 +24,8 @@ function create_tmp_table_sql {
       ORGANISATION_NAME varchar(120), 
       DEPARTMENT_NAME varchar(120), 
       PO_BOX_NUMBER varchar(12), 
-      BUILDING_NAME varchar(100), 
       SUB_BUILDING_NAME varchar(60), 
+      BUILDING_NAME varchar(100), 
       BUILDING_NUMBER integer, 
       DEPENDENT_THOROUGHFARE_NAME varchar(160), 
       THOROUGHFARE_NAME varchar(160), 
@@ -35,14 +35,16 @@ function create_tmp_table_sql {
       POSTCODE varchar(16), 
       POSTCODE_TYPE char(2), 
       X_COORDINATE float, 
-      Y_COORDINATE float, 
-      RPC integer, 
+      Y_COORDINATE float,
+      LATITUDE float,
+      LONGITUDE float,
+      RPC integer,
+      COUNTRY char(3),
       CHANGE_TYPE char(2), 
-      START_DATE date, 
+      LA_START_DATE date, 
+      RM_START_DATE date,
       LAST_UPDATE_DATE date, 
-      ENTRY_DATE date, 
-      CLASS char(2), 
-      PROCESS_DATE date
+      CLASS char(2)
     );
   "
 }
@@ -90,9 +92,7 @@ function convert_data_sql {
       change_type,
       start_date,
       last_update_date,
-      entry_date,
       primary_class,
-      process_date,
       postcode_area
     ) SELECT 
       cast(UPRN AS varchar(12)),
@@ -109,25 +109,21 @@ function convert_data_sql {
       POST_TOWN, 
       DOUBLE_DEPENDENT_LOCALITY, 
       DEPENDENT_LOCALITY, 
-      st_transform(ST_GeomFromText('POINT('||X_COORDINATE||' '||Y_COORDINATE||')',$BRITISH_NATIONAL_GRID),$WGS84),
+      ST_SetSRID(ST_MakePoint(LONGITUDE, LATITUDE), $WGS84),
       POSTCODE, 
       lower(regexp_replace(POSTCODE, ' ', '')),
       POSTCODE_TYPE, 
       RPC, 
       CHANGE_TYPE, 
-      START_DATE, 
+      RM_START_DATE, 
       LAST_UPDATE_DATE, 
-      ENTRY_DATE, 
       CLASS, 
-      PROCESS_DATE,
       lower(split_part(POSTCODE, ' ', 1))
     FROM $TEMP_TABLE_NAME;
 
     TRUNCATE TABLE $TEMP_TABLE_NAME;
   "
 }
-
-
 
 
 # Main processing actually starts here
