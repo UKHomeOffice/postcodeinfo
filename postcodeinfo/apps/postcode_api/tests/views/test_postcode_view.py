@@ -64,8 +64,8 @@ class PostcodeViewTestCase(TransactionTestCase):
         self.assertEqual('E09000003', parsed['local_authority']['gss_code'])
 
         lon, lat = parsed['centre']['coordinates']
-        self.assertAlmostEqual(51.59125130451485, lat)
-        self.assertAlmostEqual(-0.16635044363607124, lon)
+        self.assertAlmostEqual(51.59124066, lat)
+        self.assertAlmostEqual(-0.16658663, lon)
 
     def assert_has_country(self, response):
         parsed = json.loads(response.content)

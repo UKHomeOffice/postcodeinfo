@@ -45,5 +45,5 @@ class AddressBaseBasicImporterTest(django.test.TransactionTestCase):
             '50 Beatty Crescent\nKirkcaldy\nKY1 2HS',
             address.formatted_address)
         lon, lat = address.point.coords
-        self.assertAlmostEqual(56.1277867963, lat)
-        self.assertAlmostEqual(-3.1481671533, lon)
+        self.assertAlmostEqual(56.1277805, lat)
+        self.assertAlmostEqual(-3.148169, lon)
