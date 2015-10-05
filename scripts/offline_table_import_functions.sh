@@ -83,9 +83,18 @@ function run_import {
   echo "creating temporary import table"
   exec_sql "$(create_tmp_table_sql)"
 
+  expected_columns=$(columns_in_table "$TEMP_TABLE_NAME")
+
   for filename in $@; do
-    echo "importing ${filename}"
-    import_file $filename
+    cols_in_file=$(columns_in_csv $filename)
+    if [ "${cols_in_file}" == "${expected_columns}" ]; then
+      echo "importing ${filename}"
+      import_file $filename
+    else
+      echo "file ${filename} has ${cols_in_file} columns - expected ${expected_columns} - aborting!"
+      exec_sql "DROP TABLE $TEMP_TABLE_NAME;"
+      exit 1
+    fi
   done
 
   echo "converting data"
@@ -94,4 +103,13 @@ function run_import {
   exec_in_transaction "$(convert_data_sql)" && \
    exec_in_transaction "$(cleanup_tables_sql)" && \
    exec_in_transaction "$(rename_indexes_sql $LIVE_TABLE_NAME $OFFLINE_TABLE_NAME $LIVE_TABLE_NAME)"
+}
+
+# count the number of columns in a single line of csv
+function columns_in_csv {
+  echo $(awk -F, 'NR==1 { print NF }' $1)
+}
+
+function columns_in_table {
+  echo $(exec_sql "select count(column_name) from information_schema.columns where table_name='$1'")
 }
