@@ -71,7 +71,7 @@ class S3Cache(object):
     def _download_needed(self, src, key):
         src_last_modified = self.last_modified(src)
         dest_last_modified = self._last_modified_with_timezone(key)
-        return (key and dest_last_modified
+        return (key and dest_last_modified and src_last_modified
                 and dest_last_modified >= src_last_modified)
 
     def _upload(self, filename, keyname):
