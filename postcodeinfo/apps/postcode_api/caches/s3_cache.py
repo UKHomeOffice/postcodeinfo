@@ -6,12 +6,11 @@ S3-based Cache implementation
 import logging
 
 import boto
-from boto.s3.key import Key
-from dateutil import parser as dateparser
 from django.conf import settings
-import pytz
 
 from postcode_api.caches.cache import Cache
+
+log = logging.getLogger(__name__)
 
 
 class S3Cache(Cache):
@@ -24,7 +23,7 @@ class S3Cache(Cache):
         self.bucket_name = kwargs.pop('bucket', None)
         if self.bucket_name is None:
             self.bucket_name = settings.AWS['s3_bucket_name']
-        
+
     @property
     def bucket(self):
         if self._bucket is None:
@@ -32,27 +31,24 @@ class S3Cache(Cache):
             self._bucket = conn.get_bucket(self.bucket_name)
         return self._bucket
 
-    def key_for(self, object_identifier):
-        """ 
-        S3 can handle filenames with slash-separators transparently
-        """
-        return object_identifier
-
     def _s3_key(self, cache_key):
-        return Key(self.bucket, self.key_for(cache_key))
+        return boto.s3.key.Key(self.bucket, cache_key)
 
     def has(self, cache_key):
         return self._s3_key(cache_key).exists()
 
     def get(self, cache_key, dest_filename):
-        return self._s3_key(cache_key).get_contents_to_filename(dest_filename)
+        if self.has(cache_key):
+            return self._s3_key(cache_key).get_contents_to_filename(dest_filename)
 
-    def put(self, filename):
-        s3_key = self._s3_key(self.key_for(filename))
-        return s3_key.set_contents_from_filename(filename)
+    def put(self, key, local_filename):
+        s3_key = self._s3_key(local_filename)
+        return s3_key.set_contents_from_filename(local_filename)
 
     def delete(self, cache_key):
-        return self._s3_key(cache_key).delete()
+        if self.has(cache_key):
+            return self._s3_key(cache_key).delete()
 
     def last_modified(self, cache_key):
-        return self._s3_key(cache_key).last_modified
+        if self.has(cache_key):
+            return self._s3_key(cache_key).last_modified
