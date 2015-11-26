@@ -32,6 +32,10 @@ class FilesystemCache(Cache):
 
     def get(self, cache_key, dest_filename):
         if self.has(cache_key):
+            if self._full_path(cache_key) == dest_filename:
+                log.warn('dest_filename and cached file are the same! {filepath}'.format(filepath=dest_filename))
+                return dest_filename
+            
             return shutil.copy2(self._full_path(cache_key), dest_filename)
 
     def put(self, cache_key, filename):

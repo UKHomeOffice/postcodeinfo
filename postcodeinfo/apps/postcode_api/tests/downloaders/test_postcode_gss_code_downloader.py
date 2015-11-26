@@ -3,6 +3,34 @@ import mock
 import unittest
 
 from postcode_api.downloaders.postcode_gss_code import PostcodeGssCodeDownloader
+from postcode_api.downloaders.download_manager import DownloadManager
+
+
+def mock_index_json(*args, **kwargs):
+    latest = kwargs.pop('latest', datetime.datetime(2015, 7, 7) )
+    older = kwargs.pop('older', datetime.datetime(2015, 5, 2) )
+    title = kwargs.pop('title', 'National Statistics Postcode Lookup (UK)' )
+
+    j = {
+            'records': [
+                {
+                    'title': title,
+                    'updated': latest,
+                    'links': [
+                        {
+                            'type': 'open',
+                            'href': 'http://example.com/csv1'},
+                        {
+                            'type': 'details',
+                            'href': 'http://example.com/nope'}]},
+                {
+                    'title': title,
+                    'updated': older,
+                    'links': [
+                        {
+                            'type': 'open',
+                            'href': 'http://example.com/csv2'}]}]}
+    return j
 
 
 class PostcodeGssCodeDownloaderTest(unittest.TestCase):
@@ -19,33 +47,11 @@ class PostcodeGssCodeDownloaderTest(unittest.TestCase):
 
     def test_downloads_latest_record(self):
 
-        with mock.patch.object(PostcodeGssCodeDownloader, 'download_file'), \
+        with mock.patch.object(DownloadManager, 'download') as mock_file_download, \
                 mock.patch('requests.get') as http_get:
 
-            latest = datetime.datetime(2015, 7, 7)
-            older = datetime.datetime(2015, 5, 2)
-
             mock_index = mock.MagicMock()
-            title = 'National Statistics Postcode Lookup (UK)'
-            mock_index.json.return_value = {
-                'records': [
-                    {
-                        'title': title,
-                        'updated': latest,
-                        'links': [
-                            {
-                                'type': 'open',
-                                'href': 'http://example.com/csv1'},
-                            {
-                                'type': 'details',
-                                'href': 'http://example.com/nope'}]},
-                    {
-                        'title': title,
-                        'updated': older,
-                        'links': [
-                            {
-                                'type': 'open',
-                                'href': 'http://example.com/csv2'}]}]}
+            mock_index.json.return_value = mock_index_json()
 
             def index_then_csv(*args, **kwargs):
                 if '/rest/find/document' in args[0]:
@@ -58,3 +64,4 @@ class PostcodeGssCodeDownloaderTest(unittest.TestCase):
             downloader.download('/tmp')
 
             self.assertEqual(1, mock_index.json.call_count)
+            mock_file_download.assert_called_with(url='http://example.com/csv1')
