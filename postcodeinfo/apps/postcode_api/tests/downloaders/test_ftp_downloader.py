@@ -49,7 +49,7 @@ class FTPDownloaderTest(unittest.TestCase):
             ftp.dir.side_effect = self.mock_ftp_dir(pattern, num_files)
 
             downloader = FtpDownloader('host', 'user', 'pass')
-            files = downloader._list(pattern)
+            files = downloader.list(pattern)
 
             ftp.dir.assertCalledWith(pattern)
             self.assertEqual(num_files, len(files))
@@ -116,7 +116,7 @@ class FTPDownloaderTest(unittest.TestCase):
             ftp.dir.side_effect = self.mock_ftp_dir('*.zip', 10)
 
             downloader = FtpDownloader('host', 'user', 'pass')
-            downloader._list('*.zip')
+            downloader.list('*.zip')
             last_modified = downloader.last_modified('1.zip')
             self.assertEqual(dt, last_modified)
 
@@ -125,5 +125,5 @@ class FTPDownloaderTest(unittest.TestCase):
 
         with mock.patch('ftplib.FTP'):
             downloader = FtpDownloader('host', 'user', 'pass')
-            downloader._list = mock.MagicMock(return_value=mock_files)
+            downloader.list = mock.MagicMock(return_value=mock_files)
             self.assertEqual( downloader.find_dir_with_latest_file_matching('*/file-*'), 'dir-c' )

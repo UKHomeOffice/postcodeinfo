@@ -1,6 +1,5 @@
 import datetime
 import mock
-import time
 import unittest
 
 from postcode_api.downloaders.s3 import S3Cache

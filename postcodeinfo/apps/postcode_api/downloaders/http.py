@@ -4,12 +4,13 @@ HTTP downloader class
 """
 
 from dateutil import parser as dateparser
+
+import cgi
 import logging
 import os
-import tempfile
-
 import pytz
 import requests
+import tempfile
 
 
 log = logging.getLogger(__name__)
@@ -71,6 +72,12 @@ class HttpDownloader(object):
             r = requests.head(src, allow_redirects=True)
             self._headers[src] = r.headers
         return self._headers[src]
+
+    def attachment_filename( self, headers=None ):
+        if headers == None:
+            headers = self._get_headers(self.url)
+        disposition, value = cgi.parse_header(headers['Content-Disposition'])
+        return value['filename']
 
     def last_modified(self, src=None):
         """
