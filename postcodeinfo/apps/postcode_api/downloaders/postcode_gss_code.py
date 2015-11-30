@@ -15,7 +15,7 @@ from postcode_api.caches.filesystem_cache import FilesystemCache
 from postcode_api.caches.multi_level_caching_strategy import MultiLevelCachingStrategy
 from postcode_api.downloaders.download_manager import DownloadManager
 
-class PostcodeGssCodeDownloader(LocalCache, S3Cache, HttpDownloader):
+class PostcodeGssCodeDownloader(object):
 
     def __init__(self, *args, **kwargs):
         self.index_url = (

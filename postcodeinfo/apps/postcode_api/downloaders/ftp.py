@@ -41,7 +41,7 @@ class FtpDownloader(HttpDownloader):
         if dest_dir is None:
             dest_dir = tempfile.mkdtemp(prefix=self.__class__.__name__)
 
-        files = self._list(pattern)
+        files = self.list(pattern)
         log.debug('%i files matching %s' % (len(files), pattern))
 
         def download(filename):
@@ -115,7 +115,7 @@ class FtpDownloader(HttpDownloader):
             elements = path.split('/')
             return {'dir': elements[0], 'file': elements[-1]}
 
-        all_matching_files = self._list(pattern)
+        all_matching_files = self.list(pattern)
         if all_matching_files:
             parsed_file_list = map(parse_relative_path, all_matching_files)
             latest = sorted(parsed_file_list,
@@ -123,7 +123,7 @@ class FtpDownloader(HttpDownloader):
 
             return latest['dir']
 
-    def _list(self, pattern):
+    def list(self, pattern):
         files = {}
 
         def parse_ls_line(line):

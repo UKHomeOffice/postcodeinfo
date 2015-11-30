@@ -28,7 +28,7 @@ class MultiLevelCachingStrategy:
                         cache_key=cache_key, cache=cache))
                 last_mod = cache.last_modified(cache_key)
                 if self.is_newer(last_mod, best):
-                    log.info("better than previous best {best}", best)
+                    log.info("better than previous best {best}".format(best=str(best)))
                     best = {'cache': cache,
                             'key': cache_key,
                             'last_modified': cache.last_modified(cache_key)
@@ -44,6 +44,8 @@ class MultiLevelCachingStrategy:
 
     def put(self, cache_key, local_filepath):
         for cache in self.caches:
+            log.info('putting {file} to {cache} with key {key}'.format(
+                file=local_filepath, cache=str(cache), key=cache_key))
             cache.put(cache_key, local_filepath)
 
     def is_newer(self, last_modified, best):

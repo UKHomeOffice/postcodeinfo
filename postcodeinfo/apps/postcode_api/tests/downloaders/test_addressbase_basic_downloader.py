@@ -1,11 +1,17 @@
 # -*- encoding: utf-8 -*-
-import mock
-import unittest
+import mock, shutil, unittest
 
 from postcode_api.downloaders import AddressBaseBasicDownloader
-
+from random_temp_dir import RandomTempDir
 
 class AddressBaseBasicDownloaderTest(unittest.TestCase):
+
+    def setUp(self):
+        self.root_dir = RandomTempDir()
+        self.temp_file_path = self.root_dir.temp_file_path()
+
+    def tearDown(self):
+        shutil.rmtree(self.root_dir.full_path, True)
 
     def mock_env(self, env=None):
         if env is None:
@@ -29,7 +35,7 @@ class AddressBaseBasicDownloaderTest(unittest.TestCase):
     def test_passes_ftp_credentials(self):
         with mock.patch('ftplib.FTP') as ftp_class, self.mock_env():
             ftp = ftp_class.return_value
-            AddressBaseBasicDownloader().download()
+            AddressBaseBasicDownloader().download(self.root_dir.full_path)
             ftp_class.assertCalledWith('osmmftp.os.uk')
             ftp.login.assertCalledWith(
                 self.env['OS_FTP_USERNAME'], self.env['OS_FTP_PASSWORD'])
@@ -42,7 +48,7 @@ class AddressBaseBasicDownloaderTest(unittest.TestCase):
                 mock.patch(logger) as log, \
                 self.mock_env({}):
 
-            AddressBaseBasicDownloader().download()
+            AddressBaseBasicDownloader().download(self.root_dir.full_path)
 
             log.error.assert_has_calls([
                 mock.call('OS_FTP_USERNAME not set!'),
@@ -52,7 +58,7 @@ class AddressBaseBasicDownloaderTest(unittest.TestCase):
         self._mock_find_dir()
         with mock.patch('ftplib.FTP') as ftp_class, self.mock_env():
             ftp = ftp_class.return_value
-            AddressBaseBasicDownloader().download()
+            AddressBaseBasicDownloader().download(self.root_dir.full_path)
             self.assertTrue(ftp.dir.called)
             self.assertEqual('*_csv.zip', ftp.dir.call_args[0][0])
 
@@ -60,4 +66,5 @@ class AddressBaseBasicDownloaderTest(unittest.TestCase):
         self._mock_find_dir()
         with mock.patch('ftplib.FTP'), self.mock_env():
             dl = AddressBaseBasicDownloader()
+            dl.download(self.root_dir.full_path)
             self.assertTrue(dl.find_dir_with_latest_full_file.called)

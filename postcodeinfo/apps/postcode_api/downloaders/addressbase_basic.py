@@ -4,52 +4,71 @@ AddressBase Basic downloader class
 """
 
 import logging
-import ftplib
 import os
 
-from .filesystem import LocalCache
 from .ftp import FtpDownloader
-from .s3 import S3Cache
-
+from postcode_api.caches.s3_cache import S3Cache
+from .download_manager import DownloadManager
+from postcode_api.caches.filesystem_cache import FilesystemCache
+from postcode_api.caches.multi_level_caching_strategy import MultiLevelCachingStrategy
 
 log = logging.getLogger(__name__)
 
 
-class AddressBaseBasicDownloader(LocalCache, S3Cache, FtpDownloader):
+class AddressBaseBasicDownloader(object):
 
-    """
-    Ordnance Survey remove the files from the download directory after 21 days,
-    so we cache the files on Amazon S3 in case we need them after that time.
-    """
+    def __init__(self, *args, **kwargs):
+        self.ftp_host = kwargs.pop('ftp_host', 'osmmftp.os.uk')
+        self.ftp_username = kwargs.pop(
+            'ftp_username', os.environ.get('OS_FTP_USERNAME'))
+        self.ftp_password = kwargs.pop(
+            'ftp_password', os.environ.get('OS_FTP_PASSWORD'))
+        self._check_ftp_params_present()
+        self.caches = kwargs.pop('caches', self._default_caches())
+        self.caching_strategy = kwargs.pop('caching_strategy', self._default_caching_strategy())
 
-    def __init__(self):
-        if 'OS_FTP_USERNAME' not in os.environ:
+    def _default_caches(self):
+        return [
+            FilesystemCache(dir='/tmp/addressbase_basic'),
+            S3Cache()
+        ]
+
+    def _default_caching_strategy(self):
+        return MultiLevelCachingStrategy(caches=self.caches)
+
+    def _check_ftp_params_present(self):
+        if not self.ftp_username:
             log.error('OS_FTP_USERNAME not set!')
-
-        if 'OS_FTP_PASSWORD' not in os.environ:
+        if not self.ftp_password:
             log.error('OS_FTP_PASSWORD not set!')
 
-        super(AddressBaseBasicDownloader, self).__init__(
-            'osmmftp.os.uk',
-            os.environ.get('OS_FTP_USERNAME'),
-            os.environ.get('OS_FTP_PASSWORD'),
-            path=self.find_dir_with_latest_full_file())
 
-    def download(self, dest_dir=None):
+    def download(self, dest_dir):
         """
-        Execute the download.
-        Returns a list of downloaded files.
+        Fetch the URL of the latest NSPL CSV and download it.
         """
 
-        return super(AddressBaseBasicDownloader, self).download(
-            '*_csv.zip', dest_dir)
+        log.info('looking for dir with latest files')
+        latest_dir = self.find_dir_with_latest_full_file()
+        log.info('latest_dir = {latest_dir}'.format(latest_dir=latest_dir))
+
+        ftp_downloader = FtpDownloader(self.ftp_host,
+                                       self.ftp_username,
+                                       self.ftp_password,
+                                       path=latest_dir)
+
+        dl_mgr = DownloadManager(
+            destination_dir=dest_dir, downloader=ftp_downloader,
+            caching_strategy=self.caching_strategy)
+
+        return dl_mgr.download_all_matching(pattern='*_csv.zip')
 
     # Ordnance Survey's update mechanism creates a *new* order number
     # for every update, so we cannot predict ahead of time what the
     # directory path will be.
     # So we work it out as follows:
     # - the files are all called AddressBase_FULL_YYYY-MM-DD_NNN_csv.zip
-    # - get ALL the files matching that pattern in all the subidrectories
+    # - get ALL the files matching that pattern in all the subdirectories
     # - split into path / filename
     # - sort by filename
     # - the last file should be the latest, so use the directory containing it
@@ -59,10 +78,11 @@ class AddressBaseBasicDownloader(LocalCache, S3Cache, FtpDownloader):
         # initialisation
         root_path = '../from-os/'
         tmp_ftp = FtpDownloader('osmmftp.os.uk',
-            os.environ.get('OS_FTP_USERNAME'),
-            os.environ.get('OS_FTP_PASSWORD'),
-            root_path)
+                                os.environ.get('OS_FTP_USERNAME'),
+                                os.environ.get('OS_FTP_PASSWORD'),
+                                root_path)
 
-        latest_dir = tmp_ftp.find_dir_with_latest_file_matching('*/AddressBase_FULL_*')
+        latest_dir = tmp_ftp.find_dir_with_latest_file_matching(
+            '*/AddressBase_FULL_*')
         if latest_dir:
             return root_path + latest_dir
