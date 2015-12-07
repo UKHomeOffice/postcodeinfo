@@ -27,17 +27,15 @@ class HttpDownloader(object):
         self.chunk_size = int(os.environ.get('DOWNLOAD_CHUNK_SIZE', 4192))
         self._headers = {}
 
-    def download(self, dest_dir=None):
+    def download(self, *args, **kwargs):
         """
         Execute the download.
         Returns a list of downloaded files.
         """
-
-        if dest_dir is None:
-            dest_dir = tempfile.mkdtemp(prefix=self.__class__.__name__)
-
-        dest = os.path.join(dest_dir, self.url.split('/')[-1])
-        return [self.download_file(self.url, dest)]
+        dest_dir = kwargs.pop('dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
+        pattern = kwargs.pop('pattern', self.url)
+        dest = os.path.join(dest_dir, pattern.split('/')[-1])
+        return [self.download_file(pattern, dest)]
 
     def download_file(self, src, dest):
         """

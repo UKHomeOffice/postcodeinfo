@@ -32,14 +32,13 @@ class FtpDownloader(HttpDownloader):
         self._ftp = None
         self._headers = {}
 
-    def download(self, pattern, dest_dir=None):
+    def download(self, *args, **kwargs):
         """
         Execute the download.
         Returns a list of downloaded files.
         """
-
-        if dest_dir is None:
-            dest_dir = tempfile.mkdtemp(prefix=self.__class__.__name__)
+        dest_dir = kwargs.pop('dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
+        pattern = kwargs.pop('pattern')
 
         files = self.list(pattern)
         log.debug('%i files matching %s' % (len(files), pattern))

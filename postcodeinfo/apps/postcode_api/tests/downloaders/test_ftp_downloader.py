@@ -74,7 +74,7 @@ class FTPDownloaderTest(unittest.TestCase):
             mkdtemp.return_value = test_dir
 
             downloader = FtpDownloader('host', 'user', 'pass')
-            files = downloader.download(pattern)
+            files = downloader.download(pattern=pattern, dest_dir=test_dir)
 
             filename = lambda i: '{0}/{1}.zip'.format(test_dir, i)
 
