@@ -61,7 +61,7 @@ class DownloadManager(object):
 
     def download_and_put_to_cache(self, cache_key):
         log.info("not in cache - downloading")
-        downloaded_paths = self.downloader.download(self.destination_dir)
+        downloaded_paths = self.downloader.download(pattern=cache_key, dest_dir=self.destination_dir)
         for downloaded_path in downloaded_paths:
             log.info("putting to cache with key {key}".format(key=cache_key))
             self.caching_strategy.put(cache_key, downloaded_path)

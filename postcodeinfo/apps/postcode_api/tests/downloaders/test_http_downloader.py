@@ -44,9 +44,10 @@ class HttpDownloaderTest(unittest.TestCase):
             mkdtemp.return_value = test_dir
 
             for url, dest_dir, path in [
-                    (test_url, None, '%s/%s' % (test_dir, test_filename)),
+                    (test_url, test_dir, '%s/%s' % (test_dir, test_filename)),
                     (test_url, '/tmp', '/tmp/%s' % test_filename)]:
-                HttpDownloader(url).download(dest_dir)
+
+                HttpDownloader(url).download(pattern=test_url, dest_dir=dest_dir)
                 mock_open.assert_called_with(path, 'wb')
 
     def test_download_file(self):
@@ -60,7 +61,7 @@ class HttpDownloaderTest(unittest.TestCase):
             get.return_value.iter_content.return_value = iter(fake_data)
             url = 'http://example.com/dummy_url'
 
-            filename = HttpDownloader(url).download('/tmp')
+            filename = HttpDownloader(url).download(dest_dir='/tmp')
 
             self.assertEqual(['/tmp/dummy_url'], filename)
             self.mocked_file().write.assert_has_calls(
