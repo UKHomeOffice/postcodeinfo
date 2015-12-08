@@ -33,9 +33,9 @@ class HttpDownloader(object):
         Returns a list of downloaded files.
         """
         dest_dir = kwargs.pop('dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
-        pattern = kwargs.pop('pattern', self.url)
-        dest = os.path.join(dest_dir, pattern.split('/')[-1])
-        return [self.download_file(pattern, dest)]
+        url = kwargs.pop('url', self.url)
+        dest = os.path.join(dest_dir, url.split('/')[-1])
+        return [self.download_file(url, dest)]
 
     def download_file(self, src, dest):
         """
