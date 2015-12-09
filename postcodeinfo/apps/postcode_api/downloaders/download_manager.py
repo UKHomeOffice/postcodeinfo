@@ -33,17 +33,6 @@ class DownloadManager(object):
         else:
             return self.download_and_put_to_cache(cache_key, dest_dir)
 
-    def download_and_put_to_cache(self, cache_key, dest_dir=None):
-        dest_dir = dest_dir or self.destination_dir
-        log.info("not in cache - downloading")
-        downloaded_paths = self.downloader.download(
-            pattern=cache_key, dest_dir=dest_dir)
-        for downloaded_path in downloaded_paths:
-            log.info("putting to cache with key {key}".format(key=cache_key))
-            self.caching_strategy.put(cache_key, downloaded_path)
-
-        return downloaded_paths
-
     def download_all_matching(self, *args, **kwargs):
         pattern = kwargs.pop('pattern')
         files = self.downloader.list(pattern)
@@ -74,3 +63,13 @@ class DownloadManager(object):
         ]
         return MultiLevelCachingStrategy(caches=caches)
 
+    def download_and_put_to_cache(self, cache_key, dest_dir=None):
+        dest_dir = dest_dir or self.destination_dir
+        log.info("not in cache - downloading")
+        downloaded_paths = self.downloader.download(
+            pattern=cache_key, dest_dir=dest_dir)
+        for downloaded_path in downloaded_paths:
+            log.info("putting to cache with key {key}".format(key=cache_key))
+            self.caching_strategy.put(cache_key, downloaded_path)
+
+        return downloaded_paths
