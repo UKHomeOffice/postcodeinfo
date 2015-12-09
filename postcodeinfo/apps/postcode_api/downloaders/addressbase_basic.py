@@ -55,7 +55,7 @@ class AddressBaseBasicDownloader(object):
         ftp_downloader = FtpDownloader(self.ftp_host,
                                        self.ftp_username,
                                        self.ftp_password,
-                                       path=latest_dir)
+                                       latest_dir)
 
         dl_mgr = DownloadManager(
             destination_dir=dest_dir, downloader=ftp_downloader,
