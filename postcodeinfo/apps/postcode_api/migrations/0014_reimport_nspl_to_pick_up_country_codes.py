@@ -28,6 +28,7 @@ def rerun_nspl_import(apps, schema_editor):
 def dest_dir(path):
   if not os.path.exists(path):
     os.makedirs(path)
+  return path
 
 class Migration(migrations.Migration):
 
