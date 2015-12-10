@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from postcode_api.downloaders import AddressBaseBasicDownloader
 from postcode_api.importers.addressbase_basic_importer \
     import AddressBaseBasicImporter
-from postcode_api.utils import ZipExtractor
+from postcode_api.utils import ZipExtractor, flatten
 
 
 class Command(BaseCommand):
@@ -36,19 +36,27 @@ class Command(BaseCommand):
     def _process_all(self, files):
         if isinstance(files, list):
             files_to_process = []
-            for filepath in files:
+            for filepath in flatten(files):
                 extracted_files = ZipExtractor(filepath).unzip_if_needed(
                     '.*AddressBase_.*\.csv')
                 files_to_process += extracted_files
             self._import(files_to_process)
         else:
-            self._process(files)
+            self._process_file(files)
 
     def _process(self, filepath):
-        files = ZipExtractor(filepath).unzip_if_needed(
-            '.*AddressBase_.*\.csv')
+        if isinstance(filepath, list):
+            for filename in filepath:
+                self.process_file(filename)
+        else:
+            self.process_file(filepath)
 
+    def _process_file(self, path):
+        print 'processing {file}'.format(file=path)
+        files = ZipExtractor(path).unzip_if_needed(
+            '.*AddressBase_.*\.csv')
         self._import(files)
+                
 
     def _import(self, downloaded_files):
         importer = AddressBaseBasicImporter()
