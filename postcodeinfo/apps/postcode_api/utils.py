@@ -96,3 +96,16 @@ class ZipExtractor(object):
                 logging.debug('ignored ' + info.filename)
 
         return extracted_files
+
+# flatten a list in which each element may or may not be a list itself
+# from http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
+def flatten(x):
+    result = []
+    for el in x:
+        if hasattr(el, "__iter__") and not isinstance(el, basestring):
+            result.extend(flatten(el))
+        else:
+            result.append(el)
+    return result
+
+
