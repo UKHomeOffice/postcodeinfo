@@ -44,13 +44,6 @@ class Command(BaseCommand):
         else:
             self._process_file(files)
 
-    def _process(self, filepath):
-        if isinstance(filepath, list):
-            for filename in filepath:
-                self.process_file(filename)
-        else:
-            self.process_file(filepath)
-
     def _process_file(self, path):
         print 'processing {file}'.format(file=path)
         files = ZipExtractor(path).unzip_if_needed(
