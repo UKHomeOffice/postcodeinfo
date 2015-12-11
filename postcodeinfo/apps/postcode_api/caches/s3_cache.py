@@ -6,6 +6,7 @@ S3-based Cache implementation
 import logging
 
 import boto
+from boto.s3.key import Key
 from django.conf import settings
 
 from .cache import Cache
@@ -32,7 +33,7 @@ class S3Cache(Cache):
         return self._bucket
 
     def _s3_key(self, cache_key):
-        return boto.s3.key.Key(self.bucket, cache_key)
+        return Key(self.bucket, cache_key)
 
     def has(self, cache_key):
         return self._s3_key(cache_key).exists()

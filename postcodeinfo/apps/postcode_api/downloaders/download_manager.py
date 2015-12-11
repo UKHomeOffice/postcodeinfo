@@ -1,6 +1,7 @@
 import logging
 import os
 import errno
+import socket
 
 from ..caches.filesystem_cache import FilesystemCache
 from ..caches.s3_cache import S3Cache
@@ -70,6 +71,14 @@ class DownloadManager(object):
             pattern=cache_key, dest_dir=dest_dir)
         for downloaded_path in downloaded_paths:
             log.info("putting to cache with key {key}".format(key=cache_key))
-            self.caching_strategy.put(cache_key, downloaded_path)
+            self._put_to_cache(cache_key, downloaded_path)
 
         return downloaded_paths
+
+    def _put_to_cache(self, cache_key, local_path):
+        try:
+            self.caching_strategy.put(cache_key, local_path)
+        except socket.error:
+            log.exception('could not put {path} to cache as key {key}'.format(
+                path=local_path, key=cache_key))
+            pass
