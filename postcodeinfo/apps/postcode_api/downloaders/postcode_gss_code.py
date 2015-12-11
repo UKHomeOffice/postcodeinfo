@@ -5,15 +5,13 @@ Postcode GSS code downloader class
 
 import requests
 
-from .filesystem import LocalCache
 from .http import HttpDownloader
-from .s3 import S3Cache
 
-from postcode_api.downloaders.download_manager import DownloadManager
-from postcode_api.caches.s3_cache import S3Cache
-from postcode_api.caches.filesystem_cache import FilesystemCache
-from postcode_api.caches.multi_level_caching_strategy import MultiLevelCachingStrategy
-from postcode_api.downloaders.download_manager import DownloadManager
+from ..downloaders.download_manager import DownloadManager
+from ..caches.s3_cache import S3Cache
+from ..caches.filesystem_cache import FilesystemCache
+from ..caches.multi_level_caching_strategy import MultiLevelCachingStrategy
+
 
 class PostcodeGssCodeDownloader(object):
 
@@ -21,9 +19,9 @@ class PostcodeGssCodeDownloader(object):
         self.index_url = (
             'https://geoportal.statistics.gov.uk/geoportal'
             '/rest/find/document?searchText=NSPL&f=pjson')
-        self.dest_dir = kwargs.pop('destination_dir', '/tmp/postcode_gss_codes')
+        self.dest_dir = kwargs.pop(
+            'destination_dir', '/tmp/postcode_gss_codes')
         self.cache_key = 'postcode_gss_codes'
-
 
     def download(self, dest_dir):
         """

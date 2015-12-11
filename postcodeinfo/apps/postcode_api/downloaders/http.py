@@ -32,7 +32,8 @@ class HttpDownloader(object):
         Execute the download.
         Returns a list of downloaded files.
         """
-        dest_dir = kwargs.pop('dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
+        dest_dir = kwargs.pop(
+            'dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
         url = kwargs.pop('url', self.url)
         dest = os.path.join(dest_dir, url.split('/')[-1])
         return [self.download_file(url, dest)]
@@ -43,8 +44,8 @@ class HttpDownloader(object):
         """
 
         def download():
-            log.debug( 'downloading {src} to {dest}'.format(
-                src=src, dest=dest) )
+            log.debug('downloading {src} to {dest}'.format(
+                src=src, dest=dest))
             data = requests.get(src, stream=True)
             with open(dest, 'wb') as f:
                 for i, chunk in enumerate(data.iter_content(self.chunk_size)):
@@ -71,7 +72,7 @@ class HttpDownloader(object):
             self._headers[src] = r.headers
         return self._headers[src]
 
-    def attachment_filename( self, headers=None ):
+    def attachment_filename(self, headers=None):
         if headers == None:
             headers = self._get_headers(self.url)
         disposition, value = cgi.parse_header(headers['Content-Disposition'])

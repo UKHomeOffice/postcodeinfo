@@ -7,10 +7,10 @@ import logging
 import os
 
 from .ftp import FtpDownloader
-from postcode_api.caches.s3_cache import S3Cache
 from .download_manager import DownloadManager
-from postcode_api.caches.filesystem_cache import FilesystemCache
-from postcode_api.caches.multi_level_caching_strategy import MultiLevelCachingStrategy
+from ..caches.s3_cache import S3Cache
+from ..caches.filesystem_cache import FilesystemCache
+from ..caches.multi_level_caching_strategy import MultiLevelCachingStrategy
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +25,8 @@ class AddressBaseBasicDownloader(object):
             'ftp_password', os.environ.get('OS_FTP_PASSWORD'))
         self._check_ftp_params_present()
         self.caches = kwargs.pop('caches', self._default_caches())
-        self.caching_strategy = kwargs.pop('caching_strategy', self._default_caching_strategy())
+        self.caching_strategy = kwargs.pop(
+            'caching_strategy', self._default_caching_strategy())
 
     def _default_caches(self):
         return [
@@ -41,7 +42,6 @@ class AddressBaseBasicDownloader(object):
             log.error('OS_FTP_USERNAME not set!')
         if not self.ftp_password:
             log.error('OS_FTP_PASSWORD not set!')
-
 
     def download(self, dest_dir):
         """

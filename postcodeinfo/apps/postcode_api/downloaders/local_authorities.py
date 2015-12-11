@@ -3,14 +3,13 @@
 Local Authorities downloader class
 """
 
-import errno
 import logging
 import os
 
-from postcode_api.caches.s3_cache import S3Cache
-from postcode_api.caches.filesystem_cache import FilesystemCache
-from postcode_api.caches.multi_level_caching_strategy import MultiLevelCachingStrategy
-from postcode_api.downloaders.download_manager import DownloadManager
+from ..caches.s3_cache import S3Cache
+from ..caches.filesystem_cache import FilesystemCache
+from ..caches.multi_level_caching_strategy import MultiLevelCachingStrategy
+from ..downloaders.download_manager import DownloadManager
 
 from .http import HttpDownloader
 #from .s3 import S3Cache

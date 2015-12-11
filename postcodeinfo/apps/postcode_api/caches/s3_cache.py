@@ -6,9 +6,10 @@ S3-based Cache implementation
 import logging
 
 import boto
+from boto.s3.key import Key
 from django.conf import settings
 
-from postcode_api.caches.cache import Cache
+from .cache import Cache
 
 log = logging.getLogger(__name__)
 
@@ -32,14 +33,15 @@ class S3Cache(Cache):
         return self._bucket
 
     def _s3_key(self, cache_key):
-        return boto.s3.key.Key(self.bucket, cache_key)
+        return Key(self.bucket, cache_key)
 
     def has(self, cache_key):
         return self._s3_key(cache_key).exists()
 
     def get(self, cache_key, dest_filename):
         if self.has(cache_key):
-            return self._s3_key(cache_key).get_contents_to_filename(dest_filename)
+            return self._s3_key(cache_key).get_contents_to_filename(
+                dest_filename)
 
     def put(self, key, local_filename):
         s3_key = self._s3_key(local_filename)
