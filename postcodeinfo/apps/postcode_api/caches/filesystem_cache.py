@@ -11,7 +11,7 @@ import pytz
 from os.path import getmtime
 from time import mktime
 
-from postcode_api.caches.cache import Cache
+from .cache import Cache
 
 log = logging.getLogger(__name__)
 
@@ -33,19 +33,23 @@ class FilesystemCache(Cache):
     def get(self, cache_key, dest_filename):
         if self.has(cache_key):
             if self._full_path(cache_key) == dest_filename:
-                log.warn('dest_filename and cached file are the same! {filepath}'.format(filepath=dest_filename))
+                log.warn('dest_filename and cached file'
+                         ' are the same! {filepath}'.format(
+                             filepath=dest_filename))
                 return dest_filename
-            
+
             return shutil.copy2(self._full_path(cache_key), dest_filename)
 
     def put(self, cache_key, filename):
         dest_path = self._full_path(cache_key)
         log.info(
-            "putting {filename} to filesystem cache with key {key}, full path = {path}"
+            "putting {filename} to filesystem cache"
+            " with key {key}, full path = {path}"
             .format(filename=filename, key=cache_key, path=dest_path))
         if filename == dest_path:
-            log.error("{filename} and {dest_path} are the same - nothing to do!".format(
-                filename=filename, dest_path=dest_path))
+            log.error("{filename} and {dest_path} "
+                      "are the same - nothing to do!".format(
+                          filename=filename, dest_path=dest_path))
         else:
             shutil.copy2(filename, dest_path)
 

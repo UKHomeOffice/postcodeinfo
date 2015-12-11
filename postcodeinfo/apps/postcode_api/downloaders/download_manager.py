@@ -2,9 +2,9 @@ import logging
 import os
 import errno
 
-from postcode_api.caches.filesystem_cache import FilesystemCache
-from postcode_api.caches.s3_cache import S3Cache
-from postcode_api.caches.multi_level_caching_strategy import MultiLevelCachingStrategy
+from ..caches.filesystem_cache import FilesystemCache
+from ..caches.s3_cache import S3Cache
+from ..caches.multi_level_caching_strategy import MultiLevelCachingStrategy
 
 
 log = logging.getLogger(__name__)

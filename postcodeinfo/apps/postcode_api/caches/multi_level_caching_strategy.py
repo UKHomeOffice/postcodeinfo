@@ -28,14 +28,17 @@ class MultiLevelCachingStrategy:
                         cache_key=cache_key, cache=cache))
                 last_mod = cache.last_modified(cache_key)
                 if self.is_newer(last_mod, best):
-                    log.info("better than previous best {best}".format(best=str(best)))
+                    log.info(
+                        "better than previous best {best}".format(
+                            best=str(best)))
                     best = {'cache': cache,
                             'key': cache_key,
                             'last_modified': cache.last_modified(cache_key)
                             }
             else:
-                log.info("cache key {cache_key} not found in cache {cache}".format(
-                    cache_key=cache_key, cache=cache))
+                log.info("cache key {cache_key} not"
+                         " found in cache {cache}".format(
+                             cache_key=cache_key, cache=cache))
         if best:
             return best['cache'].get(best['key'], dest_filename)
 

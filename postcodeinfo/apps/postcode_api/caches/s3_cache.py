@@ -8,7 +8,7 @@ import logging
 import boto
 from django.conf import settings
 
-from postcode_api.caches.cache import Cache
+from .cache import Cache
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,8 @@ class S3Cache(Cache):
 
     def get(self, cache_key, dest_filename):
         if self.has(cache_key):
-            return self._s3_key(cache_key).get_contents_to_filename(dest_filename)
+            return self._s3_key(cache_key).get_contents_to_filename(
+                dest_filename)
 
     def put(self, key, local_filename):
         s3_key = self._s3_key(local_filename)

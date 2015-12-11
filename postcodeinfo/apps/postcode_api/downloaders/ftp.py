@@ -37,7 +37,8 @@ class FtpDownloader(HttpDownloader):
         Execute the download.
         Returns a list of downloaded files.
         """
-        dest_dir = kwargs.pop('dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
+        dest_dir = kwargs.pop(
+            'dest_dir', tempfile.mkdtemp(prefix=self.__class__.__name__))
         pattern = kwargs.pop('pattern')
 
         files = self.list(pattern)
