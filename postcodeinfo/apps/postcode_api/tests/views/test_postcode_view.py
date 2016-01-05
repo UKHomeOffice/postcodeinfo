@@ -57,12 +57,9 @@ class PostcodeViewTestCase(TransactionTestCase):
         return os.path.join(
             os.path.dirname(__file__), '../', 'sample_data/', filename)
 
-    def assert_json_structure(self, response):
+    def assert_has_coordinates(self, response):
         parsed = json.loads(response.content)
-        # local authority
-        self.assertEqual('Barnet', parsed['local_authority']['name'])
-        self.assertEqual('E09000003', parsed['local_authority']['gss_code'])
-
+        
         lon, lat = parsed['centre']['coordinates']
         self.assertAlmostEqual(51.59124066, lat)
         self.assertAlmostEqual(-0.16658663, lon)
@@ -72,6 +69,12 @@ class PostcodeViewTestCase(TransactionTestCase):
         # country
         self.assertEqual('England', parsed['country']['name'])
         self.assertEqual('E92000001', parsed['country']['gss_code'])
+
+    def assert_has_local_authority(self, response):
+        parsed = json.loads(response.content)
+        self.assertEqual('Barnet', parsed['local_authority']['name'])
+        self.assertEqual('E09000003', parsed['local_authority']['gss_code'])
+
 
 
 def valid_token(url):
@@ -100,7 +103,12 @@ def status_code(code):
 
 def json_ok(self, response):
     self.assert_produces_parseable_json(response)
-    self.assert_json_structure(response)
+
+def has_coordinates(self, response):
+    self.assert_has_coordinates(response)
+
+def has_local_authority(self, response):
+    self.assert_has_local_authority(response)
 
 
 def has_country(self, response):
@@ -120,11 +128,11 @@ cases = {
     # full postcodes
     'test_valid_postcode_and_valid_token': {
         'view': valid_token(postcode('N28AS')),
-        'assert': [status_code(200), json_ok, has_country]},
+        'assert': [status_code(200), json_ok, has_coordinates, has_local_authority, has_country]},
 
     'test_valid_postcode_with_space_and_valid_token': {
         'view': valid_token(postcode('N2%208AS')),
-        'assert': [status_code(200), json_ok, has_country]},
+        'assert': [status_code(200), json_ok, has_coordinates, has_local_authority, has_country]},
 
     'test_invalid_postcode_with_valid_token': {
         'view': valid_token(postcode('MUPP37')),
@@ -134,10 +142,13 @@ cases = {
         'view': invalid_token(postcode('N28AS')),
         'assert': [status_code(401)]},
 
-    # partial postcodes
     'test_valid_partial_postcode_valid_token': {
         'view': valid_token(partial('N2')),
-        'assert': [status_code(200), json_ok]},
+        'assert': [status_code(200), json_ok, has_coordinates, has_local_authority]},
+
+    'test_no_error_when_valid_partial_postcode_and_token_but_no_matching_local_authority': {
+        'view': valid_token(partial('NOT')),
+        'assert': [status_code(200), json_ok, has_coordinates]},
 
     'test_invalid_partial_postcode_valid_token_HTTP_404': {
         'view': valid_token(partial('N2MUPP37')),

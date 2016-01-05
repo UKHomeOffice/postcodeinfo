@@ -103,9 +103,9 @@ class LocalAuthorityManager(models.Manager):
 
             most_likely_gss_code = gss_codes.first()
             if most_likely_gss_code:
-                return LocalAuthority.objects.get(
+                return LocalAuthority.objects.filter(
                     gss_code=most_likely_gss_code[
-                        'local_authority_gss_code'])
+                        'local_authority_gss_code']).first()
 
 
 class CountryManager(models.Manager):
