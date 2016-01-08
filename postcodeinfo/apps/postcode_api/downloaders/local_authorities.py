@@ -5,6 +5,8 @@ Local Authorities downloader class
 
 import logging
 import os
+import re
+import requests
 
 from ..caches.s3_cache import S3Cache
 from ..caches.filesystem_cache import FilesystemCache
@@ -19,27 +21,46 @@ log = logging.getLogger(__name__)
 
 class LocalAuthoritiesDownloader():
 
-    def _authoritative_url(self):
-        default_url = 'http://opendatacommunities.org/downloads/graph?uri='\
-                      'http://opendatacommunities.org/graph/dev-'\
-                      'local-authorities'
+    def _index_url(self):
+        return os.environ.get('LOCAL_AUTHORITIES_INDEX_URL',
+                              ("https://geoportal.statistics.gov.uk/geoportal/"
+                               "rest/find/document?searchText="
+                               "Local%20Authority%20Districts%20UK&f=pjson"))
 
-        return os.environ.get('LOCAL_AUTHORITIES_DUMP_URL') or default_url
+    def _get_latest_file_url(self):
+        index = requests.get(self._index_url()).json()
+        la_records = filter(
+            self._is_uk_local_authorities_list, index['records'])
+        newest_record = sorted(
+            la_records, key=self._year_from_title, reverse=True)[0]
+        return filter(self._is_file_link, newest_record['links'])[0]
+
+    def _is_file_link(self, link):
+        return link['type'] == 'open'
+
+    def _is_uk_local_authorities_list(self, record):
+        title = record['title'].lower()
+        pattern = 'local authority districts \(uk\) .* names and codes'
+        return re.search(pattern, title)
+
+    def _year_from_title(self, record):
+        pattern = ('local authority districts \(uk\)'
+                   '.*([0-9]+).* names and codes')
+        return re.sub(pattern, '\1', record['title'])
 
     def __init__(self, *args, **kwargs):
         self.dest_dir = kwargs.pop('destination_dir', '/tmp/local_authorities')
 
-        self.cache_key = 'dev-local-authorities'
-        self.http_dl = HttpDownloader(self._authoritative_url())
+        self.cache_key = 'local-authorities-names-to-codes'
 
     def download(self, dest_dir):
-        dl_mgr = DownloadManager(
-            destination_dir=dest_dir, downloader=self.http_dl, caching_strategy=self._caching_strategy())
-        return dl_mgr.download(url=self._authoritative_url())
+        url = self._get_latest_file_url()['href']
 
-    def _local_filepath(self):
-        filename = self.http_dl.attachment_filename()
-        return os.path.join(self.dest_dir, filename)
+        dl_mgr = DownloadManager(
+            destination_dir=dest_dir,
+            downloader=HttpDownloader(url),
+            caching_strategy=self._caching_strategy())
+        return dl_mgr.download(url=url)
 
     def _caching_strategy(self):
         caches = [

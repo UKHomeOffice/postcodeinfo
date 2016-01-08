@@ -33,7 +33,7 @@ class PostcodeViewTestCase(TransactionTestCase):
         PostcodeGssCodeImporter().import_postcode_gss_codes(
             self._sample_data_file('NSPL_MAY_2015_Barnet_Sample.csv'))
         LocalAuthoritiesImporter().import_local_authorities(
-            self._sample_data_file('local_authorities_sample.nt'))
+            self._sample_data_file('local_authorities_sample.csv'))
 
     def tearDown(self):
         Address.objects.all().delete()

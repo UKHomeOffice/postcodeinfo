@@ -24,7 +24,8 @@ class Command(BaseCommand):
 
         downloaded_files = self._download(options['destination_dir'])
         if downloaded_files:
-            self._process(downloaded_files)
+            for path in downloaded_files:
+                self._import(path)
         else:
             print 'nothing downloaded - nothing to import'
 
@@ -33,15 +34,7 @@ class Command(BaseCommand):
         downloader = LocalAuthoritiesDownloader()
         return downloader.download(destination_dir)
 
-    def _process(self, filepath):
-        if isinstance(filepath, list):
-            filepath = filepath[0]
-        files = ZipExtractor(filepath).unzip_if_needed('.*\.nt')
-
-        for path in files:
-            print 'importing ' + path
-            self._import(path)
-
     def _import(self, downloaded_file):
+        print 'importing %{file}'.format(file=downloaded_file)
         importer = LocalAuthoritiesImporter()
         importer.import_local_authorities(downloaded_file)
