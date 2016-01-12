@@ -27,7 +27,7 @@ class DownloadManager(object):
         local_filepath = os.path.join(dest_dir, filename)
 
         self._make_sure_path_exists(dest_dir)
-        cached = self.caching_strategy.get(cache_key, local_filepath)
+        cached = self._get_from_cache_ignoring_errors(cache_key, local_filepath)
         if cached:
             log.info("found in cache!")
             return cached
@@ -49,6 +49,16 @@ class DownloadManager(object):
                 self.download(url=this_file, dest_dir=self.destination_dir))
 
         return downloaded
+
+    def _get_from_cache_ignoring_errors(self, cache_key, local_filepath):
+        try:
+            return self.caching_strategy.get(cache_key, local_filepath)
+        except:
+            msg = ('could not get {key} from cache to local_filepath {path}'
+                   ' but continuing anyway')
+            log.exception(msg.format(
+                path=local_filepath, key=cache_key))
+            pass
 
     def _make_sure_path_exists(self, path):
         try:
@@ -78,7 +88,7 @@ class DownloadManager(object):
     def _put_to_cache(self, cache_key, local_path):
         try:
             self.caching_strategy.put(cache_key, local_path)
-        except socket.error:
+        except:
             log.exception('could not put {path} to cache as key {key}'.format(
                 path=local_path, key=cache_key))
             pass
