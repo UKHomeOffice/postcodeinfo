@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import architect
+
 from django.contrib.gis.db import models
 from django.db.models import Count, signals
 from django.dispatch import receiver
@@ -21,7 +23,7 @@ class AddressManager(models.GeoManager):
             signals.pre_save.send(sender=Address, instance=obj)
         super(AddressManager, self).bulk_create(objs, batch_size=batch_size)
 
-
+@architect.install('partition', type='range', subtype='string_firstchars', constraint='1', column='postcode_index')
 class Address(models.Model):
     uprn = models.CharField(max_length=12, primary_key=True)
     os_address_toid = models.CharField(max_length=20, default='', blank=True)

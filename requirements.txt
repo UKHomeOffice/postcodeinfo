@@ -27,3 +27,4 @@ six==1.9.0
 SPARQLWrapper==1.6.4
 titlecase==0.7.2
 wheel==0.24.0
+architect==0.5.3
