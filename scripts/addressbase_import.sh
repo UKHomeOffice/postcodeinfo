@@ -137,25 +137,6 @@ function cleanup_tables_sql {
             WHERE postcode_index LIKE '$first_char%';"
     done
 
-  # echo "
-  #   SELECT 'removing tmp import table' AS status;
-  #   DROP TABLE $TEMP_TABLE_NAME;
-
-  #   SELECT 'copying indexes onto offline table' AS status;
-  #   `copy_indexes_sql`
-
-  #   SELECT 'renaming tables' AS status;
-  #   SELECT 'dropping $PREV_LIVE_TABLE_NAME' AS status;
-  #   DROP TABLE IF EXISTS $PREV_LIVE_TABLE_NAME;
-  #   SELECT 'renaming $LIVE_TABLE_NAME to $PREV_LIVE_TABLE_NAME' AS status;
-  #   ALTER TABLE $LIVE_TABLE_NAME RENAME TO $PREV_LIVE_TABLE_NAME;
-  #   $(rename_indexes_sql $LIVE_TABLE_NAME $LIVE_TABLE_NAME $PREV_LIVE_TABLE_NAME)
-
-  #   SELECT 'renaming $OFFLINE_TABLE_NAME to $LIVE_TABLE_NAME' AS status;
-  #   ALTER TABLE $OFFLINE_TABLE_NAME RENAME TO $LIVE_TABLE_NAME;
-  # "
-}
-
 
 # Main processing actually starts here
 if [ $# -eq 0 ]
