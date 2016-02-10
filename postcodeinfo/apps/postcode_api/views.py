@@ -27,9 +27,8 @@ class PostcodeView(generics.RetrieveAPIView):
 
     geom_query = 'postcode_index'
 
-    def __format_json(cls, geom, local_authority, country):
-        centre = geom.centroid.coords
-
+    def __format_json(cls, centre, local_authority, country):
+        
         if local_authority:
             local_authority = {
                 'name': local_authority.name,
@@ -52,10 +51,12 @@ class PostcodeView(generics.RetrieveAPIView):
         }
         return data
 
-    def _get_geometry(self, postcode):
+    def _get_centre_point(self, postcode):
         geom = Address.objects.filter(
             **{self.geom_query: postcode}).collect(field_name='point')
-        return geom
+        if geom:
+            centre = geom.centroid.coords
+            return centre
 
     def _get_local_authority(self, postcode):
         local_authority = LocalAuthority.objects.for_postcode(postcode)
@@ -74,7 +75,7 @@ class PostcodeView(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         postcode = kwargs.get('postcode', '').replace(' ', '').lower()
-        geom = self._get_geometry(postcode)
+        geom = self._get_centre_point(postcode)
 
         if geom:
             districts = self._get_administrative_districts(postcode)
@@ -87,8 +88,6 @@ class PostcodeView(generics.RetrieveAPIView):
 
 
 class PartialPostcodeView(PostcodeView):
-
-    geom_query = 'postcode_area'
 
     def _get_administrative_districts(self, postcode_area):
 
@@ -107,6 +106,9 @@ class PartialPostcodeView(PostcodeView):
             'local_authority': la,
             'country': country
         }
+
+    def _get_centre_point(self, postcode_area):
+        return Address.objects.get_centre_point(postcode_area)
 
 
 class MonitoringView(generics.RetrieveAPIView):
