@@ -136,7 +136,7 @@ function cleanup_tables_sql {
             SELECT * FROM $OFFLINE_TABLE_NAME
             WHERE postcode_index LIKE '$first_char%';"
     done
-
+}
 
 # Main processing actually starts here
 if [ $# -eq 0 ]
