@@ -126,6 +126,18 @@ function convert_data_sql {
 }
 
 
+function cleanup_tables_sql {
+    for first_char in {a..z} {0..9}
+    do
+      echo "SELECT 'deleting from ${LIVE_TABLE_NAME}_${first_char}' AS status;"
+      echo "TRUNCATE TABLE ${LIVE_TABLE_NAME}_${first_char};"
+      echo "SELECT 'inserting into ${LIVE_TABLE_NAME}_${first_char}' AS status;"
+      echo "INSERT INTO ${LIVE_TABLE_NAME}_${first_char}
+            SELECT * FROM $OFFLINE_TABLE_NAME
+            WHERE postcode_index LIKE '$first_char%';"
+    done
+}
+
 # Main processing actually starts here
 if [ $# -eq 0 ]
   then 

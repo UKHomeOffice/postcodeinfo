@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import architect
+
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import GEOSGeometry
+from django.db import connection
 from django.db.models import Count, signals
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
@@ -21,7 +25,22 @@ class AddressManager(models.GeoManager):
             signals.pre_save.send(sender=Address, instance=obj)
         super(AddressManager, self).bulk_create(objs, batch_size=batch_size)
 
+    def get_centre_point(self, postcode_area):
+        cursor = connection.cursor()
+        sql = """
+            SELECT ST_AsText(ST_Centroid(ST_Union(point))) AS center
+            FROM postcode_api_address
+            WHERE postcode_area=%s
+        """
+        cursor.execute(sql, [postcode_area])
+        first_row = cursor.fetchone()
+        if first_row and first_row[0]:
+            return tuple(GEOSGeometry(first_row[0]))
 
+
+@architect.install('partition',
+                   type='range', subtype='string_firstchars',
+                   constraint='1', column='postcode_index')
 class Address(models.Model):
     uprn = models.CharField(max_length=12, primary_key=True)
     os_address_toid = models.CharField(max_length=20, default='', blank=True)
@@ -76,11 +95,29 @@ def address_pre_save(sender, instance, *args, **kwargs):
     instance.postcode_area = instance.postcode.split(' ')[0].lower()
 
 
+class PostcodeGssCodeManager(models.Manager):
+
+    def most_common_in_area(self, postcode_area):
+        postcodes = Address.objects.filter(postcode_area=postcode_area).\
+            values_list('postcode_index', flat=True).\
+            distinct()
+        gss_codes = PostcodeGssCode.objects.filter(
+            postcode_index__in=postcodes).\
+            values('local_authority_gss_code', 'country_gss_code').\
+            annotate(count=Count('local_authority_gss_code')).\
+            order_by("-count")
+
+        return gss_codes.first()
+
+
 class PostcodeGssCode(models.Model):
+
     postcode_index = models.CharField(
         max_length=7, db_index=True, primary_key=True)
     local_authority_gss_code = models.CharField(max_length=9, db_index=True)
     country_gss_code = models.CharField(max_length=9, db_index=True, null=True)
+
+    objects = PostcodeGssCodeManager()
 
 
 class LocalAuthorityManager(models.Manager):
@@ -92,20 +129,15 @@ class LocalAuthorityManager(models.Manager):
             gss_code = postcode_to_gss_code_mapping.local_authority_gss_code
             return self.filter(gss_code=gss_code).first()
         else:
-            postcodes = Address.objects.filter(postcode_area=postcode)\
-                .values_list('postcode_index', flat=True)\
-                .distinct()
-            gss_codes = PostcodeGssCode.objects.filter(
-                postcode_index__in=postcodes).\
-                values('local_authority_gss_code').\
-                annotate(count=Count('local_authority_gss_code')).\
-                order_by("-count")
+            return self.for_postcode_area(postcode)
 
-            most_likely_gss_code = gss_codes.first()
-            if most_likely_gss_code:
-                return LocalAuthority.objects.filter(
-                    gss_code=most_likely_gss_code[
-                        'local_authority_gss_code']).first()
+    def for_postcode_area(self, postcode_area):
+        most_likely_gss_code = PostcodeGssCode.objects.most_common_in_area(
+            postcode_area)
+        if most_likely_gss_code:
+            return LocalAuthority.objects.filter(
+                gss_code=most_likely_gss_code[
+                    'local_authority_gss_code']).first()
 
 
 class CountryManager(models.Manager):
