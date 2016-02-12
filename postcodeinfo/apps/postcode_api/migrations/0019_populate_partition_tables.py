@@ -19,16 +19,15 @@ def partition_address_table(apps, schema_editor):
     dummy_date = time.strftime("%Y-%m-%d")
     all_possible_prefixes = string.ascii_lowercase + string.digits
     for first_char in all_possible_prefixes:
-        tmp_address = Address.objects.create(postcode_index=first_char*6,
-                                             point=Point(123, 123),
-                                             rpc=012345,
-                                             uprn=1234567890,
-                                             start_date=dummy_date,
-                                             last_update_date=dummy_date,
-                                             entry_date=dummy_date,
-                                             process_date=dummy_date
-                                             )
-        tmp_address.delete()
+        
+        sql = """
+            TRUNCATE TABLE postcode_api_address_{suffix};
+
+            INSERT INTO postcode_api_address_{suffix}
+            SELECT * FROM postcode_api_address
+            WHERE postcode_index LIKE %s;
+        """.format(suffix=first_char)
+        print "insert-selecting into partition {char}".format(char=first_char)
         schema_editor.execute(
             sql, ['{first_char}%'.format(first_char=first_char)])
 
@@ -36,7 +35,7 @@ def partition_address_table(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('postcode_api', '0015_add_ni_local_authorities'),
+        ('postcode_api', '0018_allow_null_process_date'),
     ]
 
     operations = [
