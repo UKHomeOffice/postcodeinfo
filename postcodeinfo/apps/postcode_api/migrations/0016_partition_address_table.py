@@ -29,14 +29,6 @@ def partition_address_table(apps, schema_editor):
                                              process_date=dummy_date
                                              )
         tmp_address.delete()
-        sql = """
-            INSERT INTO postcode_api_address_{suffix}
-            SELECT * FROM postcode_api_address
-            WHERE postcode_index LIKE %s;
-        """.format(suffix=first_char)
-        print "insert-selecting into partition {char}".format(char=first_char)
-        schema_editor.execute(
-            sql, ['{first_char}%'.format(first_char=first_char)])
 
 
 class Migration(migrations.Migration):
