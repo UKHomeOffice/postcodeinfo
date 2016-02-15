@@ -29,8 +29,6 @@ def partition_address_table(apps, schema_editor):
                                              process_date=dummy_date
                                              )
         tmp_address.delete()
-        schema_editor.execute(
-            sql, ['{first_char}%'.format(first_char=first_char)])
 
 
 class Migration(migrations.Migration):

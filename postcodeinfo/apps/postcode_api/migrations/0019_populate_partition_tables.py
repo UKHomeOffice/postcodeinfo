@@ -2,9 +2,7 @@
 from __future__ import unicode_literals
 
 import string
-import time
 
-from django.contrib.gis.geos import Point
 from django.db import migrations
 
 from postcode_api.models import Address
@@ -13,13 +11,8 @@ from postcode_api.models import Address
 def partition_address_table(apps, schema_editor):
     Address.architect.partition.get_partition().prepare()
 
-    # the partition tables are only lazily created on-demand, so let's
-    # aggressively pre-create them here by inserting & deleting an address
-    # with each possible prefix
-    dummy_date = time.strftime("%Y-%m-%d")
     all_possible_prefixes = string.ascii_lowercase + string.digits
     for first_char in all_possible_prefixes:
-        
         sql = """
             TRUNCATE TABLE postcode_api_address_{suffix};
 
