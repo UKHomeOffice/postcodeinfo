@@ -106,7 +106,7 @@ Alternatively, you can download and/or import the three required datasets indivi
 
 ### Download / Import OS AddressBase Basic CSV files
 
-Available from [http://www.ordnancesurvey.co.uk/business-and-government/help-and-support/products/how-to-buy.html](Ordnance Survey)
+Available from [Ordnance Survey](http://www.ordnancesurvey.co.uk/business-and-government/help-and-support/products/how-to-buy.html)
 
 The interface is complex and tricky to navigate - instructions on how to order exactly what is needed are in [docs/ordering-addressbase.md]
 
