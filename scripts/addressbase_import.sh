@@ -50,22 +50,15 @@ function create_tmp_table_sql {
 }
 
 
-# yes, get rid of any address named in the import, regardless of change type
-# as for an insert or update, we can just delete and (re-)insert
+# yes, get rid of anything from the live table, we're only doing full imports here
 function convert_data_sql {
   echo "
     DROP TABLE IF EXISTS $OFFLINE_TABLE_NAME;
 
     SELECT 'creating offline table' AS status;
     CREATE TABLE $OFFLINE_TABLE_NAME AS 
-      SELECT * from $LIVE_TABLE_NAME WHERE uprn NOT IN (
-        SELECT cast(UPRN AS varchar(12)) from $TEMP_TABLE_NAME WHERE CHANGE_TYPE='D'
-      );
-
-    SELECT 'removing uprns seen in the import from offline table' AS status;
-    DELETE FROM $OFFLINE_TABLE_NAME WHERE uprn IN (
-      SELECT cast(UPRN AS varchar(12)) FROM $TEMP_TABLE_NAME
-    );
+      SELECT * from $LIVE_TABLE_NAME LIMIT 1;
+    TRUNCATE TABLE $OFFLINE_TABLE_NAME;
 
     SELECT 'converting import data into offline address table' AS status;
     INSERT INTO $OFFLINE_TABLE_NAME
@@ -119,7 +112,8 @@ function convert_data_sql {
       LAST_UPDATE_DATE, 
       CLASS, 
       lower(split_part(POSTCODE, ' ', 1))
-    FROM $TEMP_TABLE_NAME;
+    FROM $TEMP_TABLE_NAME
+    WHERE lower(CHANGE_TYPE) != 'D';
 
     TRUNCATE TABLE $TEMP_TABLE_NAME;
   "
