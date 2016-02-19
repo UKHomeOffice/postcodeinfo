@@ -38,9 +38,6 @@ class AddressManager(models.GeoManager):
             return tuple(GEOSGeometry(first_row[0]))
 
 
-@architect.install('partition',
-                   type='range', subtype='string_firstchars',
-                   constraint='1', column='postcode_index')
 class Address(models.Model):
     uprn = models.CharField(max_length=12, primary_key=True)
     os_address_toid = models.CharField(max_length=20, default='', blank=True)

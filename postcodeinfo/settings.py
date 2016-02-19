@@ -193,6 +193,9 @@ AWS = {
     's3_bucket_name': os.environ.get('S3_BUCKET_NAME')
 }
 
+
+# Caching, as per 
+
 # django-axes is used for locking out user/ipaddress combinations who have
 # more than a certain number of failed logins
 AXES_LOGIN_FAILURE_LIMIT=5
