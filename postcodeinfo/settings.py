@@ -194,7 +194,19 @@ AWS = {
 }
 
 
-# Caching, as per 
+# Caching, for file-based cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'KEY_FUNCTION': 'postcode_api.caches.view_cache.make_key',
+        'LOCATION': '/var/cache/postcodeinfo',
+        'TIMEOUT': 60 * 24 * 5,
+        'OPTIONS': {
+            'CULL_FREQUENCY': 1000,
+            'MAX_ENTRIES': 1000000
+        }
+    }
+}
 
 # django-axes is used for locking out user/ipaddress combinations who have
 # more than a certain number of failed logins
