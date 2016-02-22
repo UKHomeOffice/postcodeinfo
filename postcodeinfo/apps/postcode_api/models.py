@@ -38,9 +38,6 @@ class AddressManager(models.GeoManager):
             return tuple(GEOSGeometry(first_row[0]))
 
 
-@architect.install('partition',
-                   type='range', subtype='string_firstchars',
-                   constraint='1', column='postcode_index')
 class Address(models.Model):
     uprn = models.CharField(max_length=12, primary_key=True)
     os_address_toid = models.CharField(max_length=20, default='', blank=True)
@@ -67,11 +64,11 @@ class Address(models.Model):
     postcode_type = models.CharField(max_length=1)
     rpc = models.PositiveSmallIntegerField()
     change_type = models.CharField(max_length=1)
-    start_date = models.DateField()
-    last_update_date = models.DateField()
-    entry_date = models.DateField()
+    start_date = models.DateField(null=True)
+    last_update_date = models.DateField(null=True)
+    entry_date = models.DateField(null=True)
     primary_class = models.CharField(max_length=1)
-    process_date = models.DateField()
+    process_date = models.DateField(null=True)
 
     objects = AddressManager()
 
@@ -164,10 +161,22 @@ class Country(models.Model):
     objects = CountryManager()
 
 
-class Download(models.Model):
-    url = models.CharField(max_length=2048, db_index=True)
-    last_modified = models.DateTimeField(auto_now=False, db_index=True)
-    etag = models.CharField(max_length=2048, db_index=True, null=True)
-    local_filepath = models.CharField(max_length=2048, db_index=True)
-    state = models.CharField(max_length=16, db_index=True)
-    last_state_change = models.DateTimeField(auto_now=False)
+class CacheVersionManager(models.Manager):
+
+    def latest_as_string(self):
+        obj = self.order_by('-timestamp').first()
+        if not obj == None:
+            return obj.format_timestamp()
+        else:
+            return '__no_cache_version__'
+
+
+class CacheVersion(models.Model):
+    timestamp = models.DateTimeField(auto_now=True, db_index=True)
+    last_addressbase_file = models.CharField(
+        max_length=128, db_index=True, null=True)
+
+    objects = CacheVersionManager()
+
+    def format_timestamp(self):
+        return self.timestamp.strftime('%Y-%m-%d-%H:%M:%S')

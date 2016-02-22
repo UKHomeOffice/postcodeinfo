@@ -26,6 +26,9 @@ ADD ./docker/nginx.service /etc/service/nginx/run
 ADD ./docker/gunicorn.service /etc/service/gunicorn/run
 ADD ./docker/syslog-format.conf /etc/syslog-ng/conf.d/001-format.conf
 
+# create cache dir owned by the web server
+RUN mkdir -p /var/cache/postcodeinfo && chown www-data /var/cache/postcodeinfo
+
 # Define mountable directories.
 VOLUME ["/var/log/nginx", "/var/log/gunicorn"]
 

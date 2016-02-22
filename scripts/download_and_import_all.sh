@@ -11,3 +11,11 @@ echo "Local Authorities"
 echo "*******************************************"
 echo "Postcode / GSS Codes"
 ./manage.py download_and_import_postcode_gss_codes
+
+echo "*******************************************"
+echo "writing new cache version"
+unset -v latest
+for file in "/tmp/addressbase_basic"/*; do
+  [[ $file -nt $latest ]] && latest=$file
+done
+./manage.py write_new_cache_version ${latest}
