@@ -114,8 +114,6 @@ function convert_data_sql {
       lower(split_part(POSTCODE, ' ', 1))
     FROM $TEMP_TABLE_NAME
     WHERE lower(CHANGE_TYPE) != 'D';
-
-    TRUNCATE TABLE $TEMP_TABLE_NAME;
   "
 }
 
