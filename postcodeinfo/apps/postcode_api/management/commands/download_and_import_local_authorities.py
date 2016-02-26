@@ -24,17 +24,10 @@ class Command(BaseCommand):
 
         downloaded_files = self._download(options['destination_dir'])
         if downloaded_files:
-            self._process_all(downloaded_files)
-        else:
-            print 'nothing downloaded - nothing to import'
-
-    def _process_all(self, files):
-        if isinstance(files, list):
-            for path in flatten(files):
+            for path in flatten([downloaded_files]):
                 self._import(path)
         else:
-            self._import(path)
-
+            print 'nothing downloaded - nothing to import'
 
     def _download(self, destination_dir):
         print 'downloading'
