@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from postcode_api.downloaders import LocalAuthoritiesDownloader
 from postcode_api.importers.local_authorities_importer \
     import LocalAuthoritiesImporter
-from postcode_api.utils import ZipExtractor
+from postcode_api.utils import flatten
 
 
 class Command(BaseCommand):
@@ -24,10 +24,17 @@ class Command(BaseCommand):
 
         downloaded_files = self._download(options['destination_dir'])
         if downloaded_files:
-            for path in downloaded_files:
-                self._import(path)
+            self._process_all(downloaded_files)
         else:
             print 'nothing downloaded - nothing to import'
+
+    def _process_all(self, files):
+        if isinstance(files, list):
+            for path in flatten(files):
+                self._import(path)
+        else:
+            self._import(path)
+
 
     def _download(self, destination_dir):
         print 'downloading'
@@ -35,6 +42,6 @@ class Command(BaseCommand):
         return downloader.download(destination_dir)
 
     def _import(self, downloaded_file):
-        print 'importing %{file}'.format(file=downloaded_file)
+        print 'importing {file}'.format(file=downloaded_file)
         importer = LocalAuthoritiesImporter()
         importer.import_local_authorities(downloaded_file)
