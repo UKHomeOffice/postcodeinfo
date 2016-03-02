@@ -14,7 +14,7 @@ def runProcess(exe, **kwargs):
 
     while p.poll() is None:
         line = p.stdout.readline()
-        logging.debug(line.rstrip())
+        logging.info(line.rstrip())
         
 
 class PSQLImportAdapter(object):

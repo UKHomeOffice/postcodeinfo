@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 
 from postcode_api.models import CacheVersion
 
-
 class Command(BaseCommand):
     args = 'latest_filename'
 
