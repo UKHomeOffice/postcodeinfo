@@ -32,7 +32,7 @@ class PostcodeViewTestCase(TransactionTestCase):
         AddressBaseBasicImporter().import_csv(
             self._sample_data_file('addressbase_basic_barnet_sample.csv'))
         PostcodeGssCodeImporter().import_postcode_gss_codes(
-            self._sample_data_file('NSPL_MAY_2015_Barnet_Sample.csv'))
+            self._sample_data_file('NSPL_FEB_2016_Barnet_Sample.csv'))
         LocalAuthoritiesImporter().import_local_authorities(
             self._sample_data_file('local_authorities_sample.csv'))
 

@@ -25,7 +25,7 @@ class PostcodeGssCodeImporterTestCase(TransactionTestCase):
             self._sample_data_file(file))
 
     def test_that_postcode_gss_code_objects_get_the_right_attributes(self):
-        self._import_data_from('NSPL_MAY_2015_sample.csv')
+        self._import_data_from('NSPL_FEB_2016_sample.csv')
         postcode_gss_code = PostcodeGssCode.objects.filter(
             postcode_index='ab10ad').first()
         self.assertEqual(
@@ -36,20 +36,20 @@ class PostcodeGssCodeImporterTestCase(TransactionTestCase):
     def test_that_when_new_postcode_gss_codes_are_imported_then_postcode_gss_code_records_get_created(self):
         # setup
         self.assertEqual(PostcodeGssCode.objects.count(), 0)
-        self._import_data_from('NSPL_MAY_2015_sample.csv')
+        self._import_data_from('NSPL_FEB_2016_sample.csv')
         # expectation
-        self.assertEqual(PostcodeGssCode.objects.count(), 9)
+        self.assertEqual(PostcodeGssCode.objects.count(), 15)
 
     def test_that_when_existing_postcode_gss_codes_are_imported_then_duplicate_postcode_gss_code_records_dont_get_created(self):
         # setup
-        self._import_data_from('NSPL_MAY_2015_sample.csv')
-        self.assertEqual(PostcodeGssCode.objects.count(), 9)
-        self._import_data_from('NSPL_MAY_2015_sample.csv')
+        self._import_data_from('NSPL_FEB_2016_sample.csv')
+        self.assertEqual(PostcodeGssCode.objects.count(), 15)
+        self._import_data_from('NSPL_FEB_2016_sample.csv')
         # expectation
-        self.assertEqual(PostcodeGssCode.objects.count(), 9)
+        self.assertEqual(PostcodeGssCode.objects.count(), 15)
 
     def test_that_it_does_not_import_the_header_row(self):
         # setup
-        self._import_data_from('NSPL_MAY_2015_sample.csv')
+        self._import_data_from('NSPL_FEB_2016_sample.csv')
         record = PostcodeGssCode.objects.filter(postcode_index='pcd').first()
         self.assertEqual(record, None)
