@@ -56,7 +56,7 @@ function create_tmp_table_sql {
       lep1 varchar(10),
       lep2 varchar(10),
       pfa varchar(10),
-      imd char(1)
+      imd varchar(10)
   );
   "
 }
