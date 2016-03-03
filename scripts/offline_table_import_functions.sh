@@ -71,7 +71,6 @@ function cleanup_tables_sql {
     DROP TABLE IF EXISTS $PREV_LIVE_TABLE_NAME;
     SELECT 'renaming $LIVE_TABLE_NAME to $PREV_LIVE_TABLE_NAME' AS status;
     ALTER TABLE $LIVE_TABLE_NAME RENAME TO $PREV_LIVE_TABLE_NAME;
-    $(rename_indexes_sql $LIVE_TABLE_NAME $LIVE_TABLE_NAME $PREV_LIVE_TABLE_NAME)
 
     SELECT 'renaming $OFFLINE_TABLE_NAME to $LIVE_TABLE_NAME' AS status;
     ALTER TABLE $OFFLINE_TABLE_NAME RENAME TO $LIVE_TABLE_NAME;
@@ -101,8 +100,7 @@ function run_import {
   # NOTE: the rename_indexes_sql must be generated AFTER
   # the cleanup_tables_sql has been run!
   exec_in_transaction "$(convert_data_sql)" && \
-   exec_in_transaction "$(cleanup_tables_sql)" && \
-   exec_in_transaction "$(rename_indexes_sql $LIVE_TABLE_NAME $OFFLINE_TABLE_NAME $LIVE_TABLE_NAME)"
+   exec_in_transaction "$(cleanup_tables_sql)" 
 }
 
 # count the number of columns in a single line of csv
