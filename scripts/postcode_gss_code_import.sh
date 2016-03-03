@@ -52,7 +52,11 @@ function create_tmp_table_sql {
       ru11ind char(2),
       oac11 char(3),
       lat float NULL,
-      long float NULL
+      long float NULL,
+      lep1 varchar(10),
+      lep2 varchar(10),
+      pfa varchar(10),
+      imd char(1)
   );
   "
 }
