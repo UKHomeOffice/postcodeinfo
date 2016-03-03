@@ -18,7 +18,7 @@ class PostcodeGssCodeDownloader(object):
     def __init__(self, *args, **kwargs):
         self.index_url = (
             'https://geoportal.statistics.gov.uk/geoportal'
-            '/rest/find/document?searchText=NSPL&f=pjson')
+            '/rest/find/document?searchText=NSPL&max=100&f=pjson')
         self.dest_dir = kwargs.pop(
             'destination_dir', '/tmp/postcode_gss_codes')
         self.cache_key = 'postcode_gss_codes'

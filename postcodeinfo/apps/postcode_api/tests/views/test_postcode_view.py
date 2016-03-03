@@ -1,6 +1,7 @@
 import json
 import os
 
+from django.core.cache import cache
 from django.test import TransactionTestCase
 from django.contrib.auth.models import User
 from postcode_api.models import Address
@@ -31,12 +32,13 @@ class PostcodeViewTestCase(TransactionTestCase):
         AddressBaseBasicImporter().import_csv(
             self._sample_data_file('addressbase_basic_barnet_sample.csv'))
         PostcodeGssCodeImporter().import_postcode_gss_codes(
-            self._sample_data_file('NSPL_MAY_2015_Barnet_Sample.csv'))
+            self._sample_data_file('NSPL_FEB_2016_Barnet_Sample.csv'))
         LocalAuthoritiesImporter().import_local_authorities(
             self._sample_data_file('local_authorities_sample.csv'))
 
     def tearDown(self):
         Address.objects.all().delete()
+        cache.clear()
 
     def request(self, path, **headers):
         token = headers.pop('token', None)
