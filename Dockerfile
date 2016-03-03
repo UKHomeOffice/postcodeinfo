@@ -1,11 +1,13 @@
 FROM phusion/baseimage:0.9.16
 
 # Dependencies
-RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && apt-get update && \
-  apt-get -y --force-yes install wget python-dev build-essential ncurses-dev \
-  software-properties-common python-software-properties libpq-dev binutils gdal-bin \
-  libproj-dev libgdal-dev python-gdal ncurses-dev postgresql-9.3-postgis-scripts nginx-full \
-  git-core
+RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && \
+  apt-get update && \
+  DEBIAN_FRONTEND='noninteractive' apt-get -y --force-yes install wget \
+  python-dev build-essential ncurses-dev software-properties-common \ 
+  python-software-properties libpq-dev binutils gdal-bin libproj-dev \
+  libgdal-dev python-gdal ncurses-dev postgresql-9.3-postgis-scripts \
+  nginx-full git-core
 
 # Due to an ubuntu bug (#1306991) we can't use the ubuntu provided pip package, so we're using
 # the recommended way: http://pip.readthedocs.org/en/latest/installing.html#install-pip
@@ -53,6 +55,9 @@ RUN ./manage.py collectstatic --noinput
 #ENV DB_PORT 5432
 
 EXPOSE 80
+
+# Slim down the image
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
