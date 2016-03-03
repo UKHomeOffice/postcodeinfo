@@ -1,6 +1,7 @@
 import json
 import os
 
+from django.core.cache import cache
 from django.test import TransactionTestCase
 from django.contrib.auth.models import User
 from postcode_api.models import Address
@@ -37,6 +38,7 @@ class PostcodeViewTestCase(TransactionTestCase):
 
     def tearDown(self):
         Address.objects.all().delete()
+        cache.clear()
 
     def request(self, path, **headers):
         token = headers.pop('token', None)

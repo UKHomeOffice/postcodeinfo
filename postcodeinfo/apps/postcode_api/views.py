@@ -1,5 +1,7 @@
 import os
 
+from django.core.cache import cache
+
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -10,6 +12,12 @@ from .models import Address, Country, LocalAuthority, PostcodeGssCode
 from .serializers import AddressSerializer
 
 from ignore_client_content_negotiation import IgnoreClientContentNegotiation
+
+def make_cache_key(request, name):
+    full_url = (request.path_info,
+            request.META['QUERY_STRING']).join('?')
+    prefix = str(request.user.id)
+    return (name, prefix, full_url).join('-')
 
 
 class AddressViewSet(viewsets.ReadOnlyModelViewSet):
@@ -74,17 +82,23 @@ class PostcodeView(generics.RetrieveAPIView):
         return districts
 
     def get(self, request, *args, **kwargs):
-        postcode = kwargs.get('postcode', '').replace(' ', '').lower()
-        geom = self._get_centre_point(postcode)
-
-        if geom:
-            districts = self._get_administrative_districts(postcode)
-            data = self.__format_json(
-                geom, districts['local_authority'], districts['country'])
-
+        data = cache.get('data')
+        if data and request.user.is_authenticated():
             return Response(data, status=status.HTTP_200_OK)
+        else:
 
-        return Response(None, status=status.HTTP_404_NOT_FOUND)
+            postcode = kwargs.get('postcode', '').replace(' ', '').lower()
+            geom = self._get_centre_point(postcode)
+
+            if geom:
+                districts = self._get_administrative_districts(postcode)
+                data = self.__format_json(
+                    geom, districts['local_authority'], districts['country'])
+                cache.set('data', data)
+
+                return Response(data, status=status.HTTP_200_OK)
+
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
 
 
 class PartialPostcodeView(PostcodeView):
