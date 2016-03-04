@@ -13,11 +13,12 @@ from .serializers import AddressSerializer
 
 from ignore_client_content_negotiation import IgnoreClientContentNegotiation
 
+
 def make_cache_key(request, name):
-    full_url = (request.path_info,
-            request.META['QUERY_STRING']).join('?')
+    full_url = '?'.join([request.path_info,
+                         request.META['QUERY_STRING']])
     prefix = str(request.user.id)
-    return (name, prefix, full_url).join('-')
+    return '-'.join([name, prefix, full_url])
 
 
 class AddressViewSet(viewsets.ReadOnlyModelViewSet):
@@ -36,7 +37,7 @@ class PostcodeView(generics.RetrieveAPIView):
     geom_query = 'postcode_index'
 
     def __format_json(cls, centre, local_authority, country):
-        
+
         if local_authority:
             local_authority = {
                 'name': local_authority.name,
@@ -82,7 +83,8 @@ class PostcodeView(generics.RetrieveAPIView):
         return districts
 
     def get(self, request, *args, **kwargs):
-        data = cache.get('data')
+        cache_key = make_cache_key(request, 'data')
+        data = cache.get(cache_key)
         if data and request.user.is_authenticated():
             return Response(data, status=status.HTTP_200_OK)
         else:
@@ -94,7 +96,7 @@ class PostcodeView(generics.RetrieveAPIView):
                 districts = self._get_administrative_districts(postcode)
                 data = self.__format_json(
                     geom, districts['local_authority'], districts['country'])
-                cache.set('data', data)
+                cache.set(cache_key, data)
 
                 return Response(data, status=status.HTTP_200_OK)
 
