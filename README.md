@@ -69,7 +69,7 @@ If you need to use the django built-in admin interface you would need to create 
 
 ```bash
 $ $(boot2docker shellinit)
-$ docker exec -ti postcode-web ./manage.py createsuperuser
+$ docker exec -ti postcodeinfo ./manage.py createsuperuser
 ```
 
 ### Setting variables used inside the container
@@ -89,7 +89,7 @@ In order to download and import the data we must execute the `download_and_impor
 
 ```bash
 $ $(boot2docker shellinit)
-$ docker exec -ti postcode-web /bin/bash
+$ docker exec -ti postcodeinfo /bin/bash
 $ ./scripts/download_and_import_all.sh
 $ exit
 ```

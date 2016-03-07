@@ -29,9 +29,9 @@ build_django_app_container() {
 
 django_manage() {
   printf $GREEN "Running ./manage.py $1"
-  docker rm postcode-web 2>/dev/null || :
+  docker rm postcodeinfo 2>/dev/null || :
   docker run --rm -ti -p 8000:8000 -v $(pwd):/srv/postcodeinfo \
-      --name postcode-web \
+      --name postcodeinfo \
       --link postcode-db:postgres \
       -e "DB_PASSWORD=postcodeinfo" \
       -e "DB_USER=postcodeinfo" \
