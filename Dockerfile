@@ -1,5 +1,6 @@
 FROM phusion/baseimage:0.9.16
 
+# Test Comment
 # Dependencies
 RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && \
   apt-get update && \
