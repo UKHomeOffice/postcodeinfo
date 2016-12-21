@@ -17,7 +17,7 @@ RED='\n\e[1;31m%-6s\e[m\n'
 run_postgis_container() {
   printf $GREEN "Postgis container not found or killed, cleaning up and starting a new one."
   docker rm postcode-db 2>/dev/null || :
-  docker run -p 5432:5432 --name postcode-db -e POSTGRES_PASSWORD=postcodeinfo -e POSTGRES_USER=postcodeinfo -d mdillon/postgis:9.3
+  docker run -p 5432:5432 --name postcode-db -e POSTGRES_PASSWORD=postcodeinfo -e POSTGRES_USER=postcodeinfo -d mdillon/postgis:9.4
 }
 
 
