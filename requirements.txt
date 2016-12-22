@@ -26,4 +26,5 @@ responses==0.3.0
 six==1.9.0
 SPARQLWrapper==1.6.4
 titlecase==0.7.2
+unittest2==1.1.0
 wheel==0.24.0
