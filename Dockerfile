@@ -2,11 +2,13 @@ FROM phusion/baseimage:0.9.16
 
 # Dependencies
 RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && \
+  sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'   &&\
+  curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -  && \
   apt-get update && \
   DEBIAN_FRONTEND='noninteractive' apt-get -y --force-yes install wget \
-  python-dev build-essential ncurses-dev software-properties-common \ 
+  python-dev build-essential ncurses-dev software-properties-common \
   python-software-properties libpq-dev binutils gdal-bin libproj-dev \
-  libgdal-dev python-gdal ncurses-dev postgresql-9.3-postgis-scripts \
+  libgdal-dev python-gdal ncurses-dev postgresql-9.4-postgis-scripts \
   nginx-full git-core
 
 # Due to an ubuntu bug (#1306991) we can't use the ubuntu provided pip package, so we're using
