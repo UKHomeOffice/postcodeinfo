@@ -1,17 +1,16 @@
 import os
 
 from django.core.cache import cache
-
+from django.contrib.gis.db.models import Collect
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework.response import Response
+from ignore_client_content_negotiation import IgnoreClientContentNegotiation
 
 from .models import Address, Country, LocalAuthority, PostcodeGssCode
 from .serializers import AddressSerializer
-
-from ignore_client_content_negotiation import IgnoreClientContentNegotiation
 
 
 def make_cache_key(request, name):
@@ -26,7 +25,7 @@ class AddressViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AddressSerializer
 
     def get_queryset(self):
-        postcode = self.request.QUERY_PARAMS.get('postcode', '').\
+        postcode = self.request.query_params.get('postcode', '').\
             replace(' ', '').lower()
 
         return self.queryset.filter(postcode_index=postcode)
@@ -62,7 +61,8 @@ class PostcodeView(generics.RetrieveAPIView):
 
     def _get_centre_point(self, postcode):
         geom = Address.objects.filter(
-            **{self.geom_query: postcode}).collect(field_name='point')
+            **{self.geom_query: postcode}
+        ).aggregate(Collect('point'))['point__collect']
         if geom:
             centre = geom.centroid.coords
             return centre
