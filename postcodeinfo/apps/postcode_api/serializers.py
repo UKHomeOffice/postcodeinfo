@@ -10,7 +10,7 @@ class AddressSerializer(GeoModelSerializer):
     def __init__(self, *args, **kwargs):
         super(AddressSerializer, self).__init__(*args, **kwargs)
 
-        fields = self.context['request'].QUERY_PARAMS.get('fields')
+        fields = self.context['request'].query_params.get('fields')
 
         if fields:
             fields = fields.split(',')
