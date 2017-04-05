@@ -2,10 +2,10 @@
   "title" : "Geoportal GeoRSS.",
   "description" : "Most recently updated metadata documents.",
   "copyright" : "",
-  "provider" : "https:\/\/geoportal.statistics.gov.uk\/geoportal",
+  "provider" : "http:\/\/geoportal.statistics.gov.uk\/geoportal",
   "updated" : "2015-04-05T16:14:56Z",
-  "source" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/find\/document?searchText=NSPL&f=pjson",
-  "more" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/find\/document?searchText=NSPL&f=pjson&start=11",
+  "source" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/find\/document?searchText=NSPL&f=pjson",
+  "more" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/find\/document?searchText=NSPL&f=pjson&start=11",
   "totalResults" : 12,
   "startIndex" : 1,
   "itemsPerPage" : 10,
@@ -26,15 +26,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/Explanation_of_the_differences_between_the_NSPL_and_the_ONSPD_v2.2.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/Explanation_of_the_differences_between_the_NSPL_and_the_ONSPD_v2.2.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B6A226E9B-2773-44F4-A5F8-D8AB0E231B00%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B6A226E9B-2773-44F4-A5F8-D8AB0E231B00%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B6A226E9B-2773-44F4-A5F8-D8AB0E231B00%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B6A226E9B-2773-44F4-A5F8-D8AB0E231B00%7D",
           "type" : "metadata"
         }
       ]
@@ -55,15 +55,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_AUG_2014_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_AUG_2014_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B9992801C-8454-4A7A-A84F-6DD25D622E0B%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B9992801C-8454-4A7A-A84F-6DD25D622E0B%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B9992801C-8454-4A7A-A84F-6DD25D622E0B%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B9992801C-8454-4A7A-A84F-6DD25D622E0B%7D",
           "type" : "metadata"
         }
       ]
@@ -84,15 +84,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_MAY_2014_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_MAY_2014_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BAFA00CD3-5F55-4980-8EC5-D94C68CED977%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BAFA00CD3-5F55-4980-8EC5-D94C68CED977%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BAFA00CD3-5F55-4980-8EC5-D94C68CED977%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BAFA00CD3-5F55-4980-8EC5-D94C68CED977%7D",
           "type" : "metadata"
         }
       ]
@@ -113,15 +113,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2014_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2014_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B21B8B70A-3F1B-400D-99A6-9F7094A78A85%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B21B8B70A-3F1B-400D-99A6-9F7094A78A85%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B21B8B70A-3F1B-400D-99A6-9F7094A78A85%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B21B8B70A-3F1B-400D-99A6-9F7094A78A85%7D",
           "type" : "metadata"
         }
       ]
@@ -142,15 +142,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2013_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2013_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BEBB87DB2-D25E-4A2A-98B4-FBE330E72E6B%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BEBB87DB2-D25E-4A2A-98B4-FBE330E72E6B%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BEBB87DB2-D25E-4A2A-98B4-FBE330E72E6B%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BEBB87DB2-D25E-4A2A-98B4-FBE330E72E6B%7D",
           "type" : "metadata"
         }
       ]
@@ -171,15 +171,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2012_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_NOV_2012_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B1F3D8B1C-3B6A-4CC8-8B28-6DB7E91EF6F3%7D",
           "type" : "metadata"
         }
       ]
@@ -200,15 +200,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_AUG_2013_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_AUG_2013_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BF48EC07C-B57F-4D03-82FC-B135F8E9502A%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BF48EC07C-B57F-4D03-82FC-B135F8E9502A%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BF48EC07C-B57F-4D03-82FC-B135F8E9502A%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BF48EC07C-B57F-4D03-82FC-B135F8E9502A%7D",
           "type" : "metadata"
         }
       ]
@@ -229,15 +229,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_FEB_2014_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_FEB_2014_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B364512BE-4509-4D65-9799-85AFB69B94D3%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B364512BE-4509-4D65-9799-85AFB69B94D3%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B364512BE-4509-4D65-9799-85AFB69B94D3%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B364512BE-4509-4D65-9799-85AFB69B94D3%7D",
           "type" : "metadata"
         }
       ]
@@ -258,15 +258,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_FEB_2015_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_FEB_2015_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B85944A27-DBF2-43CE-B543-0341537EEFE2%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7B85944A27-DBF2-43CE-B543-0341537EEFE2%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B85944A27-DBF2-43CE-B543-0341537EEFE2%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7B85944A27-DBF2-43CE-B543-0341537EEFE2%7D",
           "type" : "metadata"
         }
       ]
@@ -287,15 +287,15 @@
       },
       "links" : [
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_MAY_2013_V2_csv.zip",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/Docs\/PostCodes\/NSPL_MAY_2013_V2_csv.zip",
           "type" : "open"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BD14C75CE-95C6-4E9F-8753-ECDD88BC2B7D%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/catalog\/search\/resource\/details.page?uuid=%7BD14C75CE-95C6-4E9F-8753-ECDD88BC2B7D%7D",
           "type" : "details"
         },
         {
-          "href" : "https:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BD14C75CE-95C6-4E9F-8753-ECDD88BC2B7D%7D",
+          "href" : "http:\/\/geoportal.statistics.gov.uk\/geoportal\/rest\/document?id=%7BD14C75CE-95C6-4E9F-8753-ECDD88BC2B7D%7D",
           "type" : "metadata"
         }
       ]

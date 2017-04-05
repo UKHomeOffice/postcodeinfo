@@ -9,7 +9,7 @@ Postcode lookup RESTful API service.
 
 Data is taken from:
 * [Ordnance Survey AddressBase Basic](http://www.ordnancesurvey.co.uk/business-and-government/products/addressbase.html)
-* [National Statistics Postcode List](https://geoportal.statistics.gov.uk/geoportal)
+* [National Statistics Postcode List](http://geoportal.statistics.gov.uk/geoportal)
 * [Dept of Communities and Local Government list of local authorities](http://opendatacommunities.org/data/dev-local-authorities/)
 
 No data is included in this project due to copyright/licensing.
@@ -145,7 +145,7 @@ Estimated runtime: < 1 minute
 
 ### Download / Import NSPL Postcode/Local Authority GSS Code mapping files
 
-Available from the [Office for National Statistics](http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html) at their [Geoportal](https://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page) (search for 'NSPL' to find the latest file)
+Available from the [Office for National Statistics](http://www.ons.gov.uk/ons/guide-method/geography/products/postcode-directories/-nspp-/index.html) at their [Geoportal](http://geoportal.statistics.gov.uk/geoportal/catalog/main/home.page) (search for 'NSPL' to find the latest file)
 
 OR 
 

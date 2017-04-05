@@ -15,7 +15,7 @@ class Command(BaseCommand):
             raise CommandError(
                 'You must specify at least one csv file - '
                 'you might want to download one from, for example, '
-                'https://geoportal.statistics.gov.uk/geoportal/'
+                'http://geoportal.statistics.gov.uk/geoportal/'
                 'rest/find/document?searchText='
                 'Local%20Authority%20Districts%20UK&f=pjson')
 

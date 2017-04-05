@@ -23,7 +23,7 @@ class LocalAuthoritiesDownloader():
 
     def _index_url(self):
         return os.environ.get('LOCAL_AUTHORITIES_INDEX_URL',
-                              ("https://geoportal.statistics.gov.uk/geoportal/"
+                              ("http://geoportal.statistics.gov.uk/geoportal/"
                                "rest/find/document?searchText="
                                "Local%20Authority%20Districts%20UK&f=pjson"))
 
