@@ -75,28 +75,32 @@ class LargeTablePaginator(Paginator):
         Changed to use an estimate if the estimate is greater than 10,000
         Returns the total number of objects, across all pages.
         """
-        if self._count is None:
-            try:
-                estimate = 0
-                if not self.object_list.query.where:
-                    try:
-                        cursor = connection.cursor()
-                        cursor.execute(
-                            "SELECT reltuples "
-                            "FROM pg_class WHERE relname = %s",
-                            [self.object_list.query.model._meta.db_table])
-                        estimate = int(cursor.fetchone()[0])
-                    except:
-                        pass
-                if estimate < 10000:
-                    self._count = self.object_list.count()
-                else:
-                    self._count = estimate
-            except (AttributeError, TypeError):
-                # AttributeError if object_list has no count() method.
-                # TypeError if object_list.count() requires arguments
-                # (i.e. is of type list).
-                self._count = len(self.object_list)
+        try:
+            if self._count is not None:
+                return self._count
+        except AttributeError:
+            pass
+        try:
+            estimate = 0
+            if not self.object_list.query.where:
+                try:
+                    cursor = connection.cursor()
+                    cursor.execute(
+                        "SELECT reltuples "
+                        "FROM pg_class WHERE relname = %s",
+                        [self.object_list.query.model._meta.db_table])
+                    estimate = int(cursor.fetchone()[0])
+                except:
+                    pass
+            if estimate < 10000:
+                self._count = self.object_list.count()
+            else:
+                self._count = estimate
+        except (AttributeError, TypeError):
+            # AttributeError if object_list has no count() method.
+            # TypeError if object_list.count() requires arguments
+            # (i.e. is of type list).
+            self._count = len(self.object_list)
         return self._count
     count = property(_get_count)
 # /from https://djangosnippets.org/snippets/2593/
