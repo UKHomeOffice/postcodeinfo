@@ -190,7 +190,8 @@ if os.path.exists('/dev/log'):
         'class': 'logging.handlers.SysLogHandler',
         'address': '/dev/log',
         'formatter': 'logstash'}
-    LOGGING['loggers']['']['handlers'] = ['syslog']
+    if not DEBUG:
+        LOGGING['loggers']['']['handlers'] = ['syslog']
 
 
 if TESTING:
