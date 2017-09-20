@@ -188,7 +188,7 @@ You can specify which fields you want in the response with the `fields` kwarg:
 http://127.0.0.1:8000/addresses/?postcode=sw1a1aa&fields=formatted_address,point
 ```
 
-View the available fields [here](https://github.com/ministryofjustice/postcodeinfo/blob/develop/postcodeinfo/apps/postcode_api/serializers.py#L25)
+View the available fields [here](https://github.com/ministryofjustice/postcodeinfo/blob/master/postcodeinfo/apps/postcode_api/serializers.py#L25)
 
 Example response:
 
