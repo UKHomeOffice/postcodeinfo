@@ -256,7 +256,7 @@ This method returns a lon/lat point for the centre of the specified postcode are
 You can also perform partial postcode lookups using the partial/ endpoint:
 
 ```
-http://127.0.0.1:8000/postcodes/partial/sw1a1aa/
+http://127.0.0.1:8000/postcodes/partial/sw1a/
 ```
 
 Example response:
