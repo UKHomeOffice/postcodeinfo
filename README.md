@@ -2,6 +2,8 @@
 
 [![Code Climate](https://codeclimate.com/github/ministryofjustice/postcodeinfo/badges/gpa.svg)](https://codeclimate.com/github/ministryofjustice/postcodeinfo)
 
+*Deprecated*: Please do not use this for new MoJ projects. The recommendation is to use [OS Places](https://developer.ordnancesurvey.co.uk/os-places-api) unless it unless it explicitly doesn't support the thing we want (and, even then, consider if that's necessary). Contact the cloud platform team to find out how to access our MoJ account.
+
 
 REST API for UK Postcode information 
 ====================================
