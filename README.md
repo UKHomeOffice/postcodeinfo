@@ -7,7 +7,7 @@
 
 REST API for UK Postcode information 
 ====================================
-Postcode lookup RESTful API service. 
+Postcode lookup RESTful API service.
 
 Data is taken from:
 * [Ordnance Survey AddressBase Basic](http://www.ordnancesurvey.co.uk/business-and-government/products/addressbase.html)
