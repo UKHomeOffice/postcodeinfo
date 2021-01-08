@@ -10,7 +10,7 @@ steps:
   commands:
     #- /bin/bash ./scripts/test.sh
   when:
-    branch: [master, development]
+    branch: [master, development, feature *]
     event: push
 
 - name: build-image
@@ -24,7 +24,7 @@ steps:
     - name: gunicorn
       path: /var/log/gunicorn
   when:
-    branch: [master, development]
+    branch: [master, development, feature *]
     event: push
 
 - name: create-artefact
@@ -40,7 +40,7 @@ steps:
     - name: dockersock
       path: /var/run
   when:
-    branch: [ master, development ]
+    branch: [ master, development, feature *]
     event: push
 
 - name: deploy-to-dev
