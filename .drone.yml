@@ -1,0 +1,54 @@
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+- name: test
+  image: python
+  commands:
+    - #TODO double check dependencies needed to run this.
+    - /bin/bash ./scripts/test.sh
+  when:
+    branch: [master, development]
+    event: push
+
+- name: build-image
+  image: phusion/baseimage:0.9.16
+  commands:
+    - n=0; while [ "$n" -lt 60 ] && [ ! -e /var/run/docker.sock ]; do n=$(( n + 1 )); sleep 1; done
+    - docker build -t postcode-$${DRONE_COMMIT_SHA} . #TODO Check this
+  volumes:
+    - name: nginx
+      path: /var/log/nginx
+    - name: gunicorn
+      path: /var/log/gunicorn
+  when:
+    branch: [master, development]
+    event: push
+
+- name: deploy-to-dev
+  image: phusion/baseimage:0.9.16
+  commands:
+  -
+  environment:
+    KUBE_NAMESPACE: postcodeinfo-dev #TODO need to put in kube folder
+    KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
+    KUBE_TOKEN_POSTCODEINFO_ACP_NOTPROD:
+      from_secret: kube_token_postcodeinfo_acp_notprod    #TODO Need to check this
+  when:
+    branch: master
+    event: push
+
+- name: deploy-to-prod
+  image: phusion/baseimage:0.9.16
+  commands:
+  -
+  environment:
+    KUBE_NAMESPACE: postcodeinfo #TODO need to put in kube folder
+    KUBE_SERVER: https://kube-api-prod.prod.acp.homeoffice.gov.uk
+    KUBE_TOKEN_POSTCODEINFO_ACP_PROD:
+      from_secret: kube_token_postcodeinfo_acp_prod   #TODO Need to check this
+  when:
+    event: promote
+    target: PROD
