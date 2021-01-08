@@ -3,12 +3,12 @@ kind: pipeline
 type: kubernetes
 name: default
 
+
 steps:
 - name: test
   image: python
   commands:
-    - #TODO double check dependencies needed to run this.
-    - /bin/bash ./scripts/test.sh
+    #- /bin/bash ./scripts/test.sh
   when:
     branch: [master, development]
     event: push
