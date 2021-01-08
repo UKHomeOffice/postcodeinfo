@@ -17,7 +17,7 @@ steps:
   image: phusion/baseimage:0.9.16
   commands:
     - n=0; while [ "$n" -lt 60 ] && [ ! -e /var/run/docker.sock ]; do n=$(( n + 1 )); sleep 1; done
-    - docker build -t postcode-$${DRONE_COMMIT_SHA} . #TODO Check this
+    - docker build -t hof/postcode:$${DRONE_COMMIT_SHA} . #TODO Check this
   volumes:
     - name: nginx
       path: /var/log/nginx
@@ -25,6 +25,22 @@ steps:
       path: /var/log/gunicorn
   when:
     branch: [master, development]
+    event: push
+
+- name: create-artefact
+  image: docker:dind
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+  commands:
+    - docker login -u="ukhomeofficedigital+sas_fbis_robot" -p=$${DOCKER_PASSWORD} quay.io
+    - docker tag hof/postcodeinfo:${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/postcodeinfo:${DRONE_COMMIT_SHA}
+    - docker push quay.io/ukhomeofficedigital/postcodeinfo:${DRONE_COMMIT_SHA}
+  volumes:
+    - name: dockersock
+      path: /var/run
+  when:
+    branch: [ master, development ]
     event: push
 
 - name: deploy-to-dev
@@ -52,3 +68,16 @@ steps:
   when:
     event: promote
     target: PROD
+
+services:
+  - name: docker
+    image: docker:dind
+    volumes:
+      - name: dockersock
+        path: /var/run
+
+volumes:
+  - name: dockersock
+    temp: {}
+
+...
