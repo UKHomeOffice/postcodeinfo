@@ -17,7 +17,7 @@ steps:
   image: phusion/baseimage:0.9.16
   commands:
     - n=0; while [ "$n" -lt 60 ] && [ ! -e /var/run/docker.sock ]; do n=$(( n + 1 )); sleep 1; done
-    - docker build -t hof/postcode:$${DRONE_COMMIT_SHA} .
+    - docker build -t hof/postcodeinfo:$${DRONE_COMMIT_SHA} .
   volumes:
     - name: nginx
       path: /var/log/nginx
