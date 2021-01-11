@@ -46,7 +46,7 @@ steps:
     event: push
 
 - name: deploy-to-dev
-  image: phusion/baseimage:0.9.16
+  image: docker:dind
   commands:
   -
   environment:
@@ -59,7 +59,7 @@ steps:
     event: push
 
 - name: deploy-to-prod
-  image: phusion/baseimage:0.9.16
+  image: docker:dind
   commands:
   -
   environment:
