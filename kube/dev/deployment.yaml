@@ -88,15 +88,6 @@ spec:
             runAsNonRoot: true
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          volumeMounts:
-            - mountPath: /public
-              name: public
-      volumes:
-        - name: public
-          emptyDir: {}
-        - name: configmap
-          configMap:
-            name: configmap
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
