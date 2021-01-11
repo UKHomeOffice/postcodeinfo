@@ -10,6 +10,7 @@ html5lib==0.99999
 isodate==0.5.1
 logstash-python-formatter==0.1.2
 python-logstash==0.4.6
+logstash_formatter==0.5.17
 mock==1.0.1
 numpy==1.8.2
 psycopg2==2.7.5
