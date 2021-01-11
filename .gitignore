@@ -8,4 +8,5 @@ venv
 .coverage
 htmlcov
 postcodeinfo/static
+.idea*
 

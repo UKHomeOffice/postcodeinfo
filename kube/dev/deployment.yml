@@ -1,0 +1,105 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: null
+  generation: 1
+  labels:
+    name: pci
+    service: pci
+  name: pci
+  selfLink: /apis/apps/v1/namespaces/postcodeinfo/deployments/pci
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: pci
+      service: pci
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: pci
+        service: pci
+    spec:
+      containers:
+        - args:
+            - ./run.sh
+          command:
+            - sh
+          envFrom:
+            - configMapRef:
+                name: pci-configmap
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: postcodeinfo-rds
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: postcodeinfo-rds
+            - name: DJANGO_DEBUG
+              value: "True"
+            - name: DJANGO_ALLOWED_HOSTS
+              value: '[''*'']'
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: default_db
+                  name: postcodeinfo-rds
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: endpoint
+                  name: postcodeinfo-rds
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: postcodeinfo-rds
+          image: quay.io/ukhomeofficedigital/postcodeinfo:${DRONE_COMMIT_SHA}
+          imagePullPolicy: Always
+          name: pci
+          ports:
+            - containerPort: 10080
+              protocol: TCP
+            - containerPort: 10443
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 600m
+              memory: 512Mi
+            requests:
+              cpu: 60m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /public
+              name: public
+      volumes:
+        - name: public
+          emptyDir: {}
+        - name: configmap
+          configMap:
+            name: configmap
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}
