@@ -4,11 +4,10 @@ kind: Deployment
 metadata:
   annotations:
     deployment.kubernetes.io/revision: "1"
-  generation: 1
+  name: pci
   labels:
     name: pci
     service: pci
-  name: pci
 spec:
   replicas: 1
   selector:
@@ -17,7 +16,6 @@ spec:
       service: pci
   template:
     metadata:
-      creationTimestamp: null
       labels:
         name: pci
         service: pci
