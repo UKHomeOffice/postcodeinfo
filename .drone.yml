@@ -46,7 +46,7 @@ steps:
     event: push
 
 - name: deploy-to-dev
-  image: docker:dind
+  image: quay.io/ukhomeofficedigital/kd:v1.14.0
   commands:
     - export KUBE_TOKEN=$${KUBE_TOKEN_PCI}
     - kd --insecure-skip-tls-verify -f kube/dev/ingress-internal.yaml -f kube/networkpolicy-internal.yaml
