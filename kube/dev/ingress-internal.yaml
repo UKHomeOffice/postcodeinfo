@@ -1,33 +1,27 @@
 ---
-apiVersion: v1
-items:
-  - apiVersion: extensions/v1beta1
-    kind: Ingress
-    metadata:
-      annotations:
-        cert-manager.io/enabled: "true"
-        ingress.kubernetes.io/backend-protocol: HTTP
-        ingress.kubernetes.io/secure-backends: "true"
-        kubernetes.io/ingress.class: "nginx-internal"
-      generation: 1
-      name: ingress
-      namespace: postcodeinfo-dev
-      resourceVersion: "1075748951"
-      selfLink: /apis/extensions/v1beta1/namespaces/postcodeinfo-dev/ingresses/ingress
-    spec:
-      rules:
-        - host: www.postcodeinfo-notprod.homeoffice.gov.uk
-          http:
-            paths:
-              - backend:
-                  serviceName: pci
-                  servicePort: 10080
-                path: /
-      tls:
-        - hosts:
-            - www.postcodeinfo-notprod.homeoffice.gov.uk
-          secretName: cert
-kind: List
+apiVersion: extensions/v1beta1
+kind: Ingress
 metadata:
-  resourceVersion: ""
-  selfLink: ""
+  name: ingress
+  namespace: postcodeinfo-dev
+  labels:
+    cert-manager.io/solver: route53
+  annotations:
+    cert-manager.io/enabled: "true"
+    kubernetes.io/ingress.class: "nginx-internal"
+    ingress.kubernetes.io/backend-protocol: HTTP
+    ingress.kubernetes.io/secure-backends: "true"
+  generation: 1
+spec:
+  rules:
+    - host: www.postcodeinfo-notprod.homeoffice.gov.uk
+      http:
+        paths:
+          - backend:
+              serviceName: pci
+              servicePort: 10080
+            path: /
+  tls:
+    - hosts:
+        - www.postcodeinfo-notprod.homeoffice.gov.uk
+      secretName: cert
