@@ -4,26 +4,17 @@ kind: Deployment
 metadata:
   annotations:
     deployment.kubernetes.io/revision: "1"
-  creationTimestamp: null
   generation: 1
   labels:
     name: pci
     service: pci
   name: pci
-  selfLink: /apis/apps/v1/namespaces/postcodeinfo/deployments/pci
 spec:
-  progressDeadlineSeconds: 600
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       name: pci
       service: pci
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
   template:
     metadata:
       creationTimestamp: null
