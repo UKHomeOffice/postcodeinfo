@@ -48,13 +48,13 @@ steps:
 - name: deploy-to-dev
   image: quay.io/ukhomeofficedigital/kd:v1.14.0
   commands:
-    - export KUBE_TOKEN=$${KUBE_TOKEN_PCI}
+    - export KUBE_TOKEN=$${KUBE_TOKEN_NOTPROD}
     - kd --insecure-skip-tls-verify -f kube/dev/ingress-internal.yaml -f kube/networkpolicy-internal.yaml
     - kd --insecure-skip-tls-verify --timeout 4m --check-interval 10s -f kube/dev/deployment.yaml
   environment:
     KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
-    KUBE_TOKEN_PCI:
-      from_secret: kube_token_postcodeinfo_acp_notprod
+    KUBE_TOKEN_NOTPROD:
+      from_secret: kube_token_notprod
   when:
     branch: [ master, development, feature/*]
     event: push
@@ -66,7 +66,7 @@ steps:
   environment:
     KUBE_NAMESPACE: postcodeinfo
     KUBE_SERVER: https://kube-api-prod.prod.acp.homeoffice.gov.uk
-    KUBE_TOKEN_POSTCODEINFO_ACP_PROD:
+    KUBE_TOKEN_PROD:
       from_secret: kube_token_postcodeinfo_acp_prod
   when:
     event: promote
