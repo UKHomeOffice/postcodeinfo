@@ -4,10 +4,6 @@ items:
 - apiVersion: networking.k8s.io/v1
   kind: NetworkPolicy
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"acp-deny-all","namespace":"postcodeinfo-dev"},"spec":{"podSelector":{}}}
-    generation: 1
     name: acp-deny-all
     namespace: postcodeinfo-dev
   spec:
@@ -18,7 +14,6 @@ items:
 - apiVersion: networking.k8s.io/v1
   kind: NetworkPolicy
   metadata:
-    generation: 1
     name: pci-allow-ingress
     namespace: postcodeinfo-dev
   spec:
