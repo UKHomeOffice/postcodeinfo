@@ -42,12 +42,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: postcodeinfo-rds
+                  name: postcodeinfodev
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: username
-                  name: postcodeinfo-rds
+                  name: postcodeinfodev
             - name: DJANGO_DEBUG
               value: "True"
             - name: DJANGO_ALLOWED_HOSTS
@@ -56,17 +56,17 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: default_db
-                  name: postcodeinfo-rds
+                  name: postcodeinfodev
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
                   key: endpoint
-                  name: postcodeinfo-rds
+                  name: postcodeinfodev
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
-                  name: postcodeinfo-rds
+                  name: postcodeinfodev
           resources:
             limits:
               cpu: "600m"
