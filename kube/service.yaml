@@ -9,7 +9,7 @@ items:
         name: pci
         role: service
       name: pci
-      namespace: postcodeinfo
+      namespace: postcodeinfo-dev
       resourceVersion: "139155693"
     spec:
       type: ClusterIP
