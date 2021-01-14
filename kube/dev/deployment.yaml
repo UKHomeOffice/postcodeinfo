@@ -8,18 +8,15 @@ metadata:
   labels:
     name: pci
     service: pci
-    app: pci
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: pci
-      app: pci
   template:
     metadata:
       labels:
         name: pci
-        app: pci
         service: pci
     spec:
       containers:
