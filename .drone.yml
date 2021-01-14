@@ -49,7 +49,7 @@ steps:
   image: quay.io/ukhomeofficedigital/kd:v1.14.0
   commands:
     - export KUBE_TOKEN=$${KUBE_TOKEN_NOTPROD}
-    - kd --insecure-skip-tls-verify -f kube/dev/configmap.yaml -f kube/dev/ingress-internal.yaml -f kube/networkpolicy-internal.yaml -f kube/service.yaml
+    - kd --insecure-skip-tls-verify -f kube/dev/configmaps.yaml -f kube/dev/ingress-internal.yaml -f kube/networkpolicy-internal.yaml -f kube/service.yaml
     - kd --insecure-skip-tls-verify --timeout 4m --check-interval 10s -f kube/dev/deployment.yaml
   environment:
     KUBE_NAMESPACE: pci-dev
