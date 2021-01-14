@@ -38,8 +38,8 @@ spec:
           command:
             - sh
           envFrom:
-            - configMapRef:
-                name: pci-configmap
+          - configMapRef:
+              name: pci-configmap
           env:
             - name: DB_PASSWORD
               valueFrom:
