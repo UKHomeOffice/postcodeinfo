@@ -16,7 +16,6 @@ items:
       selector:
         app: pci
         name: pci
-      clusterIP: 10.10.5.30
       ports:
         - name: http
           port: 10080
