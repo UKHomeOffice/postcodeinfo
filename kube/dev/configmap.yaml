@@ -18,4 +18,4 @@ data:
   DB_USERNAME: "postcodeinfo"
   DB_PASSWORD: "postcodeinfo"
   DB_HOST: postgres
-  DB_PORT: 5432
+  DB_PORT: "5432"
