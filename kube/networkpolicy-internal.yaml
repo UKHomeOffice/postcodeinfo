@@ -4,16 +4,6 @@ items:
 - apiVersion: networking.k8s.io/v1
   kind: NetworkPolicy
   metadata:
-    name: acp-deny-all
-    namespace: postcodeinfo-dev
-  spec:
-    podSelector: {}
-    policyTypes:
-      - Ingress
-
-- apiVersion: networking.k8s.io/v1
-  kind: NetworkPolicy
-  metadata:
     name: pci-allow-ingress
     namespace: postcodeinfo-dev
   spec:
