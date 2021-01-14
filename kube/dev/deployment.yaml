@@ -30,10 +30,6 @@ spec:
               protocol: TCP
             - containerPort: 10443
               protocol: TCP
-          args:
-            - ./run.sh
-          command:
-            - sh
           envFrom:
           - configMapRef:
               name: pci-configmap
