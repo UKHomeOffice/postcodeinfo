@@ -42,7 +42,7 @@ steps:
     - name: dockersock
       path: /var/run
   when:
-    branch: [ master, development, feature/*]
+    branch: [ master, development, feature/* ]
     event: push
 
 - name: deploy-to-dev
@@ -57,7 +57,7 @@ steps:
     KUBE_TOKEN_NOTPROD:
       from_secret: kube_token_notprod
   when:
-    branch: [master, development, feature/*]
+    branch: [ master, development, feature/* ]
     event: push
 
 - name: deploy-to-prod

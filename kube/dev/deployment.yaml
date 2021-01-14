@@ -3,13 +3,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    downscaler/uptime: Mon-Fri 07:00-21:00 Europe/London
+    deployment.kubernetes.io/revision: "1"
   name: pci
+  labels:
+    name: pci
+    service: pci
+    app: pci
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: pci
+      app: pci
   template:
     metadata:
       labels:
@@ -19,7 +24,7 @@ spec:
     spec:
       containers:
         - name: pci
-          image: quay.io/ukhomeofficedigital/postcodeinfo:${DRONE_COMMIT_SHA}
+          image: quay.io/ukhomeofficedigital/postcodeinfo:{{.DRONE_COMMIT_SHA}}
           imagePullPolicy: Always
           securityContext:
             runAsNonRoot: true

@@ -5,12 +5,17 @@ items:
     kind: Service
     metadata:
       labels:
+        app: pci
         name: pci
         role: service
       name: pci
       namespace: postcodeinfo
       resourceVersion: "139155693"
     spec:
+      type: ClusterIP
+      selector:
+        app: pci
+        name: pci
       clusterIP: 10.10.5.30
       ports:
         - name: http
@@ -21,10 +26,7 @@ items:
           port: 10443
           protocol: TCP
           targetPort: 10443
-      selector:
-        name: pci
       sessionAffinity: None
-      type: ClusterIP
     status:
       loadBalancer: {}
 kind: List

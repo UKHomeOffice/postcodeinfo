@@ -11,11 +11,11 @@ data:
   NODE_ENV: "development"
   DJANGO_DEBUG: true
   DJANGO_ALLOWED_HOSTS: 127.0.0.1
-  SECRET_KEY: tfZmYFM7KWWbSujx2F4WZyYAIcUrQRZp
+  SECRET_KEY: "tfZmYFM7KWWbSujx2F4WZyYAIcUrQRZp"
   OS_FTP_USERNAME: anonymous
   OS_FTP_PASSWORD: anonymous@
   DB_NAME: postcodeinfo
-  DB_USERNAME: postcodeinfo
-  DB_PASSWORD: postcodeinfo
+  DB_USERNAME: "postcodeinfo"
+  DB_PASSWORD: "postcodeinfo"
   DB_HOST: postgres
   DB_PORT: 5432
