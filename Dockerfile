@@ -1,8 +1,5 @@
 FROM phusion/baseimage:0.9.16
 
-# Make a new user
-RUN adduser pci
-
 # Dependencies
 RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && \
   sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'   &&\
@@ -66,10 +63,7 @@ EXPOSE 80
 # Slim down the image
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+#USER www-data
+
 # Use baseimage-docker's init process.
-#CMD ["/sbin/my_init"]
-USER www-data
-
 CMD ["/sbin/my_init"]
-
-#CMD ["/sbin/my_init","--", "setuser", "pci", "bash"]
