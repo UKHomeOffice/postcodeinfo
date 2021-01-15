@@ -68,4 +68,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Use baseimage-docker's init process.
 #CMD ["/sbin/my_init"]
-CMD ["/sbin/my_init","--", "setuser", "pci", "bash"]
+USER www-data
+
+CMD ["/sbin/my_init"]
+
+#CMD ["/sbin/my_init","--", "setuser", "pci", "bash"]
