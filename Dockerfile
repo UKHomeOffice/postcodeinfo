@@ -11,8 +11,6 @@ RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && \
   libgdal-dev python-gdal ncurses-dev postgresql-9.5 \
   nginx-full git-core
 
-# Postgresql changed from postgresql-9.4-postgis-scripts to postgresql-9.5
-
 # Due to an ubuntu bug (#1306991) we can't use the ubuntu provided pip package, so we're using
 # the recommended way: http://pip.readthedocs.org/en/latest/installing.html#install-pip
 RUN curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | python2.7
@@ -63,7 +61,8 @@ EXPOSE 80
 # Slim down the image
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-#USER www-data
+# Switched user to www-data
+USER www-data
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
