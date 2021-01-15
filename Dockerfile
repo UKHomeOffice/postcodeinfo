@@ -1,5 +1,8 @@
 FROM phusion/baseimage:0.9.16
 
+# Make a new user
+RUN adduser user
+
 # Dependencies
 RUN DEBIAN_FRONTEND='noninteractive' add-apt-repository ppa:nginx/stable && \
   sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'   &&\
@@ -64,4 +67,4 @@ EXPOSE 80
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Use baseimage-docker's init process.
-CMD ["/sbin/my_init"]
+CMD ["su", "-", "user", "-c", "/sbin/my_init"]
